@@ -1,17 +1,14 @@
 from __future__ import annotations
 
+import ast
 import inspect
 import logging
-import ast
-import types
-from pyclbr import Function
-import sys
 import textwrap
+from pyclbr import Function
 from typing import Any, Callable
-import gc  # garbage collector
 
-import pint
 import astor
+import pint
 from pitot import Q_
 
 ReturnQuantity = Callable[..., pint.Quantity[Any]]
@@ -38,6 +35,12 @@ def get_full_class_name(obj):
     return module + "." + obj.__class__.__name__
 
 
+def raise_dim_error(e, received, expected):
+    exception = str(get_full_class_name(e)) + f'("{received}", "{expected}")'
+    new_node = AstRaise().get_node(exception)
+    return new_node
+
+
 class Visitor(ast.NodeTransformer):
     def __init__(self, fun_globals) -> None:
         self.fun_globals = fun_globals
@@ -54,7 +57,7 @@ class Visitor(ast.NodeTransformer):
 
         if isinstance(node.func, ast.Name):
 
-            if __builtins__[node.func.id]:
+            if node.func.id in __builtins__.keys():
                 return node
 
             signature = inspect.signature(self.fun_globals[node.func.id])
@@ -63,18 +66,12 @@ class Visitor(ast.NodeTransformer):
                 if (received := self.vars[node.args[i].id]) != (
                     expected := value.annotation
                 ):
-                    print(
-                        f"WARNING : unit '{received}' is different than '{expected}'"
-                    )
                     try:
                         conv_value = Q_(str(received)).to(str(expected)).m
                     except pint.errors.DimensionalityError as e:
-                        exception = (
-                            str(get_full_class_name(e))
-                            + f'("{received}", "{expected}")'
-                        )
-                        new_node = AstRaise().get_node(exception)
-                        return new_node
+                        raise_node = raise_dim_error(e, received, expected)
+                        ast.copy_location(raise_node, node)
+                        return raise_node
 
                     new_arg = ast.BinOp(
                         node.args[i],
@@ -84,40 +81,36 @@ class Visitor(ast.NodeTransformer):
                     new_args.append(new_arg)
 
             if new_args:
-                newnode = ast.Call(
+                new_node = ast.Call(
                     func=node.func,
                     args=new_args,
                     keywords=node.keywords,
                 )
-                ast.copy_location(newnode, node)
-                ast.fix_missing_locations(newnode)
+                ast.copy_location(new_node, node)
+                ast.fix_missing_locations(new_node)
 
-                return newnode
+                return new_node
 
         return node
 
     def visit_AnnAssign(self, node: ast.AnnAssign) -> Any:
+
         if isinstance(node.value, ast.Call):
             # TODO : Check if annotation = return annotation of func
             self.vars[node.target.id] = inspect.signature(
                 self.fun_globals[node.value.func.value.id]
             ).return_annotation
+
         elif isinstance(node.value, ast.Name):
             if (received := self.vars[node.value.id]) != (
                 expected := node.annotation.value
             ):
-                print(
-                    f"WARNING : unit '{received}' is different than '{expected}'"
-                )
                 try:
                     conv_value = Q_(str(received)).to(str(expected)).m
                 except pint.errors.DimensionalityError as e:
-                    exception = (
-                        str(get_full_class_name(e))
-                        + f'("{received}", "{expected}")'
-                    )
-                    new_node = AstRaise().get_node(exception)
-                    return new_node
+                    raise_node = raise_dim_error(e, received, expected)
+                    ast.copy_location(raise_node, node)
+                    return raise_node
 
                 new_value = ast.BinOp(
                     node.value,
@@ -176,6 +169,7 @@ def check_units(fun: Function) -> Function:
         new_fun (function): new function based on input function with eventually modified
         code to keep unit coherence.
     """
+
     fun_tree = ast.parse(
         textwrap.dedent(inspect.getsource(fun))  # dedent for nested methods
     )  # get the function AST
@@ -188,10 +182,16 @@ def check_units(fun: Function) -> Function:
     exec(f_str[f_str.find("\n") + 1 :], fun.__globals__, locals())
 
     new_fun = locals()[fun.__name__]
-    code = new_fun.__code__
-    code.replace(co_filename="patate")
-    new_fun.__code__ = new_fun.__code__.replace(
-        co_filename=fun.__code__.co_filename,
-        co_firstlineno=fun.__code__.co_firstlineno,
-    )  # Big mess without it, especially on pytest
-    return new_fun
+
+    co_consts = new_fun.__code__.co_consts
+    for const in fun.__code__.co_consts:
+        if const not in co_consts:
+            co_consts = co_consts + (const,)
+    cocode = new_fun.__code__.co_code
+
+    fun.__code__ = fun.__code__.replace(
+        co_code=cocode,
+        co_consts=co_consts,
+    )
+
+    return fun
