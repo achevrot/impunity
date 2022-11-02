@@ -29,7 +29,9 @@ def test_different_units():
 
         alt_m: "m" = 1000
         alt_ft: "ft" = alt_m
-        assert alt_m != alt_ft
+        print(alt_ft)
+        assert alt_m == 1000
+        assert alt_ft == pytest.approx(3280.84, rel=1e-2)
 
     test_different_units()
 
@@ -46,7 +48,7 @@ def test_wrong_units():
 
 
 def main():
-    test_wrong_units()
+    test_different_units()
 
 
 if __name__ == "__main__":

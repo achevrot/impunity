@@ -3,6 +3,7 @@ from __future__ import annotations
 import inspect
 import logging
 import ast
+import types
 from pyclbr import Function
 import sys
 import textwrap
@@ -52,6 +53,10 @@ class Visitor(ast.NodeTransformer):
     def visit_Call(self, node: ast.Call) -> Any:
 
         if isinstance(node.func, ast.Name):
+
+            if __builtins__[node.func.id]:
+                return node
+
             signature = inspect.signature(self.fun_globals[node.func.id])
             new_args = []
             for i, (_, value) in enumerate(signature.parameters.items()):
@@ -97,6 +102,36 @@ class Visitor(ast.NodeTransformer):
             self.vars[node.target.id] = inspect.signature(
                 self.fun_globals[node.value.func.value.id]
             ).return_annotation
+        elif isinstance(node.value, ast.Name):
+            if (received := self.vars[node.value.id]) != (
+                expected := node.annotation.value
+            ):
+                print(
+                    f"WARNING : unit '{received}' is different than '{expected}'"
+                )
+                try:
+                    conv_value = Q_(str(received)).to(str(expected)).m
+                except pint.errors.DimensionalityError as e:
+                    exception = (
+                        str(get_full_class_name(e))
+                        + f'("{received}", "{expected}")'
+                    )
+                    new_node = AstRaise().get_node(exception)
+                    return new_node
+
+                new_value = ast.BinOp(
+                    node.value,
+                    ast.Mult(),
+                    ast.Constant(conv_value),
+                )
+
+                return ast.AnnAssign(
+                    target=node.target,
+                    annotation=node.annotation,
+                    value=new_value,
+                    simple=node.simple,
+                )
+
         else:
             try:
                 self.vars[node.target.id] = node.annotation.value
