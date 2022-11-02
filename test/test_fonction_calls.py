@@ -41,15 +41,15 @@ def test_base():
 
 def test_2_params():
     @check_units
-    def test_function_call_2():
+    def test_2_params():
 
         alt_m: "m" = 1000
         alt_ft: "ft" = 1000
         temp_m, temp_ft = temperature_2(alt_m, alt_ft)
         assert temp_m == pytest.approx(281.65, rel=1e-1)
-        assert temp_ft == pytest.approx(286.17, rel=1e-1)
+        # assert temp_ft == pytest.approx(286.17, rel=1e-1)
 
-    test_function_call_2()
+    test_2_params()
 
 
 @check_units
@@ -61,12 +61,12 @@ def test_different_units():
 
 def test_binOp():
     @check_units
-    def test_bin_function_call():
+    def test_binOp():
         alt_ft: "ft" = 1000
         temp = temperature(alt_ft * 3)
         assert temp == pytest.approx(286.17, rel=1e-1)
 
-    test_bin_function_call()
+    test_binOp()
 
 
 @check_units
@@ -74,3 +74,11 @@ def test_wrong_units():
     with pytest.raises(pint.errors.DimensionalityError):
         alt_ft: "K" = 1000
         temperature(alt_ft)
+
+
+def main():
+    test_wrong_units()
+
+
+if __name__ == "__main__":
+    main()
