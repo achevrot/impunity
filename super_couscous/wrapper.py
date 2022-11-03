@@ -6,6 +6,7 @@ import logging
 import textwrap
 from pyclbr import Function
 from typing import Any, Callable
+from .QuantityNode import QuantityNode
 
 import astor
 import pint
@@ -49,9 +50,67 @@ class Visitor(ast.NodeTransformer):
         self.vars = {}
         self.calls = {}
         # TODO : put
-
         self.generic_visit(node)
         return node
+
+    def get_node_unit(self, node: ast.AST) -> QuantityNode:
+        """Method to induce the unit of a node through recursive calls on children if any.
+
+        Args:
+            node (ast.AST): input node
+
+        Returns:
+            QuantityNode: QuantityNode(node, induced_unit)
+        """
+
+        if isinstance(node, ast.Constant):
+            return QuantityNode(node, "dimensionless")
+        elif isinstance(node, ast.Tuple):
+            return tuple(map(self.get_node_unit, node.elts))
+        elif isinstance(node, ast.List):
+            return list(map(self.get_node_unit, node.elts))
+        elif isinstance(node, ast.Set):
+            return set(map(self.get_node_unit, node.elts))
+        elif isinstance(node, ast.Dict):
+            return dict(
+                zip(
+                    map(self.get_node_unit, node.keys),
+                    map(self.get_node_unit, node.values),
+                )
+            )
+        elif isinstance(node, ast.Name):
+            return QuantityNode(node, self.vars[node.id])
+
+        elif isinstance(node, ast.BinOp) and isinstance(
+            node.op, (ast.Add, ast.Sub)
+        ):
+            left = self.get_node_unit(node.left)
+            right = self.get_node_unit(node.right)
+
+            try:
+                conv_value = Q_(right.unit).to(left.unit).m
+            except pint.errors.DimensionalityError as e:
+                raise_node = raise_dim_error(e, right.unit, left.unit)
+                ast.copy_location(raise_node, node)
+                return raise_node
+
+            return QuantityNode(
+                ast.BinOp(
+                    left.node,
+                    node.op,
+                    ast.BinOp(right.node, ast.Mult(), ast.Constant(conv_value)),
+                ),
+                left.unit,
+            )
+
+        elif isinstance(node, ast.BinOp) and isinstance(
+            node.op, (ast.Mult, ast.Div)
+        ):
+            # TODO
+            pass
+
+        else:
+            return QuantityNode(node, None)
 
     def visit_Call(self, node: ast.Call) -> Any:
 
@@ -134,6 +193,9 @@ class Visitor(ast.NodeTransformer):
         self.generic_visit(node)
         return node
 
+    def visit_BinOp(self, node: ast.BinOp) -> Any:
+        return self.get_node_unit(node).node
+
     def visit_Assign(self, node: ast.Assign) -> Any:
         if isinstance(node.value, ast.Call):
             for target in node.targets:
@@ -143,20 +205,6 @@ class Visitor(ast.NodeTransformer):
 
         self.generic_visit(node)
         return node
-
-
-def has_quantity(node: ast.FunctionDef) -> bool:
-
-    return_value = node.returns
-    args = node.args
-
-    if isinstance(node.returns, ast.Attribute):
-        if node.returns.attr == "Quantity":
-            return True
-    elif isinstance(node.returns, ast.Subscript):
-        return False
-
-    return True
 
 
 def check_units(fun: Function) -> Function:

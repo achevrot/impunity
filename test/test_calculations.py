@@ -19,3 +19,27 @@ def test_mixed_units():
         assert result == pytest.approx(209.22, rel=1e-2)
 
     test_mixed_units()
+
+
+def test_add_operation():
+    @check_units
+    def test_operation():
+        alt_m: "m" = 1000
+        alt_ft: "ft" = 2000
+        alt_m2: "m" = 3000
+        result: "m" = alt_m + alt_ft + alt_m2
+        assert result == pytest.approx(4609.6, rel=1e-2)
+
+    test_operation()
+
+
+def test_list_operation():
+    @check_units
+    def test_operation():
+        alt_m: "m" = 1000
+        alt_ft: "ft" = 2000
+        alt_m2: "m" = 3000
+        _, result_2 = (alt_m + alt_ft + alt_m2, alt_m + alt_ft + alt_m2)
+        assert result_2 == pytest.approx(4609.6, rel=1e-2)
+
+    test_operation()
