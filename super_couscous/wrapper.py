@@ -29,15 +29,10 @@ class AstRaise(ast.NodeTransformer):
         self.exception = node
 
 
-def get_full_class_name(obj):
-    module = obj.__class__.__module__
-    if module is None or module == str.__class__.__module__:
-        return obj.__class__.__name__
-    return module + "." + obj.__class__.__name__
-
-
 def raise_dim_error(e, received, expected):
-    exception = str(get_full_class_name(e)) + f'("{received}", "{expected}")'
+    exception = (
+        e.__module__ + "." + e.__qualname__ + f'("{received}", "{expected}")'
+    )
     new_node = AstRaise().get_node(exception)
     return new_node
 
@@ -87,26 +82,54 @@ class Visitor(ast.NodeTransformer):
             left = self.get_node_unit(node.left)
             right = self.get_node_unit(node.right)
 
-            try:
-                conv_value = Q_(right.unit).to(left.unit).m
-            except pint.errors.DimensionalityError as e:
-                raise_node = raise_dim_error(e, right.unit, left.unit)
-                ast.copy_location(raise_node, node)
-                return raise_node
-
-            return QuantityNode(
-                ast.BinOp(
+            if pint.Unit(left.unit).is_compatible_with(pint.Unit(right.unit)):
+                conv_value = pint.Unit(left.unit).from_(pint.Unit(right.unit)).m
+                new_node = ast.BinOp(
                     left.node,
                     node.op,
                     ast.BinOp(right.node, ast.Mult(), ast.Constant(conv_value)),
-                ),
-                left.unit,
-            )
+                )
+                ast.copy_location(new_node, node)
+                return QuantityNode(new_node, left.unit)
+
+            else:
+                raise_node = raise_dim_error(
+                    pint.errors.DimensionalityError, right.unit, left.unit
+                )
+                ast.copy_location(raise_node, node)
+                return raise_node
 
         elif isinstance(node, ast.BinOp) and isinstance(
             node.op, (ast.Mult, ast.Div)
         ):
-            # TODO
+            left = self.get_node_unit(node.left)
+            right = self.get_node_unit(node.right)
+
+            if pint.Unit(left.unit).is_compatible_with(pint.Unit(right.unit)):
+                conv_value = pint.Unit(left.unit).from_(pint.Unit(right.unit)).m
+                new_node = ast.BinOp(
+                    left.node,
+                    node.op,
+                    ast.BinOp(right.node, ast.Mult(), ast.Constant(conv_value)),
+                )
+                ast.copy_location(new_node, node)
+                unit = (
+                    f"{left.unit}*{left.unit}"
+                    if isinstance(node.op, ast.Mult)
+                    else "dimensionless"
+                )
+                return QuantityNode(new_node, unit)
+            else:
+                new_node = ast.BinOp(left.node, node.op, right.node)
+                ast.copy_location(new_node, node)
+                unit = (
+                    f"{left.unit}*{right.unit}"
+                    if isinstance(node.op, ast.Mult)
+                    else f"{left.unit}/{right.unit}"
+                )
+                return QuantityNode(new_node, unit)
+
+        elif isinstance(node, ast.Call):
             pass
 
         else:
@@ -122,13 +145,19 @@ class Visitor(ast.NodeTransformer):
             signature = inspect.signature(self.fun_globals[node.func.id])
             new_args = []
             for i, (_, value) in enumerate(signature.parameters.items()):
-                if (received := self.vars[node.args[i].id]) != (
+                if (received := self.get_node_unit(node.args[i]).unit) != (
                     expected := value.annotation
                 ):
-                    try:
-                        conv_value = Q_(str(received)).to(str(expected)).m
-                    except pint.errors.DimensionalityError as e:
-                        raise_node = raise_dim_error(e, received, expected)
+                    if pint.Unit(received).is_compatible_with(
+                        pint.Unit(expected)
+                    ):
+                        conv_value = (
+                            pint.Unit(expected).from_(pint.Unit(received)).m
+                        )
+                    else:
+                        raise_node = raise_dim_error(
+                            pint.errors.DimensionalityError, received, expected
+                        )
                         ast.copy_location(raise_node, node)
                         return raise_node
 
@@ -164,10 +193,14 @@ class Visitor(ast.NodeTransformer):
             if (received := self.vars[node.value.id]) != (
                 expected := node.annotation.value
             ):
-                try:
-                    conv_value = Q_(str(received)).to(str(expected)).m
-                except pint.errors.DimensionalityError as e:
-                    raise_node = raise_dim_error(e, received, expected)
+                if pint.Unit(received).is_compatible_with(pint.Unit(expected)):
+                    conv_value = (
+                        pint.Unit(expected).from_(pint.Unit(received)).m
+                    )
+                else:
+                    raise_node = raise_dim_error(
+                        pint.errors.DimensionalityError, received, expected
+                    )
                     ast.copy_location(raise_node, node)
                     return raise_node
 
@@ -199,9 +232,19 @@ class Visitor(ast.NodeTransformer):
     def visit_Assign(self, node: ast.Assign) -> Any:
         if isinstance(node.value, ast.Call):
             for target in node.targets:
-                self.vars[target.id] = inspect.signature(
-                    self.fun_globals[node.value.func.id]
-                ).return_annotation
+                if isinstance(target, ast.Tuple):
+                    for i, elem in enumerate(target.elts):
+                        self.vars[elem.id] = (
+                            inspect.signature(
+                                self.fun_globals[node.value.func.id]
+                            )
+                            .return_annotation.__args__[i]
+                            .__forward_value__
+                        )
+                else:
+                    self.vars[target.id] = inspect.signature(
+                        self.fun_globals[node.value.func.id]
+                    ).return_annotation
 
         self.generic_visit(node)
         return node
