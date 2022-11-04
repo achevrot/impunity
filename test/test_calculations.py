@@ -15,8 +15,8 @@ def test_mixed_units():
         alt_2: "ft" = 350
         temp: "K" = 120
         result: "m / K" = (alt_1 + alt_2) * 25 / temp
-
-        assert result == pytest.approx(209.22, rel=1e-2)
+        print(result)
+        assert result == pytest.approx(230.55, rel=1e-2)
 
     test_mixed_units()
 

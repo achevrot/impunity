@@ -1,5 +1,5 @@
 from re import T
-from typing import Any
+from typing import Any, Tuple
 import pytest
 from super_couscous import check_units
 import pint
@@ -21,7 +21,7 @@ def temperature(altitude_m: "m") -> "K":
     return temp
 
 
-def temperature_2(altitude_m: "m", altitude_ft: "ft") -> "K":
+def temperature_2(altitude_m: "m", altitude_ft: "ft") -> Tuple["K", "K"]:
     temp_m: pint.Quantity[Any] = np.maximum(
         288.15 - 0.0065 * altitude_m, 216.65
     )
@@ -45,9 +45,21 @@ def test_2_params():
 
         alt_m: "m" = 1000
         alt_ft: "ft" = 1000
-        temp_m, temp_ft = temperature_2(alt_m, alt_ft)
+        temp_m = temperature_2(alt_m, alt_ft)
+        assert temp_m[0] == pytest.approx(281.65, rel=1e-1)
+
+    test_2_params()
+
+
+def test_tuples():
+    @check_units
+    def test_2_params():
+
+        alt_m: "m" = 1000
+        alt_ft: "ft" = 1000
+        temp_ft, temp_m = temperature_2(alt_m, alt_ft)
         assert temp_m == pytest.approx(281.65, rel=1e-1)
-        # assert temp_ft == pytest.approx(286.17, rel=1e-1)
+        assert temp_ft == pytest.approx(286.17, rel=1e-1)
 
     test_2_params()
 
