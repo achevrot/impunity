@@ -3,7 +3,6 @@ from typing import Any, Tuple
 import pytest
 from super_couscous import check_units
 import pint
-from pitot import Q_
 import numpy as np
 
 m = K = ft = Any

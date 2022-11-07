@@ -10,7 +10,6 @@ from .QuantityNode import QuantityNode
 
 import astor
 import pint
-from pitot import Q_
 
 ReturnQuantity = Callable[..., pint.Quantity[Any]]
 
