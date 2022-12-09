@@ -2,13 +2,13 @@
 
 ![License](https://img.shields.io/pypi/l/impunity.svg) [![Checked with mypy](https://img.shields.io/badge/mypy-checked-blue.svg)](https://mypy.readthedocs.io/) [![Code style: black](https://img.shields.io/badge/code%20style-black-black.svg)](https://github.com/psf/black)
 
-**impunity** is a Python library consisting of **a single decorator** function designed to ensure consistency among physical quantities manipulated by the function. Compared to other libraries (pint, etc.), it has **a minimal overhead on performance** because units are unknown at runtime, only through static analysis.
+**impunity** is a Python library consisting of **a single decorator** function designed to ensure consistency among physical quantities. Compared to other libraries (pint, etc.), it has **a minimal overhead on performance** because units are only manipulated through static analysis and disappear at runtime.
 
-impunity is based on Python flexible variable and function annotations ([PEP 593](https://peps.python.org/pep-0593/)) and checks consistency between variable and arguments of functions. If physical units are consistent, automatic conversion is applied by rewriting the code of the function if necessary.
+impunity is based on Python “flexible variable and function annotations” ([PEP 593](https://peps.python.org/pep-0593/)) and checks consistency between variables and arguments of functions. If physical units are consistent, impunity rewrites the code by automatically applying conversions in the code of the function.
 
-impunity is compatible with regular type annotations, and development remains compatible with other static analysis tools and type checkers like [mypy](https://mypy.readthedocs.io/).
+impunity is compatible with regular type annotations, and functions decorated with impunity remain compatible with other static analysis tools and type checkers like [mypy](https://mypy.readthedocs.io/).
 
-In most situations, impunity will only perform minimal sanity checks on your code at import time and not impact your code.
+In most situations, impunity will only perform minimal sanity checks on your code at import time and not edit anything.
 
 ## Installation
 
@@ -80,7 +80,7 @@ Full documentation available at [website]()
   def regular_conversion():
       pass
 
-  @impunity(rewrite="output.log")  # check code output
+  @impunity(rewrite="output.log")  # check code output in an external file
   def regular_conversion():
       pass
   ```
@@ -106,6 +106,8 @@ altitudes: feet_array = np.arange(0, 1000, 100)
 ```
 
 **impunity** is implemented and typed with `Annotated` keywords.
+
+## impunity in a debugger
 
 ## Tests
 
