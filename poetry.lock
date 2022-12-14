@@ -32,7 +32,7 @@ test = ["astroid (<=2.5.3)", "pytest"]
 name = "attrs"
 version = "22.1.0"
 description = "Classes Without Boilerplate"
-category = "dev"
+category = "main"
 optional = false
 python-versions = ">=3.5"
 
@@ -52,9 +52,9 @@ python-versions = "*"
 
 [[package]]
 name = "black"
-version = "22.10.0"
+version = "22.12.0"
 description = "The uncompromising code formatter."
-category = "dev"
+category = "main"
 optional = false
 python-versions = ">=3.7"
 
@@ -73,14 +73,6 @@ jupyter = ["ipython (>=7.8.0)", "tokenize-rt (>=3.2.0)"]
 uvloop = ["uvloop (>=0.15.2)"]
 
 [[package]]
-name = "certifi"
-version = "2022.9.24"
-description = "Python package for providing Mozilla's CA Bundle."
-category = "main"
-optional = false
-python-versions = ">=3.6"
-
-[[package]]
 name = "cffi"
 version = "1.15.1"
 description = "Foreign Function Interface for Python calling C code."
@@ -95,7 +87,7 @@ pycparser = "*"
 name = "click"
 version = "8.1.3"
 description = "Composable command line interface toolkit"
-category = "dev"
+category = "main"
 optional = false
 python-versions = ">=3.7"
 
@@ -106,7 +98,7 @@ colorama = {version = "*", markers = "platform_system == \"Windows\""}
 name = "colorama"
 version = "0.4.5"
 description = "Cross-platform colored terminal text."
-category = "dev"
+category = "main"
 optional = false
 python-versions = ">=2.7, !=3.0.*, !=3.1.*, !=3.2.*, !=3.3.*, !=3.4.*"
 
@@ -149,6 +141,17 @@ optional = false
 python-versions = ">=3.6"
 
 [[package]]
+name = "exceptiongroup"
+version = "1.0.4"
+description = "Backport of PEP 654 (exception groups)"
+category = "main"
+optional = false
+python-versions = ">=3.7"
+
+[package.extras]
+test = ["pytest (>=6)"]
+
+[[package]]
 name = "executing"
 version = "1.1.1"
 description = "Get the currently executing AST node of a frame, and other information"
@@ -163,7 +166,7 @@ tests = ["rich", "littleutils", "pytest", "asttokens"]
 name = "iniconfig"
 version = "1.1.1"
 description = "iniconfig: brain-dead simple config-ini parsing"
-category = "dev"
+category = "main"
 optional = false
 python-versions = "*"
 
@@ -311,7 +314,7 @@ reports = ["lxml"]
 name = "mypy-extensions"
 version = "0.4.3"
 description = "Experimental type system extensions for programs checked with the mypy typechecker."
-category = "dev"
+category = "main"
 optional = false
 python-versions = "*"
 
@@ -325,7 +328,7 @@ python-versions = ">=3.5"
 
 [[package]]
 name = "numpy"
-version = "1.23.4"
+version = "1.23.5"
 description = "NumPy is the fundamental package for array computing with Python."
 category = "main"
 optional = false
@@ -335,31 +338,12 @@ python-versions = ">=3.8"
 name = "packaging"
 version = "21.3"
 description = "Core utilities for Python packages"
-category = "dev"
+category = "main"
 optional = false
 python-versions = ">=3.6"
 
 [package.dependencies]
 pyparsing = ">=2.0.2,<3.0.5 || >3.0.5"
-
-[[package]]
-name = "pandas"
-version = "1.5.1"
-description = "Powerful data structures for data analysis, time series, and statistics"
-category = "main"
-optional = false
-python-versions = ">=3.8"
-
-[package.dependencies]
-numpy = [
-    {version = ">=1.21.0", markers = "python_version >= \"3.10\""},
-    {version = ">=1.20.3", markers = "python_version < \"3.10\""},
-]
-python-dateutil = ">=2.8.1"
-pytz = ">=2020.1"
-
-[package.extras]
-test = ["pytest-xdist (>=1.31)", "pytest (>=6.0)", "hypothesis (>=5.5.3)"]
 
 [[package]]
 name = "parso"
@@ -377,7 +361,7 @@ testing = ["docopt", "pytest (<6.0.0)"]
 name = "pathspec"
 version = "0.10.1"
 description = "Utility library for gitignore style pattern matching of file paths."
-category = "dev"
+category = "main"
 optional = false
 python-versions = ">=3.7"
 
@@ -414,41 +398,10 @@ test = ["pytest", "pytest-mpl", "pytest-cov", "pytest-subtests"]
 uncertainties = ["uncertainties (>=3.1.6)"]
 
 [[package]]
-name = "pint-pandas"
-version = "0.2"
-description = "Physical quantities module"
-category = "main"
-optional = false
-python-versions = ">=3.6"
-
-[package.dependencies]
-pandas = ">=1.2"
-pint = ">=0.17"
-
-[package.extras]
-test = ["nbval", "coveralls", "codecov", "pytest-subtests", "pytest-cov", "pytest-mpl", "pytest"]
-
-[[package]]
-name = "pitot"
-version = "0.2.0"
-description = "Toolbox for aeronautic units and conversions"
-category = "main"
-optional = false
-python-versions = ">=3.8,<4.0"
-
-[package.dependencies]
-numpy = ">=1.23.0,<2.0.0"
-pandas = ">=1.4.3,<2.0.0"
-Pint = ">=0.19.2,<0.20.0"
-Pint-Pandas = ">=0.2,<0.3"
-pyproj = ">=3.3.1,<4.0.0"
-typing-extensions = ">=4.3.0,<5.0.0"
-
-[[package]]
 name = "platformdirs"
 version = "2.5.2"
 description = "A small Python module for determining appropriate platform-specific dirs, e.g. a \"user data dir\"."
-category = "dev"
+category = "main"
 optional = false
 python-versions = ">=3.7"
 
@@ -460,7 +413,7 @@ test = ["appdirs (==1.4.4)", "pytest-cov (>=2.7)", "pytest-mock (>=3.6)", "pytes
 name = "pluggy"
 version = "1.0.0"
 description = "plugin and hook calling mechanisms for python"
-category = "dev"
+category = "main"
 optional = false
 python-versions = ">=3.6"
 
@@ -540,7 +493,7 @@ plugins = ["importlib-metadata"]
 name = "pyparsing"
 version = "3.0.9"
 description = "pyparsing module - Classes and methods to define and execute parsing grammars"
-category = "dev"
+category = "main"
 optional = false
 python-versions = ">=3.6.8"
 
@@ -548,32 +501,21 @@ python-versions = ">=3.6.8"
 diagrams = ["railroad-diagrams", "jinja2"]
 
 [[package]]
-name = "pyproj"
-version = "3.4.0"
-description = "Python interface to PROJ (cartographic projections and coordinate transformations library)"
-category = "main"
-optional = false
-python-versions = ">=3.8"
-
-[package.dependencies]
-certifi = "*"
-
-[[package]]
 name = "pytest"
-version = "7.1.3"
+version = "7.2.0"
 description = "pytest: simple powerful testing with Python"
-category = "dev"
+category = "main"
 optional = false
 python-versions = ">=3.7"
 
 [package.dependencies]
 attrs = ">=19.2.0"
 colorama = {version = "*", markers = "sys_platform == \"win32\""}
+exceptiongroup = {version = ">=1.0.0rc8", markers = "python_version < \"3.11\""}
 iniconfig = "*"
 packaging = "*"
 pluggy = ">=0.12,<2.0"
-py = ">=1.8.2"
-tomli = ">=1.0.0"
+tomli = {version = ">=1.0.0", markers = "python_version < \"3.11\""}
 
 [package.extras]
 testing = ["argcomplete", "hypothesis (>=3.56)", "mock", "nose", "pygments (>=2.7.2)", "requests", "xmlschema"]
@@ -608,20 +550,12 @@ pytest = ">=5.0.0"
 name = "python-dateutil"
 version = "2.8.2"
 description = "Extensions to the standard Python datetime module"
-category = "main"
+category = "dev"
 optional = false
 python-versions = "!=3.0.*,!=3.1.*,!=3.2.*,>=2.7"
 
 [package.dependencies]
 six = ">=1.5"
-
-[[package]]
-name = "pytz"
-version = "2022.5"
-description = "World timezone definitions, modern and historical"
-category = "main"
-optional = false
-python-versions = "*"
 
 [[package]]
 name = "pywin32"
@@ -647,7 +581,7 @@ py = {version = "*", markers = "implementation_name == \"pypy\""}
 name = "six"
 version = "1.16.0"
 description = "Python 2 and 3 compatibility utilities"
-category = "main"
+category = "dev"
 optional = false
 python-versions = ">=2.7, !=3.0.*, !=3.1.*, !=3.2.*"
 
@@ -671,7 +605,7 @@ tests = ["cython", "littleutils", "pygments", "typeguard", "pytest"]
 name = "tomli"
 version = "2.0.1"
 description = "A lil' TOML parser"
-category = "dev"
+category = "main"
 optional = false
 python-versions = ">=3.7"
 
@@ -714,7 +648,7 @@ python-versions = "*"
 [metadata]
 lock-version = "1.1"
 python-versions = "^3.8"
-content-hash = "4272f24f18fef30cb97867db71e8e05aaa72f72a11052b763b3a07aa2d5f7d18"
+content-hash = "8fa18ed2674fa36ed8afbe000be0acf45b920c6fcc4a5a21e5450b388ec650ff"
 
 [metadata.files]
 appnope = []
@@ -723,7 +657,6 @@ asttokens = []
 attrs = []
 backcall = []
 black = []
-certifi = []
 cffi = []
 click = []
 colorama = []
@@ -731,6 +664,7 @@ coverage = []
 debugpy = []
 decorator = []
 entrypoints = []
+exceptiongroup = []
 executing = []
 iniconfig = []
 ipykernel = []
@@ -744,14 +678,11 @@ mypy-extensions = []
 nest-asyncio = []
 numpy = []
 packaging = []
-pandas = []
 parso = []
 pathspec = []
 pexpect = []
 pickleshare = []
 pint = []
-pint-pandas = []
-pitot = []
 platformdirs = []
 pluggy = []
 prompt-toolkit = []
@@ -762,12 +693,10 @@ py = []
 pycparser = []
 pygments = []
 pyparsing = []
-pyproj = []
 pytest = []
 pytest-cov = []
 pytest-timeout = []
 python-dateutil = []
-pytz = []
 pywin32 = []
 pyzmq = []
 six = []

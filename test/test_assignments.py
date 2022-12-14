@@ -1,11 +1,10 @@
 from typing import Any
 import pytest
-from super_couscous import check_units
+from impunity.wrapper import impunity
 import pint
-from pitot import Q_
 import numpy as np
 
-m = K = ft = Any
+m = K = ft = Pa = Any
 
 
 # -----------------------
@@ -15,21 +14,22 @@ m = K = ft = Any
 # -----------------------
 
 
-@check_units
 def test_base():
+    @impunity
+    def test_base():
+        alt_m: "m" = 1000
+        alt_m2: "m" = alt_m
+        assert alt_m == alt_m2
 
-    alt_m: "m" = 1000
-    alt_m2: "m" = alt_m
-    assert alt_m == alt_m2
+    test_base()
 
 
 def test_different_units():
-    @check_units
+    @impunity
     def test_different_units():
 
         alt_m: "m" = 1000
         alt_ft: "ft" = alt_m
-        print(alt_ft)
         # assert alt_m == 1000
         assert alt_ft == pytest.approx(3280.84, rel=1e-2)
 
@@ -37,14 +37,23 @@ def test_different_units():
 
 
 def test_wrong_units():
-    @check_units
+    @impunity
     def test_wrong_units():
-
-        alt_m: "m" = 1000
         with pytest.raises(pint.errors.DimensionalityError):
+            alt_m: "m" = 1000
             alt_K: "K" = alt_m
 
     test_wrong_units()
+
+
+def test_assign_wo_annotation():
+    @impunity
+    def test_assign_wo_annotation():
+        density_troposphere = np.maximum(1500, 6210)  # return None unit
+        density: "Pa" = density_troposphere * np.exp(0)
+        assert density == 6210
+
+    test_assign_wo_annotation()
 
 
 def main():
