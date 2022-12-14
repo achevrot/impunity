@@ -8,7 +8,7 @@ from typing import Any, Callable
 
 import astor
 
-from .Visitor import Visitor
+from .visitor import Visitor
 
 _log = logging.getLogger(__name__)
 

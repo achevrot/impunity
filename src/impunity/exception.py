@@ -1,5 +1,6 @@
 import ast
 
+
 class AstRaise(ast.NodeTransformer):
     def get_node(self, except_name: str) -> ast.Raise:
         mod = ast.parse(f"raise {except_name}")

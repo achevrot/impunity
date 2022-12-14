@@ -1,8 +1,10 @@
 from typing import Any, Tuple
-import pytest
-from impunity.wrapper import impunity
+
 import pint
+import pytest
+
 import numpy as np
+from impunity import impunity
 
 m = K = ft = cm = Pa = kts = dimensionless = Any
 
@@ -12,6 +14,8 @@ m = K = ft = cm = Pa = kts = dimensionless = Any
 # bin : Binary operator in func call
 # -----------------------
 
+# TODO ça peut valoir le coup de mettre ces fonctions d'abord dans un config.py
+# puis après de faire un autre fichier de test qui vérifie les imports
 
 @impunity
 def temperature(altitude_m: "m") -> "K":
@@ -26,65 +30,50 @@ def temperature_2(altitude_m: "m", altitude_ft: "ft") -> Tuple["K", "K"]:
     return temp_m, temp_ft
 
 
+@impunity
 def test_base():
-    @impunity
-    def test_base():
 
-        alt_m: "m" = 1000
-        temp = temperature(alt_m)
-        assert temp == pytest.approx(281.65, rel=1e-1)
-
-    test_base()
+    alt_m: "m" = 1000
+    temp = temperature(alt_m)
+    assert temp == pytest.approx(281.65, rel=1e-1)
 
 
+@impunity
 def test_base_cm():
-    @impunity
-    def test_base_cm():
 
-        alt_m: "m" = 1000
-        temp = temperature(alt_m)
-        assert temp == pytest.approx(281.65, rel=1e-1)
+    alt_m: "m" = 1000
+    temp = temperature(alt_m)
+    assert temp == pytest.approx(281.65, rel=1e-1)
 
-        alt_cm: "cm" = 100000
-        temp = temperature(alt_cm)
-        assert temp == pytest.approx(281.65, rel=1e-1)
-
-    test_base_cm()
+    alt_cm: "cm" = 100000
+    temp = temperature(alt_cm)
+    assert temp == pytest.approx(281.65, rel=1e-1)
 
 
+@impunity
 def test_2_params():
-    @impunity
-    def test_2_params():
 
-        alt_m: "m" = 1000
-        alt_ft: "ft" = 1000
-        temp_m = temperature_2(alt_m, alt_ft)
-        assert temp_m[0] == pytest.approx(281.65, rel=1e-1)
-
-    test_2_params()
+    alt_m: "m" = 1000
+    alt_ft: "ft" = 1000
+    temp_m = temperature_2(alt_m, alt_ft)
+    assert temp_m[0] == pytest.approx(281.65, rel=1e-1)
 
 
-def test_tuples():
-    @impunity
-    def test_2_params():
+@impunity
+def test_2_params():
 
-        alt_m: "m" = 1000
-        alt_ft: "ft" = 1000
-        temp_ft, temp_m = temperature_2(alt_m, alt_ft)
-        assert temp_m == pytest.approx(281.65, rel=1e-1)
-        assert temp_ft == pytest.approx(286.17, rel=1e-1)
-
-    test_2_params()
+    alt_m: "m" = 1000
+    alt_ft: "ft" = 1000
+    temp_ft, temp_m = temperature_2(alt_m, alt_ft)
+    assert temp_m == pytest.approx(281.65, rel=1e-1)
+    assert temp_ft == pytest.approx(286.17, rel=1e-1)
 
 
+@impunity
 def test_different_units():
-    @impunity
-    def test_different_units():
-        alt_ft: "ft" = 1000
-        temp = temperature(alt_ft)
-        assert temp == pytest.approx(286.17, rel=1e-1)
-
-    test_different_units()
+    alt_ft: "ft" = 1000
+    temp = temperature(alt_ft)
+    assert temp == pytest.approx(286.17, rel=1e-1)
 
 
 # def test_weird_signature():
@@ -96,14 +85,11 @@ def test_different_units():
 #     test_weird_signature()
 
 
+@impunity
 def test_binOp():
-    @impunity
-    def test_binOp():
-        alt_ft: "ft" = 1000
-        temp = temperature(alt_ft * 3)
-        assert temp == pytest.approx(286.17, rel=1e-1)
-
-    test_binOp()
+    alt_ft: "ft" = 1000
+    temp = temperature(alt_ft * 3)
+    assert temp == pytest.approx(286.17, rel=1e-1)
 
 
 # def test_call_multi_args():
@@ -151,29 +137,15 @@ def test_binOp():
 #     assert res == pytest.approx(isa.STRATOSPHERE_TEMP, rel=1e-1)
 
 
+@impunity
 def test_wrong_units():
-    @impunity
-    def test_wrong_units():
-        with pytest.raises(pint.errors.DimensionalityError):
-            alt_ft: "K" = 1000
-            temperature(alt_ft)
-
-    test_wrong_units()
+    with pytest.raises(pint.errors.DimensionalityError):
+        alt_ft: "K" = 1000
+        temperature(alt_ft)
 
 
-def test_wrong_received_units():
-    @impunity
-    def test_wrong_units():
-        alt_ft: "ft" = 1000
-        with pytest.raises(pint.errors.DimensionalityError):
-            res: "ft" = temperature(alt_ft)
-
-    test_wrong_units()
-
-
-def main():
-    test_wrong_units()
-
-
-if __name__ == "__main__":
-    main()
+@impunity
+def test_wrong_units1():
+    alt_ft: "ft" = 1000
+    with pytest.raises(pint.errors.DimensionalityError):
+        res: "ft" = temperature(alt_ft)

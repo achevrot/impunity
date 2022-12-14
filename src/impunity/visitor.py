@@ -10,10 +10,15 @@ from typing import Any
 
 import pint
 from pint import UnitRegistry
-from typing_extensions import Annotated, TypeGuard
+
+if sys.version_info >= (3, 10):
+    # TBH Annotated from 3.9, TypeGuard from 3.10
+    from typing import Annotated, TypeGuard
+else:
+    from typing_extensions import Annotated, TypeGuard
 
 from .exception import raise_dim_error
-from .QuantityNode import QuantityNode
+from .quantityNode import QuantityNode
 
 annot_type = type(Annotated[int, "spam"])
 
