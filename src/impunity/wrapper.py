@@ -3,8 +3,10 @@ from __future__ import annotations
 import ast
 import inspect
 import logging
+import os
 import textwrap
-from typing import Any, Callable
+from pathlib import Path
+from typing import Any, Callable, Union
 
 import astor
 
@@ -16,6 +18,7 @@ _log = logging.getLogger(__name__)
 def impunity(
     *args: Callable[[Any], Any],
     ignore: bool = False,
+    rewrite: Union[bool, str] = True,
 ) -> Callable[[Any], Any]:
 
     """Decorator function to check units based on annotations
@@ -33,15 +36,30 @@ def impunity(
         if ignore:
             return fun
 
-        fun_tree = ast.parse(
-            textwrap.dedent(inspect.getsource(fun))  # dedent for nested methods
+        fun_tree = ast.parse(  # dedent for nested methods
+            textwrap.dedent(inspect.getsource(fun))
         )  # get the function AST
         visitor = Visitor(fun)
         fun_tree = visitor.visit(fun_tree)  # send it to the NodeTransformer
         f_str = astor.to_source(
             fun_tree
         )  # get the string of the transformed function
-        exec(f_str[f_str.find("\n") + 1 :])
+
+        if not rewrite:
+            return fun
+
+        if isinstance(rewrite, str):
+            path = Path(rewrite)
+            if not path.is_absolute():
+                origin_path = Path(
+                    os.path.abspath(inspect.getfile(fun))
+                ).parents[0]
+                path = origin_path.joinpath(path)
+            with open(path, "a+") as f:
+                f.write(f_str[f_str.find("\n") + 1:])
+                f.write("\n")
+
+        exec(f_str[f_str.find("\n") + 1:])
 
         new_fun = locals()[fun.__name__]
 

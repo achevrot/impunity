@@ -405,11 +405,11 @@ class Visitor(ast.NodeTransformer):
             if node.func.id in __builtins__.keys():
                 return node
 
-            signature = inspect.signature(self.fun_globals[node.func.id])
+            parameters = inspect.getfullargspec(self.fun_globals[node.func.id])
             new_args = []
-            for i, (_, value) in enumerate(signature.parameters.items()):
+            for i, arg in enumerate(parameters.args):
                 if (received := self.get_node_unit(node.args[i]).unit) != (
-                    expected := value.annotation
+                    expected := parameters.annotations[arg]
                 ):
                     if pint.Unit(received).is_compatible_with(
                         pint.Unit(expected)

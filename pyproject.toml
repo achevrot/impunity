@@ -2,7 +2,7 @@
 name = "impunity"
 version = "0.1.0"
 description = ""
-authors = ["achevrot <antoine.chevrot@onera.fr>"]
+authors = ["Antoine Chevrot <antoine.chevrot@gmail.com>"]
 
 [tool.poetry.dependencies]
 python = "^3.8"
