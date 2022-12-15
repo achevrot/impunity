@@ -1,4 +1,4 @@
-from typing import Any
+from typing import Any, Annotated
 
 import pint
 import pytest
@@ -28,6 +28,16 @@ def test_assign_same_unit() -> None:
     assert alt_m == alt_m2
 
     global_copy: "m" = global_alt
+    assert global_copy == global_alt
+
+
+@impunity
+def test_assign_same_unit_annotated() -> None:
+    alt_m: Annotated[float, "m"] = 1000
+    alt_m2: Annotated[float, "m"] = alt_m
+    assert alt_m == alt_m2
+
+    global_copy: Annotated[float, "m"] = global_alt
     assert global_copy == global_alt
 
 
