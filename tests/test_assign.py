@@ -6,7 +6,10 @@ import pytest
 import numpy as np
 from impunity import impunity
 
-m = K = ft = Pa = Any
+m = Any
+K = Any
+ft = Any
+Pa = Any
 
 
 # -----------------------
@@ -17,8 +20,9 @@ m = K = ft = Pa = Any
 
 global_alt: "m" = 1000
 
+
 @impunity
-def test_assign_same_unit():
+def test_assign_same_unit() -> None:
     alt_m: "m" = 1000
     alt_m2: "m" = alt_m
     assert alt_m == alt_m2
@@ -28,7 +32,7 @@ def test_assign_same_unit():
 
 
 @impunity
-def test_assign_compatible_unit():
+def test_assign_compatible_unit() -> None:
     alt_m: "m" = 1000
     alt_ft: "ft" = alt_m
     assert alt_ft == pytest.approx(3280.84, rel=1e-2)
@@ -39,14 +43,14 @@ def test_assign_compatible_unit():
 
 
 @impunity
-def test_assign_incompatible_unit():
+def test_assign_incompatible_unit() -> None:
     with pytest.raises(pint.errors.DimensionalityError):
         alt_m: "m" = 1000
-        invalid: "K" = alt_m
+        invalid: "K" = alt_m  # noqa: F841
 
 
 @impunity
-def test_assign_wo_annotation():
+def test_assign_wo_annotation() -> None:
     density_troposphere = np.maximum(1500, 6210)  # return None unit
     density: "Pa" = density_troposphere * np.exp(0)
     assert density == 6210
