@@ -1,0 +1,28 @@
+{
+  "folders": [{ "path": "." }],
+  "settings": {
+    // Linting + type checking
+    "python.linting.pylintEnabled": false,
+    "python.linting.flake8Enabled": true,
+    "python.linting.mypyEnabled": true,
+    "python.linting.enabled": true,
+
+    // Formatting
+    "editor.formatOnSave": true,
+    "python.formatting.provider": "black",
+
+    // Testing
+    "python.testing.unittestEnabled": false,
+    "python.testing.pytestEnabled": true,
+    "python.testing.pytestArgs": ["tests"],
+
+    // File list
+    "files.exclude": {
+      "dist/": true,
+      "build:": true
+    }
+  },
+  "extensions": {
+    "recommendations": ["ms-python.python", "valentjn.vscode-ltex"]
+  }
+}
