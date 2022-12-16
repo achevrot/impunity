@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import ast
+import functools
 import inspect
 import logging
 import os
@@ -36,14 +37,14 @@ def impunity(
         if ignore:
             return fun
 
-        fun_tree = ast.parse(  # dedent for nested methods
-            textwrap.dedent(inspect.getsource(fun))
-        )  # get the function AST
+        # dedent for nested methods
+        fun_tree = ast.parse(textwrap.dedent(inspect.getsource(fun)))
+
         visitor = Visitor(fun)
-        fun_tree = visitor.visit(fun_tree)  # send it to the NodeTransformer
-        f_str = astor.to_source(
-            fun_tree
-        )  # get the string of the transformed function
+        fun_tree = visitor.visit(fun_tree)
+
+        # get the string of the transformed function
+        f_str = astor.to_source(fun_tree)
 
         if not rewrite:
             return fun
@@ -55,11 +56,11 @@ def impunity(
                     os.path.abspath(inspect.getfile(fun))
                 ).parents[0]
                 path = origin_path.joinpath(path)
-            with open(path, "a+") as f:
-                f.write(f_str[f_str.find("\n") + 1:])
+            with open(path, "w") as f:
+                f.write(f_str[f_str.find("\n") + 1 :])
                 f.write("\n")
 
-        exec(f_str[f_str.find("\n") + 1:])
+        exec(f_str[f_str.find("\n") + 1 :])
 
         new_fun = locals()[fun.__name__]
 
@@ -74,6 +75,8 @@ def impunity(
             for new_method in method_list:
                 origin_method = getattr(fun, new_method.__name__)
                 co_consts = new_method.__code__.co_consts
+                co_lnotab = new_method.__code__.co_lnotab
+                co_firstlineno = fun.__code__.co_firstlineno + 1
                 for const in origin_method.__code__.co_consts:
                     if const not in co_consts:
                         co_consts = co_consts + (const,)
@@ -82,10 +85,14 @@ def impunity(
                 origin_method.__code__ = origin_method.__code__.replace(
                     co_code=cocode,
                     co_consts=co_consts,
+                    co_lnotab=co_lnotab,
+                    co_firstlineno=co_firstlineno,
                 )
 
         else:
             co_consts = new_fun.__code__.co_consts
+            co_lnotab = new_fun.__code__.co_lnotab
+            co_firstlineno = fun.__code__.co_firstlineno + 1
             for const in fun.__code__.co_consts:
                 if const not in co_consts:
                     co_consts = co_consts + (const,)
@@ -94,6 +101,8 @@ def impunity(
             fun.__code__ = fun.__code__.replace(
                 co_code=cocode,
                 co_consts=co_consts,
+                co_lnotab=co_lnotab,
+                co_firstlineno=co_firstlineno,
             )
 
         return fun

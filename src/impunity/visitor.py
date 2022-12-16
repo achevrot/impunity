@@ -34,6 +34,17 @@ logging.basicConfig(
 )
 
 
+def get_annotation_unit(annotation) -> str:
+    if isinstance(annotation, ast.Constant):
+        return annotation.value
+    elif isinstance(annotation, ast.Subscript):
+        return annotation.slice.elts[1].value
+    else:
+        raise TypeError(
+            f"{annotation} is not an annotation type expected by impunity"
+        )
+
+
 def is_annotated(hint: Any, annot_type=annot_type) -> TypeGuard[annot_type]:
     return (type(hint) is annot_type) and hasattr(hint, "__metadata__")
 
@@ -465,7 +476,10 @@ class Visitor(ast.NodeTransformer):
             # )
             new_node = node
 
-        elif (received := value.unit) != (expected := node.annotation.value):
+        elif (received := value.unit) != (expected := node.annotation):
+
+            expected = get_annotation_unit(expected)
+
             if received == "dimensionless":
                 new_node = node
             elif pint.Unit(received).is_compatible_with(pint.Unit(expected)):
@@ -494,7 +508,8 @@ class Visitor(ast.NodeTransformer):
             if node.target.value.id == "self":
                 self.class_attr[node.target.attr] = value.unit
         else:
-            self.vars[node.target.id] = node.annotation.value
+            annotation = get_annotation_unit(node.annotation)
+            self.vars[node.target.id] = annotation
         # ast.fix_missing_locations(new_node)
         return ast.copy_location(new_node, node)
 
