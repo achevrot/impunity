@@ -1,7 +1,6 @@
 from __future__ import annotations
 
 import ast
-import functools
 import inspect
 import logging
 import os
@@ -57,10 +56,12 @@ def impunity(
                 ).parents[0]
                 path = origin_path.joinpath(path)
             with open(path, "w") as f:
-                f.write(f_str[f_str.find("\n") + 1 :])
+                idx = f_str.find("\n") + 1
+                f.write(f_str[idx:])
                 f.write("\n")
 
-        exec(f_str[f_str.find("\n") + 1 :])
+        idx = f_str.find("\n") + 1
+        exec(f_str[idx:])
 
         new_fun = locals()[fun.__name__]
 
@@ -101,7 +102,7 @@ def impunity(
             fun.__code__ = fun.__code__.replace(
                 co_code=cocode,
                 co_consts=co_consts,
-                co_lnotab=co_lnotab,
+                # co_lnotab=co_lnotab,
                 co_firstlineno=co_firstlineno,
             )
 

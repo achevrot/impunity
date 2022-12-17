@@ -10,11 +10,11 @@ env:
 
 jobs:
   deploy:
-    runs-on: ubuntu-latest # ${{ matrix.os }}
+    runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        # os: [ubuntu-latest, macos-latest, windows-latest]
-        python-version: ["3.8", "3.9", "3.10"]
+        os: [ubuntu-latest, macos-latest, windows-latest]
+        python-version: ["3.8", "3.9", "3.10", "3.11"]
     env:
       PYTHON_VERSION: ${{ matrix.python-version }}
     steps:
@@ -60,14 +60,14 @@ jobs:
           poetry install
 
       - name: Style checking
-        if: ${{ matrix.python-version == '3.10' }}
+        if: ${{ matrix.python-version == '3.8' && matrix.os == 'ubuntu-latest' }}
         run: |
           poetry run flake8 src tests
           poetry run isort --check-only src tests
           poetry run black --check src tests
 
       - name: Type checking
-        if: ${{ matrix.python-version == '3.10' }}
+        if: ${{ matrix.python-version == '3.8' && matrix.os == 'ubuntu-latest' }}
         run: |
           poetry run mypy src tests
 
@@ -76,7 +76,7 @@ jobs:
           poetry run pytest --cov --cov-report xml
 
       - name: Upload coverage to Codecov
-        if: ${{ github.event_name != 'pull_request_target' && matrix.python-version == '3.10' }}
+        if: ${{ github.event_name != 'pull_request_target' && matrix.os == 'ubuntu-latest' }}
         uses: codecov/codecov-action@v3
         with:
           env_vars: PYTHON_VERSION
