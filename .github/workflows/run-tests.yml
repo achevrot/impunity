@@ -81,6 +81,7 @@ jobs:
         run: |
           poetry run python -m coverage run -m unittest
           poetry run python -m coverage report
+          ls -al
 
       - name: Upload coverage to Codecov
         if: ${{ github.event_name != 'pull_request_target' && matrix.os == 'ubuntu-latest' }}
