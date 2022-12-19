@@ -17,6 +17,7 @@ jobs:
         python-version: ["3.8", "3.9", "3.10", "3.11"]
     env:
       PYTHON_VERSION: ${{ matrix.python-version }}
+      CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
     steps:
       - uses: actions/checkout@v3
 
@@ -78,11 +79,15 @@ jobs:
 
       - name: Run tests
         run: |
-          poetry run python -m coverage run -m unittest
-          poetry run python -m coverage report
+          poetry run coverage run -m unittest
+          poetry run coverage report
 
       - name: Upload coverage to Codecov
         if: ${{ github.event_name != 'pull_request_target' && matrix.os == 'ubuntu-latest' }}
-        uses: codecov/codecov-action@v2
-        with:
-          env_vars: PYTHON_VERSION
+        run: |
+          poetry run codecov
+
+
+        # uses: codecov/codecov-action@v2
+        # with:
+        #   env_vars: PYTHON_VERSION
