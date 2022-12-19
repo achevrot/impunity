@@ -1,12 +1,18 @@
+import unittest
 from typing import Any, Tuple
 
 import pint
-import pytest
 
 import numpy as np
 from impunity import impunity
 
-m = K = ft = cm = Pa = kts = dimensionless = Any
+m = Any
+K = Any
+ft = Any
+cm = Any
+Pa = Any
+kts = Any
+dimensionless = Any
 
 # -----------------------
 # du : different units
@@ -14,8 +20,6 @@ m = K = ft = cm = Pa = kts = dimensionless = Any
 # bin : Binary operator in func call
 # -----------------------
 
-# TODO ça peut valoir le coup de mettre ces fonctions d'abord dans un config.py
-# puis après de faire un autre fichier de test qui vérifie les imports
 
 @impunity
 def temperature(altitude_m: "m") -> "K":
@@ -30,122 +34,113 @@ def temperature_2(altitude_m: "m", altitude_ft: "ft") -> Tuple["K", "K"]:
     return temp_m, temp_ft
 
 
-@impunity
-def test_base():
+class Functions(unittest.TestCase):
+    @impunity
+    def test_base(self) -> None:
 
-    alt_m: "m" = 1000
-    temp = temperature(alt_m)
-    assert temp == pytest.approx(281.65, rel=1e-1)
+        alt_m: "m" = 1000
+        temp = temperature(alt_m)
+        self.assertAlmostEqual(temp, 281.65, delta=1e-1)
 
+    @impunity
+    def test_base_cm(self) -> None:
 
-@impunity
-def test_base_cm():
+        alt_m: "m" = 1000
+        temp = temperature(alt_m)
+        self.assertAlmostEqual(temp, 281.65, delta=1e-1)
 
-    alt_m: "m" = 1000
-    temp = temperature(alt_m)
-    assert temp == pytest.approx(281.65, rel=1e-1)
+        alt_cm: "cm" = 100000
+        temp = temperature(alt_cm)
+        self.assertAlmostEqual(temp, 281.65, delta=1e-1)
 
-    alt_cm: "cm" = 100000
-    temp = temperature(alt_cm)
-    assert temp == pytest.approx(281.65, rel=1e-1)
+    @impunity
+    def test_2_params(self) -> None:
 
+        alt_m: "m" = 1000
+        alt_ft: "ft" = 1000
+        temp_m = temperature_2(alt_m, alt_ft)
+        self.assertAlmostEqual(temp_m[0], 281.65, delta=1e-1)
 
-@impunity
-def test_2_params():
+    @impunity
+    def test_2_params_expansion(self) -> None:
 
-    alt_m: "m" = 1000
-    alt_ft: "ft" = 1000
-    temp_m = temperature_2(alt_m, alt_ft)
-    assert temp_m[0] == pytest.approx(281.65, rel=1e-1)
+        alt_m: "m" = 1000
+        alt_ft: "ft" = 1000
+        temp_m, temp_ft = temperature_2(alt_m, alt_ft)
+        self.assertAlmostEqual(temp_m, 281.65, delta=1e-1)
+        self.assertAlmostEqual(temp_ft, 286.17, delta=1e-1)
 
+    @impunity
+    def test_different_units(self) -> None:
+        alt_ft: "ft" = 1000
+        temp = temperature(alt_ft)
+        # TODO: radian / celsius
+        self.assertAlmostEqual(temp, 286.17, delta=1e-1)
 
-@impunity
-def test_2_params():
+    # def test_weird_signature(self)-> None:
+    #     @impunity
+    #     def test_weird_signature(self)-> None:
+    #         alt_ft: "ft" = 1000
+    #         press, density, temp = isa.atmosphere(alt_ft)
 
-    alt_m: "m" = 1000
-    alt_ft: "ft" = 1000
-    temp_ft, temp_m = temperature_2(alt_m, alt_ft)
-    assert temp_m == pytest.approx(281.65, rel=1e-1)
-    assert temp_ft == pytest.approx(286.17, rel=1e-1)
+    #     test_weird_signature()
 
+    @impunity
+    def test_binOp(self) -> None:
+        alt_ft: "ft" = 1000
+        temp = temperature(alt_ft * 3)
+        self.assertAlmostEqual(temp, 268.65, delta=1e-1)
 
-@impunity
-def test_different_units():
-    alt_ft: "ft" = 1000
-    temp = temperature(alt_ft)
-    assert temp == pytest.approx(286.17, rel=1e-1)
+    # def test_call_multi_args(self)-> None:
+    #     @impunity
+    #     def test_call_multi_args(self)-> None:
+    #         alt_m: "m" = 1000
+    #         tas: "kts" = 200
+    #         res: "dimensionless" = aero.tas2mach(tas, alt_m)
 
+    #     test_call_multi_args()
 
-# def test_weird_signature():
-#     @impunity
-#     def test_weird_signature():
-#         alt_ft: "ft" = 1000
-#         press, density, temp = isa.atmosphere(alt_ft)
+    # def test_call_np(self)-> None:
+    #     @impunity
+    #     def test_call_np(h: "m") -> "K":
 
-#     test_weird_signature()
+    #         temp_0: "K" = 288.15
+    #         c: "K/m" = 0.0065
+    #         temp: "K" = np.maximum(
+    #             temp_0 - c * h,
+    #             216.65,
+    #         )
+    #         return temp
 
+    #     m: "m" = 11000
+    #     res = test_call_np(m)
+    #     assert res == pytest.approx(isa.STRATOSPHERE_TEMP, delta=1e-1)
 
-@impunity
-def test_binOp():
-    alt_ft: "ft" = 1000
-    temp = temperature(alt_ft * 3)
-    assert temp == pytest.approx(286.17, rel=1e-1)
+    # def test_using_globals(self)-> None:
+    #     @impunity
+    #     def test_using_globals(h: "m") -> "K":
 
+    #         temp_0: "K" = 288.15
+    #         c: "K/m" = 0.0065
+    #         e = isa.STRATOSPHERE_TEMP
+    #         temp: "K" = np.maximum(
+    #             temp_0 - c * h,
+    #             e,
+    #         )
+    #         return temp
 
-# def test_call_multi_args():
-#     @impunity
-#     def test_call_multi_args():
-#         alt_m: "m" = 1000
-#         tas: "kts" = 200
-#         res: "dimensionless" = aero.tas2mach(tas, alt_m)
+    #     m: "m" = 11000
+    #     res = test_using_globals(m)
+    #     assert res == pytest.approx(isa.STRATOSPHERE_TEMP, delta=1e-1)
 
-#     test_call_multi_args()
+    @impunity
+    def test_wrong_units(self) -> None:
+        with self.assertRaises(pint.errors.DimensionalityError):
+            alt_ft: "K" = 1000
+            temperature(alt_ft)
 
-
-# def test_call_np():
-#     @impunity
-#     def test_call_np(h: "m") -> "K":
-
-#         temp_0: "K" = 288.15
-#         c: "K/m" = 0.0065
-#         temp: "K" = np.maximum(
-#             temp_0 - c * h,
-#             216.65,
-#         )
-#         return temp
-
-#     m: "m" = 11000
-#     res = test_call_np(m)
-#     assert res == pytest.approx(isa.STRATOSPHERE_TEMP, rel=1e-1)
-
-
-# def test_using_globals():
-#     @impunity
-#     def test_using_globals(h: "m") -> "K":
-
-#         temp_0: "K" = 288.15
-#         c: "K/m" = 0.0065
-#         e = isa.STRATOSPHERE_TEMP
-#         temp: "K" = np.maximum(
-#             temp_0 - c * h,
-#             e,
-#         )
-#         return temp
-
-#     m: "m" = 11000
-#     res = test_using_globals(m)
-#     assert res == pytest.approx(isa.STRATOSPHERE_TEMP, rel=1e-1)
-
-
-@impunity
-def test_wrong_units():
-    with pytest.raises(pint.errors.DimensionalityError):
-        alt_ft: "K" = 1000
-        temperature(alt_ft)
-
-
-@impunity
-def test_wrong_units1():
-    alt_ft: "ft" = 1000
-    with pytest.raises(pint.errors.DimensionalityError):
-        res: "ft" = temperature(alt_ft)
+    @impunity
+    def test_wrong_units1(self) -> None:
+        alt_ft: "ft" = 1000
+        with self.assertRaises(pint.errors.DimensionalityError):
+            res: "ft" = temperature(alt_ft)  # noqa: F841

@@ -66,14 +66,15 @@ jobs:
           poetry run isort --check-only src tests
           poetry run black --check src tests
 
-      - name: Type checking
-        if: ${{ matrix.python-version == '3.8' && matrix.os == 'ubuntu-latest' }}
-        run: |
-          poetry run mypy src tests
+      # - name: Type checking
+      #   if: ${{ matrix.python-version == '3.8' && matrix.os == 'ubuntu-latest' }}
+      #   run: |
+      #     poetry run mypy src tests
 
       - name: Run tests
         run: |
-          poetry run pytest --cov --cov-report xml
+          poetry run python -m coverage run -m unittest
+          poetry run python -m coverage report
 
       - name: Upload coverage to Codecov
         if: ${{ github.event_name != 'pull_request_target' && matrix.os == 'ubuntu-latest' }}

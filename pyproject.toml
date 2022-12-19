@@ -1,7 +1,7 @@
 [tool.poetry]
 name = "impunity"
 version = "0.1.0"
-description = ""
+description = "Static checking of physical units consistency"
 authors = ["Antoine Chevrot <antoine.chevrot@gmail.com>"]
 
 [tool.poetry.dependencies]
@@ -15,19 +15,16 @@ black = ">=21.6"
 mypy = ">=0.981"
 isort = "^5.11.2"
 flake8 = ">=5.0"
-pytest = "^7.1"
-pytest-cov = "^4.0"
-pytest-timeout = "^2.1.0"
-ipykernel = "^6.16.1"  # not really necessary...
 numpy = "^1.23.5"
+coverage = "^7.0.0"
 
 [build-system]
 requires = ["poetry-core>=1.0.0"]
 build-backend = "poetry.core.masonry.api"
 
 [tool.black]
-line-length = 80
-target_version = ['py37', 'py38', 'py39']
+line-length = 120
+target_version = ['py38', 'py39', 'py310', 'py311']
 include = '\.pyi?$'
 exclude = '''
 /(
@@ -41,6 +38,9 @@ exclude = '''
 '''
 
 [tool.isort]
-line_length = 80
+line_length = 120
 profile = "black"
-known_first_party = ["numpy", "pandas", "pyproj", "shapely"]
+known_first_party = ["numpy", "pandas"]
+
+[tool.coverage.run]
+source = ["src"]

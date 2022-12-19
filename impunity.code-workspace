@@ -1,27 +1,33 @@
 {
-  "folders": [{ "path": "." }],
+  "folders": [
+    {
+      "path": "."
+    }
+  ],
   "settings": {
     // Linting + type checking
     "python.linting.pylintEnabled": false,
     "python.linting.flake8Enabled": true,
     "python.linting.mypyEnabled": true,
     "python.linting.enabled": true,
-
     // Formatting
     "editor.formatOnSave": true,
     "python.formatting.provider": "black",
-
     // Testing
-    "python.testing.unittestEnabled": false,
-    "python.testing.pytestEnabled": true,
-    "python.testing.pytestArgs": ["tests"],
-
+    "python.testing.unittestEnabled": true,
+    "python.testing.unittestArgs": [
+      "-v",
+      "-s",
+      ".",
+      "-p",
+      "tests/test*.py"
+    ],
+    "python.testing.pytestEnabled": false,
     // File list
     "files.exclude": {
       "dist/": true,
       "build:": true
     },
-
     "files.watcherExclude": {
       "**/.git/objects/**": true,
       "**/.git/subtree-cache/**": true,
@@ -29,6 +35,9 @@
     }
   },
   "extensions": {
-    "recommendations": ["ms-python.python", "valentjn.vscode-ltex"]
+    "recommendations": [
+      "ms-python.python",
+      "valentjn.vscode-ltex"
+    ]
   }
 }
