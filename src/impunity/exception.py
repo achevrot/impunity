@@ -12,8 +12,6 @@ class AstRaise(ast.NodeTransformer):
 
 
 def raise_dim_error(e, received, expected):
-    exception = (
-        e.__module__ + "." + e.__qualname__ + f'("{received}", "{expected}")'
-    )
+    exception = e.__module__ + "." + e.__qualname__ + f'("{received}", "{expected}")'
     new_node = AstRaise().get_node(exception)
     return new_node
