@@ -1,7 +1,7 @@
 [tool.poetry]
 name = "impunity"
 version = "0.1.0"
-description = "Static checking of physical units consistency"
+description = "Static checking for consistency of physical units"
 authors = ["Antoine Chevrot <antoine.chevrot@gmail.com>"]
 
 [tool.poetry.dependencies]

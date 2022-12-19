@@ -1,9 +1,10 @@
 # impunity
+
 [![tests](https://github.com/achevrot/impunity/actions/workflows/run-tests.yml/badge.svg)](https://github.com/achevrot/impunity/actions/workflows/run-tests.yml)
 [![Code Coverage](https://img.shields.io/codecov/c/github/achevrot/impunity.svg)](https://codecov.io/gh/achevrot/impunity)
 ![License](https://img.shields.io/pypi/l/impunity.svg) [![Checked with mypy](https://img.shields.io/badge/mypy-checked-blue.svg)](https://mypy.readthedocs.io/) [![Code style: black](https://img.shields.io/badge/code%20style-black-black.svg)](https://github.com/psf/black)
 
-**impunity** is a Python library consisting of **a single decorator** function designed to ensure consistency of physical quantities. Compared to other libraries (pint, etc.), it has **a minimal overhead on performance** because units are only manipulated through static analysis and disappear at runtime.
+**impunity** is a Python library consisting of **a single decorator** function designed to ensure consistency of physical quantities. Compared to other libraries (pint, etc.), it has **a minimal overhead on performance** because physical units are only manipulated through static analysis and disappear at runtime.
 
 impunity is based on Python “flexible variable and function annotations” ([PEP 593](https://peps.python.org/pep-0593/)) and checks consistency between variables and arguments of functions. If physical units are consistent, impunity rewrites the code by automatically applying conversions in the code of the function.
 
@@ -110,9 +111,16 @@ altitudes: feet_array = np.arange(0, 1000, 100)
 
 ## impunity in a debugger
 
+TODO
+
 ## Tests
 
-Tests are supported by [pytest]()
+Tests are supported by the unittest package.
+
+Because AST manipulation can be tricky, continuous integration is ensured by Github Actions for:
+
+- Linux, MacOS and Windows;
+- all versions of Python since 3.8
 
 ## Why impunity?
 
