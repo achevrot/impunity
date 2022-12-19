@@ -34,6 +34,7 @@ jobs:
       - name: Add poetry to windows path
         if: "startsWith(matrix.os, 'windows')"
         run: |
+          echo "C:\Users\runneradmin\.local\bin\poetry" >> $GITHUB_PATH
           Add-Content $env:GITHUB_PATH "C:\Users\runneradmin\.local\bin\poetry"
 
       # Poetry cache depends on OS, Python version and Poetry version.
