@@ -41,7 +41,7 @@ def get_annotation_unit(annotation) -> str:
         if isinstance(annotation.slice, ast.Tuple):
             return annotation.slice.elts[1].value
         else:
-            return annotation.slice.value
+            return annotation.slice.value.elts[1].value
     else:
         raise TypeError(f"{annotation} is not an annotation type expected by impunity")
 
