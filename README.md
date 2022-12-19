@@ -1,5 +1,6 @@
 # impunity
 [![tests](https://github.com/achevrot/impunity/actions/workflows/run-tests.yml/badge.svg)](https://github.com/achevrot/impunity/actions/workflows/run-tests.yml)
+[![Code Coverage](https://img.shields.io/codecov/c/github/achevrot/impunity.svg)](https://codecov.io/gh/achevrot/impunity)
 ![License](https://img.shields.io/pypi/l/impunity.svg) [![Checked with mypy](https://img.shields.io/badge/mypy-checked-blue.svg)](https://mypy.readthedocs.io/) [![Code style: black](https://img.shields.io/badge/code%20style-black-black.svg)](https://github.com/psf/black)
 
 **impunity** is a Python library consisting of **a single decorator** function designed to ensure consistency of physical quantities. Compared to other libraries (pint, etc.), it has **a minimal overhead on performance** because units are only manipulated through static analysis and disappear at runtime.
