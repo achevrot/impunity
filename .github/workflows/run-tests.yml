@@ -86,8 +86,3 @@ jobs:
         if: ${{ github.event_name != 'pull_request_target' && matrix.os == 'ubuntu-latest' }}
         run: |
           poetry run codecov
-
-
-        # uses: codecov/codecov-action@v2
-        # with:
-        #   env_vars: PYTHON_VERSION
