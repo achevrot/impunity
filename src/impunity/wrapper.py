@@ -2,24 +2,47 @@ from __future__ import annotations
 
 import ast
 import inspect
-import logging
 import os
 import textwrap
 from pathlib import Path
-from typing import Any, Callable, Union
+
+# from typing_extensions import ParamSpec
+from typing import Union, TypeVar, Callable, overload, Any
 
 import astor
 
 from .visitor import Visitor
 
-_log = logging.getLogger(__name__)
+# P = ParamSpec("P")
+# T = TypeVar("T")
+# T = TypeVar("T", bound=Callable[..., Any])
+# OriginalFunc = Callable[P, T]  # erreur, mais pourquoi ???
+# OriginalFunc = Callable[..., T]  # renvoie un OriginalFunc signature
+
+F = TypeVar("F", bound=Callable[..., Any])  # fonctionne sur un appel direct
+
+
+@overload
+def impunity(__func: F) -> F:
+    ...
+
+
+@overload
+def impunity(
+    __func: None = None,
+    *,
+    ignore: bool = False,
+    rewrite: Union[bool, str] = True,
+) -> Callable[[F], F]:
+    ...
 
 
 def impunity(
-    *args: Callable[[Any], Any],
+    __func: None | F = None,
+    *,
     ignore: bool = False,
     rewrite: Union[bool, str] = True,
-) -> Callable[[Any], Any]:
+) -> F | Callable[[F], F]:
 
     """Decorator function to check units based on annotations
 
@@ -32,7 +55,7 @@ def impunity(
         code to keep unit coherence.
     """
 
-    def deco_f(fun: Callable[[Any], Any]) -> Callable[[Any], Any]:
+    def deco_f(fun: Callable[..., Any]):
         if ignore:
             return fun
 
@@ -106,7 +129,7 @@ def impunity(
 
         return fun
 
-    if len(args) == 0:
+    if __func is not None:
+        return deco_f(__func)
+    else:
         return deco_f
-
-    return deco_f(args[0])

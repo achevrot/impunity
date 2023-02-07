@@ -6,7 +6,8 @@ import inspect
 import logging
 import sys
 import types
-from typing import Any
+from typing import Any, Dict, Optional, Union, cast
+from _collections_abc import Sequence
 
 import pint
 from pint import UnitRegistry
@@ -18,9 +19,16 @@ else:
     from typing_extensions import Annotated, TypeGuard
 
 from .exception import raise_dim_error
-from .quantityNode import QuantityNode
+from .quantityNode import QuantityNode, Unit
 
-annot_type = type(Annotated[int, "spam"])
+annotation_node = Union[ast.Subscript, ast.Name, ast.Constant]
+
+
+class annot_type(Annotated[int, "spam"]):
+    """Class to access __metadata__ from Annotated variables"""
+
+    __metadata__ = getattr(super, "__metadata__")
+
 
 _log = logging.getLogger(__name__)
 
@@ -34,19 +42,26 @@ logging.basicConfig(
 )
 
 
-def get_annotation_unit(annotation) -> str:
+def get_annotation_unit(annotation: annotation_node | ast.expr) -> str:
+    unit = None
     if isinstance(annotation, ast.Constant):
-        return annotation.value
+        unit = annotation.value
     elif isinstance(annotation, ast.Subscript):
-        if isinstance(annotation.slice, ast.Tuple):
-            return annotation.slice.elts[1].value
-        else:
-            return annotation.slice.value.elts[1].value
+        if isinstance(annotation.slice, ast.Index):
+            if isinstance(annotation.slice.value, ast.Tuple):
+                unit_node = annotation.slice.value.elts[1]
+        elif isinstance(annotation.slice, ast.Tuple):
+            unit_node = annotation.slice.elts[1]
+        if isinstance(unit_node, ast.Constant):
+            unit = unit_node.value
+
+    if unit is not None:
+        return unit
     else:
         raise TypeError(f"{annotation} is not an annotation type expected by impunity")
 
 
-def is_annotated(hint: Any, annot_type=annot_type) -> TypeGuard[annot_type]:
+def is_annotated(hint: Any, annot_type=annot_type) -> TypeGuard[annot_type]:  # type: ignore
     return (type(hint) is annot_type) and hasattr(hint, "__metadata__")
 
 
@@ -108,10 +123,10 @@ class Visitor(ast.NodeTransformer):
             method_list = [
                 getattr(fun, func) for func in dir(fun) if callable(getattr(fun, func)) and not func.startswith("__")
             ]
-            self.add_func(fun.__init__)
+            self.add_func(fun.__init__)  # type: ignore
             for function in method_list:
                 self.add_func(function)
-            self.class_attr = {}
+            self.class_attr: Dict[str, Unit] = {}
         else:
             self.add_func(fun)
 
@@ -122,11 +137,13 @@ class Visitor(ast.NodeTransformer):
         # check for couscous decorator:
         if node.decorator_list:
             for decorator in node.decorator_list:
-                if isinstance(decorator, ast.Call) and decorator.func.id == "couscous":
-                    for kw in decorator.keywords:
-                        if kw.arg == "ignore" and kw.value.value:
-                            self.couscous_func.pop(node.name, False)
-                            return node
+                if isinstance(decorator, ast.Call) and isinstance(decorator.func, ast.Name):
+                    if decorator.func.id == "couscous":
+                        for kw in decorator.keywords:
+                            if hasattr(kw, "value"):
+                                if kw.arg == "ignore" and kw.value.value:  # type: ignore
+                                    self.couscous_func.pop(node.name, False)
+                                    return node
 
         if (fun := self.get_func(node.name)) is not None:
             self.nested_flag = True
@@ -162,22 +179,10 @@ class Visitor(ast.NodeTransformer):
 
         # from function signature
         for arg in node.args.args:
-            annotation = getattr(arg, "annotation", None)
-            if annotation is not None:
-                if isinstance(annotation, ast.Constant):
-                    if annotation.value in self.ureg:
-                        self.vars[arg.arg] = arg.annotation.value
-                    else:
-                        _log.warning(
-                            f"In function {self.fun.__module__}/{self.fun.__name__}:"
-                            "Signature of couscoussed functions must be in Unit Registry"
-                        )
-                elif isinstance(annotation, ast.Subscript):
-                    if annotation.value.id == "Annotated":
-                        if isinstance(arg.annotation.slice, ast.Index):
-                            self.vars[arg.arg] = arg.annotation.slice.value.elts[1].value
-                        else:
-                            self.vars[arg.arg] = arg.annotation.slice.elts[1].value
+            if arg.annotation is not None:
+                anno_unit = get_annotation_unit(arg.annotation)
+                if anno_unit in self.ureg:
+                    self.vars[arg.arg] = anno_unit
                 else:
                     _log.warning(
                         f"In function {self.fun.__module__}/{self.fun.__name__}: "
@@ -185,11 +190,10 @@ class Visitor(ast.NodeTransformer):
                     )
 
         # Check units in the return node
-
         self.generic_visit(node)
         return node
 
-    def get_node_unit(self, node: ast.AST) -> QuantityNode:
+    def get_node_unit(self, node: Optional[ast.expr]) -> QuantityNode:
         """Method to induce the unit of a node through recursive
         calls on children if any.
 
@@ -200,6 +204,8 @@ class Visitor(ast.NodeTransformer):
             QuantityNode: QuantityNode(node, induced_unit)
         """
 
+        new_node: Union[ast.BinOp, ast.IfExp, ast.Call]
+
         if isinstance(node, ast.Constant):
             return QuantityNode(node, None)
         if isinstance(node, ast.Subscript):
@@ -208,24 +214,31 @@ class Visitor(ast.NodeTransformer):
             elems = list(map(self.get_node_unit, node.elts))
             return QuantityNode(
                 ast.Tuple([elem.node for elem in elems], ctx=node.ctx),
-                [elem.unit for elem in elems],
+                cast(Sequence[Unit], [elem.unit for elem in elems]),
             )
         elif isinstance(node, ast.List):
             if not node.elts:
                 return QuantityNode(node, None)
             else:
-                return list(map(self.get_node_unit, node.elts))
+                elems = list(map(self.get_node_unit, node.elts))
+                return QuantityNode(
+                    ast.List([elem.node for elem in elems], ctx=node.ctx),
+                    cast(Sequence[Unit], [elem.unit for elem in elems]),
+                )
         elif isinstance(node, ast.Set):
-            return set(map(self.get_node_unit, node.elts))
+            elems = list(map(self.get_node_unit, node.elts))
+            return QuantityNode(
+                ast.Set([elem.node for elem in elems]),
+                cast(Sequence[Unit], [elem.unit for elem in elems]),
+            )
         elif isinstance(node, ast.Dict):
             if not node.keys:
                 return QuantityNode(node, None)
             else:
-                return dict(
-                    zip(
-                        map(self.get_node_unit, node.keys),
-                        map(self.get_node_unit, node.values),
-                    )
+                elems = list(map(self.get_node_unit, node.values))
+                return QuantityNode(
+                    ast.Dict(zip(node.keys, [elem.node for elem in elems])),
+                    cast(Sequence[Unit], [elem.unit for elem in elems]),
                 )
         elif isinstance(node, ast.Name):
             return QuantityNode(node, self.vars[node.id])
@@ -301,7 +314,10 @@ class Visitor(ast.NodeTransformer):
 
         elif isinstance(node, ast.Call):
 
-            id = node.func.id if isinstance(node.func, ast.Name) else node.func.attr
+            if isinstance(node.func, ast.Name):
+                id = node.func.id
+            elif isinstance(node.func, ast.Attribute):
+                id = node.func.attr
             if id in self.couscous_func:
                 signature = self.get_func_signature(id)
             else:
@@ -373,11 +389,11 @@ class Visitor(ast.NodeTransformer):
 
         if isinstance(node.func, ast.Name):
 
-            if node.func.id in __builtins__.keys():
+            if node.func.id in __builtins__.keys():  # type: ignore
                 return node
 
             parameters = inspect.getfullargspec(self.fun_globals[node.func.id])
-            new_args = []
+            new_args: list[ast.BinOp | ast.expr] = []
             for i, arg in enumerate(parameters.args):
                 if (received := self.get_node_unit(node.args[i]).unit) != (expected := parameters.annotations[arg]):
                     if pint.Unit(received).is_compatible_with(pint.Unit(expected)):
@@ -429,14 +445,14 @@ class Visitor(ast.NodeTransformer):
             # )
             new_node = node
 
-        elif (received := value.unit) != (expected := node.annotation):
+        elif (received := value.unit) != (expected := cast(annotation_node, node.annotation)):
 
-            expected = get_annotation_unit(expected)
+            expected_unit = get_annotation_unit(expected)
 
             if received == "dimensionless":
                 new_node = node
-            elif pint.Unit(received).is_compatible_with(pint.Unit(expected)):
-                conv_value = pint.Unit(expected).from_(pint.Unit(received)).m
+            elif pint.Unit(received).is_compatible_with(pint.Unit(expected_unit)):
+                conv_value = pint.Unit(expected_unit).from_(pint.Unit(received)).m
                 new_value = ast.BinOp(
                     node.value,
                     ast.Mult(),
@@ -450,17 +466,19 @@ class Visitor(ast.NodeTransformer):
                 )
 
             else:
-                raise_node = raise_dim_error(pint.errors.DimensionalityError, received, expected)
+                raise_node = raise_dim_error(pint.errors.DimensionalityError, received, expected_unit)
                 return raise_node
         else:
             new_node = node
 
         if isinstance(node.target, ast.Attribute):
-            if node.target.value.id == "self":
-                self.class_attr[node.target.attr] = value.unit
+            if isinstance(node.target.value, ast.Name):
+                if node.target.value.id == "self":
+                    self.class_attr[node.target.attr] = value.unit
         else:
-            annotation = get_annotation_unit(node.annotation)
-            self.vars[node.target.id] = annotation
+            if isinstance(node.target, ast.Name):
+                annotation = get_annotation_unit(cast(annotation_node, node.annotation))
+                self.vars[node.target.id] = annotation
         # ast.fix_missing_locations(new_node)
         return ast.copy_location(new_node, node)
 
@@ -502,28 +520,35 @@ class Visitor(ast.NodeTransformer):
                 if isinstance(target, ast.Tuple):
                     if isinstance(node.value.func, ast.Name):
                         for i, elem in enumerate(target.elts):
-                            self.vars[elem.id] = (
-                                inspect.signature(self.fun_globals[node.value.func.id])
-                                .return_annotation.__args__[i]
-                                .__forward_value__
-                            )
+                            if isinstance(elem, ast.Name):
+                                self.vars[elem.id] = (
+                                    inspect.signature(self.fun_globals[node.value.func.id])
+                                    .return_annotation.__args__[i]
+                                    .__forward_value__
+                                )
                     else:
                         for i, elem in enumerate(target.elts):
-                            self.vars[elem.id] = (
-                                inspect.signature(
-                                    getattr(
-                                        self.fun_globals[node.value.func.value.id],
-                                        node.value.func.attr,
+                            if (
+                                isinstance(node.value.func, ast.Attribute)
+                                and isinstance(elem, ast.Name)
+                                and isinstance(node.value.func.value, ast.Name)
+                            ):
+                                self.vars[elem.id] = (
+                                    inspect.signature(
+                                        getattr(
+                                            self.fun_globals[node.value.func.value.id],
+                                            node.value.func.attr,
+                                        )
                                     )
+                                    .return_annotation.__args__[i]
+                                    .__forward_value__
                                 )
-                                .return_annotation.__args__[i]
-                                .__forward_value__
-                            )
                 elif isinstance(target, ast.Name):
                     self.vars[target.id] = value.unit
-                else:
-                    if target.value.id == "self":
-                        self.class_attr[target.attr] = value.unit
+                elif isinstance(target, ast.Attribute):
+                    if isinstance(target.value, ast.Name):
+                        if target.value.id == "self":
+                            self.class_attr[target.attr] = value.unit
             new_node = node
 
         else:
@@ -541,8 +566,9 @@ class Visitor(ast.NodeTransformer):
                 elif isinstance(target, ast.Name):
                     self.vars[target.id] = value.unit
                 elif isinstance(target, ast.Attribute):
-                    if target.value.id == "self":
-                        self.class_attr[target.attr] = value.unit
+                    if isinstance(target.value, ast.Name):
+                        if target.value.id == "self":
+                            self.class_attr[target.attr] = value.unit
 
         return ast.copy_location(new_node, node)
 
@@ -561,7 +587,7 @@ class Visitor(ast.NodeTransformer):
         if return_annotation is inspect._empty:
             _log.warning(f"In function {self.fun.__module__}/{self.fun.__name__}: Some return annotations are missing")
 
-        if isinstance(return_annotation, Annotated):
+        if is_annotated(return_annotation):
             expected = return_annotation.__metadata__
         elif isinstance(return_annotation, str):
             expected = return_annotation
