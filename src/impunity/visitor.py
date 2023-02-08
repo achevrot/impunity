@@ -27,7 +27,9 @@ annotation_node = Union[ast.Subscript, ast.Name, ast.Constant]
 class annot_type(Annotated[int, "spam"]):
     """Class to access __metadata__ from Annotated variables"""
 
-    __metadata__ = getattr(super, "__metadata__")
+    def __init__(self, *args, **kw):
+        super(annot_type, self).__init__(*args, **kw)
+        self.__metadata__ = getattr(super(), "__metadata__")
 
 
 _log = logging.getLogger(__name__)
@@ -394,22 +396,23 @@ class Visitor(ast.NodeTransformer):
 
             parameters = inspect.getfullargspec(self.fun_globals[node.func.id])
             new_args: list[ast.BinOp | ast.expr] = []
-            for i, arg in enumerate(parameters.args):
-                if (received := self.get_node_unit(node.args[i]).unit) != (expected := parameters.annotations[arg]):
-                    if pint.Unit(received).is_compatible_with(pint.Unit(expected)):
-                        conv_value = pint.Unit(expected).from_(pint.Unit(received)).m
-                    else:
-                        raise_node = raise_dim_error(pint.errors.DimensionalityError, received, expected)
-                        return raise_node
+            if node.args:
+                for i, arg in enumerate(parameters.args):
+                    if (received := self.get_node_unit(node.args[i]).unit) != (expected := parameters.annotations[arg]):
+                        if pint.Unit(received).is_compatible_with(pint.Unit(expected)):
+                            conv_value = pint.Unit(expected).from_(pint.Unit(received)).m
+                        else:
+                            raise_node = raise_dim_error(pint.errors.DimensionalityError, received, expected)
+                            return raise_node
 
-                    new_arg = ast.BinOp(
-                        node.args[i],
-                        ast.Mult(),
-                        ast.Constant(conv_value),
-                    )
-                    new_args.append(new_arg)
-                else:
-                    new_args.append(node.args[i])
+                        new_arg = ast.BinOp(
+                            node.args[i],
+                            ast.Mult(),
+                            ast.Constant(conv_value),
+                        )
+                        new_args.append(new_arg)
+                    else:
+                        new_args.append(node.args[i])
             if new_args:
                 new_node = ast.Call(
                     func=node.func,

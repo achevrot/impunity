@@ -144,3 +144,7 @@ class Functions(unittest.TestCase):
         alt_ft: "ft" = 1000
         with self.assertRaises(pint.errors.DimensionalityError):
             res: "ft" = temperature(alt_ft)  # noqa: F841
+
+
+if __name__ == "__main__":
+    unittest.main()

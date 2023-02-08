@@ -47,3 +47,7 @@ class Arithmetic(unittest.TestCase):
         _, result_2 = (alt_m + alt_ft + alt_m2, alt_m + alt_ft + alt_m2)
 
         self.assertAlmostEqual(result_2, 4609.6, delta=1e-2)
+
+
+if __name__ == "__main__":
+    unittest.main()

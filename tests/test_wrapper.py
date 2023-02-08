@@ -24,3 +24,7 @@ class Wrapper(unittest.TestCase):
         alt_m2: "m" = 3000
         result: "m" = alt_m + alt_ft + alt_m2
         self.assertAlmostEqual(result, 6000, delta=1e-2)
+
+
+if __name__ == "__main__":
+    unittest.main()

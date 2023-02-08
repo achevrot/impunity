@@ -65,3 +65,7 @@ class Assign(unittest.TestCase):
         density_troposphere = np.maximum(1500, 6210)  # return None unit
         density: "Pa" = density_troposphere * np.exp(0)
         self.assertEqual(density, 6210)
+
+
+if __name__ == "__main__":
+    unittest.main()
