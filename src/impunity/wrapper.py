@@ -4,11 +4,11 @@ import ast
 import inspect
 import os
 import textwrap
-from pathlib import Path
 import types
+from pathlib import Path
 
 # from typing_extensions import ParamSpec
-from typing import Optional, Union, TypeVar, Callable, overload, Any
+from typing import Any, Callable, Optional, TypeVar, Union, overload
 
 import astor
 

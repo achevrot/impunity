@@ -2,7 +2,6 @@ import ast
 import sys
 from typing import Optional, TypeVar, overload
 
-
 if sys.version_info >= (3, 9):
     from _collections_abc import Sequence
 else:

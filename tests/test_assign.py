@@ -10,10 +10,13 @@ if sys.version_info >= (3, 9):
 else:
     from typing_extensions import Annotated
 
-m = Any
-K = Any
-ft = Any
-Pa = Any
+m = Annotated[Any, "m"]
+K = Annotated[Any, "K"]
+ft = Annotated[Any, "ft"]
+cm = Annotated[Any, "cm"]
+Pa = Annotated[Any, "Pa"]
+kts = Annotated[Any, "kts"]
+dimensionless = Annotated[Any, "dimensionless"]
 
 
 # -----------------------

@@ -6,8 +6,8 @@ import inspect
 import logging
 import sys
 import types
-from typing import Any, Dict, Optional, Union, cast
 from numbers import Number
+from typing import Any, Dict, Optional, Union, cast
 
 if sys.version_info >= (3, 9):
     from _collections_abc import Sequence

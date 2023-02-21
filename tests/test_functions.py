@@ -1,10 +1,14 @@
-from typing_extensions import Annotated
+import sys
 import unittest
-
 from typing import Any, Tuple
 
 import numpy as np
 from impunity import impunity
+
+if sys.version_info >= (3, 9):
+    from typing import Annotated
+else:
+    from typing_extensions import Annotated
 
 m = Annotated[Any, "m"]
 K = Annotated[Any, "K"]
