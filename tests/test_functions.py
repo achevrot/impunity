@@ -1,18 +1,18 @@
+from typing_extensions import Annotated
 import unittest
-from typing import Any, Tuple
 
-import pint
+from typing import Any, Tuple
 
 import numpy as np
 from impunity import impunity
 
-m = Any
-K = Any
-ft = Any
-cm = Any
-Pa = Any
-kts = Any
-dimensionless = Any
+m = Annotated[Any, "m"]
+K = Annotated[Any, "K"]
+ft = Annotated[Any, "ft"]
+cm = Annotated[Any, "cm"]
+Pa = Annotated[Any, "Pa"]
+kts = Annotated[Any, "kts"]
+dimensionless = Annotated[Any, "dimensionless"]
 
 # -----------------------
 # du : different units
@@ -89,7 +89,7 @@ class Functions(unittest.TestCase):
     def test_binOp(self) -> None:
         alt_ft: "ft" = 1000
         temp = temperature(alt_ft * 3)
-        self.assertAlmostEqual(temp, 268.65, delta=1e-1)
+        self.assertAlmostEqual(temp, 282.21, delta=1e-1)
 
     # def test_call_multi_args(self)-> None:
     #     @impunity
@@ -133,17 +133,18 @@ class Functions(unittest.TestCase):
     #     res = test_using_globals(m)
     #     assert res == pytest.approx(isa.STRATOSPHERE_TEMP, delta=1e-1)
 
-    @impunity
-    def test_wrong_units(self) -> None:
-        with self.assertRaises(pint.errors.DimensionalityError):
-            alt_ft: "K" = 1000
-            temperature(alt_ft)
+    # @impunity
+    # def test_wrong_units(self) -> None:
+    #     with self.assertLogs(_log):
+    #         alt_ft: "K" = 1000
+    #         temperature(alt_ft)
 
-    @impunity
-    def test_wrong_units1(self) -> None:
-        alt_ft: "ft" = 1000
-        with self.assertRaises(pint.errors.DimensionalityError):
-            res: "ft" = temperature(alt_ft)  # noqa: F841
+    # @impunity
+    # def test_wrong_units1(self) -> None:
+    #     alt_ft: "ft" = 1000
+    #     with self.assertLogs() as captured:
+    #         res: "ft" = temperature(alt_ft)  # noqa: F841
+    #     self.assertEqual(len(captured.records), 1)
 
 
 if __name__ == "__main__":

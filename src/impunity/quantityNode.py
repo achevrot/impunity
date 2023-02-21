@@ -1,6 +1,12 @@
 import ast
+import sys
 from typing import Optional, TypeVar, overload
-from _collections_abc import Sequence
+
+
+if sys.version_info >= (3, 9):
+    from _collections_abc import Sequence
+else:
+    from typing import Sequence
 
 Unit = Optional[str]
 N = TypeVar("N", bound=Optional[ast.expr], covariant=True)

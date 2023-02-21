@@ -1,11 +1,16 @@
+from typing_extensions import Annotated
 import unittest
 from typing import Any
 
 from impunity import impunity
 
-m = Any
-K = Any
-ft = Any
+m = Annotated[Any, "m"]
+K = Annotated[Any, "K"]
+ft = Annotated[Any, "ft"]
+cm = Annotated[Any, "cm"]
+Pa = Annotated[Any, "Pa"]
+kts = Annotated[Any, "kts"]
+dimensionless = Annotated[Any, "dimensionless"]
 
 
 class Wrapper(unittest.TestCase):

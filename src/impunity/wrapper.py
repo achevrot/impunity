@@ -5,9 +5,10 @@ import inspect
 import os
 import textwrap
 from pathlib import Path
+import types
 
 # from typing_extensions import ParamSpec
-from typing import Union, TypeVar, Callable, overload, Any
+from typing import Optional, Union, TypeVar, Callable, overload, Any
 
 import astor
 
@@ -38,11 +39,11 @@ def impunity(
 
 
 def impunity(
-    __func: None | F = None,
+    __func: Optional[F] = None,
     *,
     ignore: bool = False,
     rewrite: Union[bool, str] = True,
-) -> F | Callable[[F], F]:
+) -> Union[F, Callable[[F], F]]:
 
     """Decorator function to check units based on annotations
 
@@ -67,7 +68,6 @@ def impunity(
 
         # get the string of the transformed function
         f_str = astor.to_source(fun_tree)
-
         if not rewrite:
             return fun
 
@@ -82,7 +82,11 @@ def impunity(
                 f.write("\n")
 
         idx = f_str.find("\n") + 1
-        exec(f_str[idx:])
+        if f_str[0] == "@":
+            exec(f_str[idx:])
+        else:
+            # if impunity is called without the decorator synthax
+            exec(f_str)
 
         new_fun = locals()[fun.__name__]
 
@@ -118,13 +122,24 @@ def impunity(
             for const in fun.__code__.co_consts:
                 if const not in co_consts:
                     co_consts = co_consts + (const,)
-            cocode = new_fun.__code__.co_code
 
-            fun.__code__ = fun.__code__.replace(
-                co_code=cocode,
-                co_consts=co_consts,
-                # co_lnotab=co_lnotab,
-                co_firstlineno=co_firstlineno,
+            fun.__code__ = types.CodeType(
+                fun.__code__.co_argcount,
+                fun.__code__.co_kwonlyargcount,
+                fun.__code__.co_posonlyargcount,
+                fun.__code__.co_nlocals,
+                fun.__code__.co_stacksize,
+                fun.__code__.co_flags,
+                new_fun.__code__.co_code,
+                co_consts,
+                fun.__code__.co_names,
+                fun.__code__.co_varnames,
+                fun.__code__.co_filename,
+                fun.__code__.co_name,
+                co_firstlineno,
+                fun.__code__.co_lnotab,
+                fun.__code__.co_freevars,
+                fun.__code__.co_cellvars,
             )
 
         return fun
