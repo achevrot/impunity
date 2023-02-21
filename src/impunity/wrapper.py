@@ -3,6 +3,7 @@ from __future__ import annotations
 import ast
 import inspect
 import os
+import sys
 import textwrap
 import types
 from pathlib import Path
@@ -118,30 +119,51 @@ def impunity(
         else:
             co_consts = new_fun.__code__.co_consts
             co_lnotab = new_fun.__code__.co_lnotab
-            co_firstlineno = fun.__code__.co_firstlineno + 1
+            co_firstlineno = fun.__code__.co_firstlineno
             for const in fun.__code__.co_consts:
                 if const not in co_consts:
                     co_consts = co_consts + (const,)
 
-            fun.__code__ = types.CodeType(
-                fun.__code__.co_argcount,
-                fun.__code__.co_kwonlyargcount,
-                fun.__code__.co_posonlyargcount,
-                fun.__code__.co_nlocals,
-                fun.__code__.co_stacksize,
-                fun.__code__.co_flags,
-                new_fun.__code__.co_code,
-                co_consts,
-                fun.__code__.co_names,
-                fun.__code__.co_varnames,
-                fun.__code__.co_filename,
-                fun.__code__.co_name,
-                co_firstlineno,
-                fun.__code__.co_lnotab,
-                fun.__code__.co_freevars,
-                fun.__code__.co_cellvars,
-            )
-
+            if sys.version_info >= (3, 11):
+                fun.__code__ = types.CodeType(
+                    fun.__code__.co_argcount,
+                    fun.__code__.co_posonlyargcount,
+                    fun.__code__.co_kwonlyargcount,
+                    fun.__code__.co_nlocals,
+                    fun.__code__.co_stacksize,
+                    fun.__code__.co_flags,
+                    new_fun.__code__.co_code,
+                    co_consts,
+                    fun.__code__.co_names,
+                    fun.__code__.co_varnames,
+                    fun.__code__.co_filename,
+                    fun.__code__.co_name,
+                    fun.__code__.co_qualname,
+                    co_firstlineno,
+                    fun.__code__.co_lnotab,
+                    fun.__code__.co_exceptiontable,
+                    fun.__code__.co_freevars,
+                    fun.__code__.co_cellvars,
+                )
+            else:
+                fun.__code__ = types.CodeType(
+                    fun.__code__.co_argcount,
+                    fun.__code__.co_posonlyargcount,
+                    fun.__code__.co_kwonlyargcount,
+                    fun.__code__.co_nlocals,
+                    fun.__code__.co_stacksize,
+                    fun.__code__.co_flags,
+                    new_fun.__code__.co_code,
+                    co_consts,
+                    fun.__code__.co_names,
+                    fun.__code__.co_varnames,
+                    fun.__code__.co_filename,
+                    fun.__code__.co_name,
+                    co_firstlineno,
+                    fun.__code__.co_lnotab,
+                    fun.__code__.co_freevars,
+                    fun.__code__.co_cellvars,
+                )
         return fun
 
     if __func is not None:
