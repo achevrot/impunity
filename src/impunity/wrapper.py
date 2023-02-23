@@ -119,7 +119,6 @@ def impunity(
         else:
             co_consts = new_fun.__code__.co_consts
             co_lnotab = new_fun.__code__.co_lnotab
-            co_firstlineno = fun.__code__.co_firstlineno
             for const in fun.__code__.co_consts:
                 if const not in co_consts:
                     co_consts = co_consts + (const,)
@@ -139,8 +138,8 @@ def impunity(
                     fun.__code__.co_filename,
                     fun.__code__.co_name,
                     fun.__code__.co_qualname,
-                    co_firstlineno,
-                    fun.__code__.co_lnotab,
+                    fun.__code__.co_firstlineno,
+                    new_fun.__code__.co_linetable,
                     fun.__code__.co_exceptiontable,
                     fun.__code__.co_freevars,
                     fun.__code__.co_cellvars,
@@ -159,8 +158,8 @@ def impunity(
                     fun.__code__.co_varnames,
                     fun.__code__.co_filename,
                     fun.__code__.co_name,
-                    co_firstlineno,
-                    fun.__code__.co_lnotab,
+                    fun.__code__.co_firstlineno,
+                    new_fun.__code__.co_lnotab,
                     fun.__code__.co_freevars,
                     fun.__code__.co_cellvars,
                 )
