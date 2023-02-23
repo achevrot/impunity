@@ -157,7 +157,10 @@ class Visitor(ast.NodeTransformer):
             annotations = getattr(fun, "__annotations__", None)
             if annotations:
                 globals = list(cls.couscous_func.values())[-1].__globals__
-                annotations = {k: v if not isinstance(v, str) else eval(v, globals) for k, v in annotations.items()}
+                locals = fun.__globals__
+                annotations = {
+                    k: v if not isinstance(v, str) else eval(v, globals, locals) for k, v in annotations.items()
+                }
                 return cast(Dict, annotations)
         elif callable(name):
             annotations = getattr(name, "__annotations__", None)
@@ -314,7 +317,10 @@ class Visitor(ast.NodeTransformer):
                 return QuantityNode(ast.copy_location(new_node, node), None)
 
             if pint.Unit(left.unit).is_compatible_with(pint.Unit(right.unit)):
-                conv_value = pint.Unit(left.unit).from_(pint.Unit(right.unit)).m
+                if "dimensionless" in (left.unit, right.unit):
+                    conv_value = 1
+                else:
+                    conv_value = pint.Unit(left.unit).from_(pint.Unit(right.unit)).m
                 new_node = ast.BinOp(
                     left.node,
                     node.op,
@@ -338,7 +344,10 @@ class Visitor(ast.NodeTransformer):
                 return QuantityNode(ast.copy_location(new_node, node), None)
 
             if pint.Unit(left.unit).is_compatible_with(pint.Unit(right.unit)):
-                conv_value = pint.Unit(left.unit).from_(pint.Unit(right.unit)).m
+                if "dimensionless" in (left.unit, right.unit):
+                    conv_value = 1
+                else:
+                    conv_value = pint.Unit(left.unit).from_(pint.Unit(right.unit)).m
                 new_node = ast.BinOp(
                     left.node,
                     node.op,
@@ -416,7 +425,10 @@ class Visitor(ast.NodeTransformer):
                         received = received.__metadata__[0]  # type: ignore
                     if received != expected:
                         if pint.Unit(received).is_compatible_with(pint.Unit(expected)):
-                            conv_value = pint.Unit(expected).from_(pint.Unit(received)).m
+                            if "dimensionless" in (received, expected):
+                                conv_value = 1
+                            else:
+                                conv_value = pint.Unit(expected).from_(pint.Unit(received)).m
                             new_arg = ast.BinOp(
                                 node.args[i],
                                 ast.Mult(),
@@ -474,7 +486,10 @@ class Visitor(ast.NodeTransformer):
                         if is_annotated(expected):
                             expected = expected.__metadata__[0]  # type: ignore
                         if pint.Unit(received).is_compatible_with(pint.Unit(expected)):
-                            conv_value = pint.Unit(expected).from_(pint.Unit(received)).m
+                            if "dimensionless" in (received, expected):
+                                conv_value = 1
+                            else:
+                                conv_value = pint.Unit(expected).from_(pint.Unit(received)).m
                         else:
                             _log.warning(
                                 f"In function {self.fun.__module__}/{self.fun.__name__}: "
@@ -502,7 +517,10 @@ class Visitor(ast.NodeTransformer):
                                 return node
 
                             if pint.Unit(received).is_compatible_with(pint.Unit(expected)):
-                                conv_value = pint.Unit(expected).from_(pint.Unit(received)).m
+                                if "dimensionless" in (received, expected):
+                                    conv_value = 1
+                                else:
+                                    conv_value = pint.Unit(expected).from_(pint.Unit(received)).m
                             else:
                                 _log.warning(
                                     f"In function {self.fun.__module__}/{self.fun.__name__}: "
@@ -571,7 +589,10 @@ class Visitor(ast.NodeTransformer):
                 new_node = node
 
             elif pint.Unit(received).is_compatible_with(pint.Unit(expected_unit)):
-                conv_value = pint.Unit(expected_unit).from_(pint.Unit(received)).m
+                if "dimensionless" in (received, expected_unit):
+                    conv_value = 1
+                else:
+                    conv_value = pint.Unit(expected_unit).from_(pint.Unit(received)).m
                 new_value = ast.BinOp(
                     node.value,
                     ast.Mult(),
@@ -723,7 +744,10 @@ class Visitor(ast.NodeTransformer):
 
         if (received := value.unit) != expected:
             if pint.Unit(received).is_compatible_with(pint.Unit(expected)):
-                conv_value = pint.Unit(expected).from_(pint.Unit(received)).m
+                if "dimensionless" in (received, expected):
+                    conv_value = 1
+                else:
+                    conv_value = pint.Unit(expected).from_(pint.Unit(received)).m
                 new_value = ast.BinOp(
                     node.value,
                     ast.Mult(),
