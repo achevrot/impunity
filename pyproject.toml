@@ -2,7 +2,10 @@
 name = "impunity"
 version = "0.2.1"
 description = "Static checking for consistency of physical units"
-authors = ["Antoine Chevrot <antoine.chevrot@gmail.com>"]
+authors = [
+  "Antoine Chevrot <antoine.chevrot@gmail.com>",
+  "Xavier Olive <git@xoolive.org>"
+]
 
 [tool.poetry.dependencies]
 python = "^3.8"
@@ -10,11 +13,10 @@ Pint = ">=0.19.2"
 astor = "^0.8.1"
 typing-extensions = { version=">=4.2.0,<5.0.0", python="<3.10" }
 
-[tool.poetry.dev-dependencies]
+[tool.poetry.group.dev.dependencies]
 black = ">=21.6"
 mypy = ">=0.981"
-isort = "^5.11.2"
-flake8 = ">=5.0"
+ruff = "^0.0.253"
 numpy = "^1.23.5"
 coverage = "^7.0.0"
 codecov = "^2.1.12"
@@ -38,10 +40,21 @@ exclude = '''
 )/
 '''
 
-[tool.isort]
-line_length = 120
-profile = "black"
-known_first_party = ["numpy", "pandas"]
+[tool.ruff]
+select = [
+  "E", "W",  # pycodestyle
+  "F",  # pyflakes
+  "I",  # isort
+  "NPY",  # numpy
+  # "PD",  # pandas
+  "DTZ", # flake8-datetimez
+  "RUF"
+]
+line-length = 120
+target-version = "py38"
+
+[tool.ruff.isort]
+known-first-party = ["numpy", "pandas"]
 
 [tool.coverage.run]
 source = ["src"]
