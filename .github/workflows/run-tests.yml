@@ -64,8 +64,7 @@ jobs:
       - name: Style checking
         if: ${{ matrix.python-version == '3.8' && matrix.os == 'ubuntu-latest' }}
         run: |
-          poetry run flake8 src tests
-          poetry run isort --check-only src tests
+          poetry run ruff src tests
           poetry run black --check src tests
 
       # - name: Type checking

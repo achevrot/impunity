@@ -7,7 +7,7 @@
   "settings": {
     // Linting + type checking
     "python.linting.pylintEnabled": false,
-    "python.linting.flake8Enabled": true,
+    "python.linting.flake8Enabled": false,
     "python.linting.mypyEnabled": true,
     "python.linting.enabled": true,
     // Formatting
@@ -15,13 +15,7 @@
     "python.formatting.provider": "black",
     // Testing
     "python.testing.unittestEnabled": true,
-    "python.testing.unittestArgs": [
-      "-v",
-      "-s",
-      ".",
-      "-p",
-      "tests/test*.py"
-    ],
+    "python.testing.unittestArgs": ["-v", "-s", ".", "-p", "tests/test*.py"],
     "python.testing.pytestEnabled": false,
     // File list
     "files.exclude": {
@@ -37,7 +31,8 @@
   "extensions": {
     "recommendations": [
       "ms-python.python",
-      "valentjn.vscode-ltex"
+      "valentjn.vscode-ltex",
+      "charliermarsh.ruff"
     ]
   }
 }

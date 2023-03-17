@@ -2,8 +2,9 @@ import sys
 import unittest
 from typing import Any, Tuple
 
-import numpy as np
 from impunity import impunity
+
+import numpy as np
 
 if sys.version_info >= (3, 9):
     from typing import Annotated
@@ -48,14 +49,12 @@ def temperature_3(altitude_m: "m") -> Annotated[Any, "celsius"]:
 class Functions(unittest.TestCase):
     @impunity
     def test_base(self) -> None:
-
         alt_m: "m" = 1000
         temp = temperature(alt_m)
         self.assertAlmostEqual(temp, 281.65, delta=1e-1)
 
     @impunity
     def test_base_cm(self) -> None:
-
         alt_m: "m" = 1000
         temp = temperature(alt_m)
         self.assertAlmostEqual(temp, 281.65, delta=1e-1)
@@ -66,7 +65,6 @@ class Functions(unittest.TestCase):
 
     @impunity
     def test_2_params(self) -> None:
-
         alt_m: "m" = 1000
         alt_ft: "ft" = 1000
         temp_m = temperature_2(alt_m, alt_ft)
@@ -74,7 +72,6 @@ class Functions(unittest.TestCase):
 
     @impunity
     def test_2_params_expansion(self) -> None:
-
         alt_m: "m" = 1000
         alt_ft: "ft" = 1000
         temp_m, temp_ft = temperature_2(alt_m, alt_ft)
@@ -154,7 +151,7 @@ class Functions(unittest.TestCase):
     # def test_wrong_units1(self) -> None:
     #     alt_ft: "ft" = 1000
     #     with self.assertLogs() as captured:
-    #         res: "ft" = temperature(alt_ft)  # noqa: F841
+    #         res: "ft" = temperature(alt_ft)
     #     self.assertEqual(len(captured.records), 1)
 
 

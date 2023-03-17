@@ -45,7 +45,6 @@ def impunity(
     ignore: bool = False,
     rewrite: Union[bool, str] = True,
 ) -> Union[F, Callable[[F], F]]:
-
     """Decorator function to check units based on annotations
 
     Args:
@@ -106,7 +105,7 @@ def impunity(
                 co_firstlineno = fun.__code__.co_firstlineno + 1
                 for const in origin_method.__code__.co_consts:
                     if const not in co_consts:
-                        co_consts = co_consts + (const,)
+                        co_consts = (*co_consts, const)
                 cocode = new_method.__code__.co_code
 
                 origin_method.__code__ = origin_method.__code__.replace(
@@ -121,7 +120,7 @@ def impunity(
             co_lnotab = new_fun.__code__.co_lnotab
             for const in fun.__code__.co_consts:
                 if const not in co_consts:
-                    co_consts = co_consts + (const,)
+                    co_consts = (*co_consts, const)
 
             if sys.version_info >= (3, 11):
                 fun.__code__ = types.CodeType(

@@ -2,8 +2,9 @@ import sys
 import unittest
 from typing import Any
 
-import numpy as np
 from impunity import impunity
+
+import numpy as np
 
 if sys.version_info >= (3, 9):
     from typing import Annotated
@@ -71,7 +72,7 @@ class Assign(unittest.TestCase):
     # def test_assign_incompatible_unit(self) -> None:
     #     with self.assertRaises(pint.errors.DimensionalityError):
     #         alt_m: "m" = 1000
-    #         invalid: "K" = alt_m  # noqa: F841
+    #         invalid: "K" = alt_m
 
     @impunity
     def test_assign_wo_annotation(self) -> None:
