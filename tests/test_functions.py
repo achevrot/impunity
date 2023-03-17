@@ -38,6 +38,13 @@ def temperature_2(altitude_m: "m", altitude_ft: "ft") -> Tuple["K", "K"]:
     return temp_m, temp_ft
 
 
+@impunity
+def temperature_3(altitude_m: "m") -> Annotated[Any, "celsius"]:
+    temp = temperature(altitude_m)
+    temp2: Annotated[Any, "celsius"] = temp
+    return temp2
+
+
 class Functions(unittest.TestCase):
     @impunity
     def test_base(self) -> None:

@@ -53,10 +53,10 @@ logging.basicConfig(
 class VarDict(dict):
     def __missing__(self, key):
         if isinstance(key, Number):
-            _log.warning(f"The value {key} is not annotated. Defaulted to dimensionless")
+            pass
         else:
             _log.warning(f"The variable {key} is not annotated. Defaulted to dimensionless")
-        return "dimensionless"
+        return None
 
 
 def get_annotation_unit(annotation: annotation_node | ast.expr) -> str:
@@ -286,16 +286,25 @@ class Visitor(ast.NodeTransformer):
                 return QuantityNode(node, None)
             else:
                 elems = list(map(self.get_node_unit, node.elts))
-                return QuantityNode(
-                    ast.List([elem.node for elem in elems], ctx=node.ctx),
-                    cast(Sequence[Unit], [elem.unit for elem in elems]),
-                )
+                if all(elem.unit == elems[0].unit for elem in elems):
+                    return QuantityNode(
+                        ast.List([elem.node for elem in elems], ctx=node.ctx),
+                        elems[0].unit,
+                    )
+                else:
+                    _log.warning(
+                        f"In function {self.fun.__module__}/{self.fun.__name__}: "
+                        f"Type inside list must be the same. Defaulted to dimensionless"
+                    )
+                    return QuantityNode(node, "dimensionless")
+
         elif isinstance(node, ast.Set):
             elems = list(map(self.get_node_unit, node.elts))
             return QuantityNode(
                 ast.Set([elem.node for elem in elems]),
                 cast(Sequence[Unit], [elem.unit for elem in elems]),
             )
+
         elif isinstance(node, ast.Dict):
             if not node.keys:
                 return QuantityNode(node, None)
@@ -314,13 +323,12 @@ class Visitor(ast.NodeTransformer):
 
             if left.unit is None or right.unit is None:
                 new_node = ast.BinOp(left.node, node.op, right.node)
-                return QuantityNode(ast.copy_location(new_node, node), None)
+                return QuantityNode(
+                    ast.copy_location(new_node, node), left.unit if left.unit is not None else right.unit
+                )
 
             if pint.Unit(left.unit).is_compatible_with(pint.Unit(right.unit)):
-                if "dimensionless" in (left.unit, right.unit):
-                    conv_value = 1
-                else:
-                    conv_value = pint.Unit(left.unit).from_(pint.Unit(right.unit)).m
+                conv_value = pint.Unit(left.unit).from_(pint.Unit(right.unit)).m
                 new_node = ast.BinOp(
                     left.node,
                     node.op,
@@ -341,13 +349,18 @@ class Visitor(ast.NodeTransformer):
 
             if left.unit is None or right.unit is None:
                 new_node = ast.BinOp(left.node, node.op, right.node)
-                return QuantityNode(ast.copy_location(new_node, node), None)
+                return QuantityNode(
+                    ast.copy_location(new_node, node), left.unit if left.unit is not None else right.unit
+                )
+
+            if is_annotated(left.unit):
+                left.unit = left.unit.__metadata__[0]  # type: ignore
+
+            if is_annotated(right.unit):
+                right.unit = right.unit.__metadata__[0]  # type: ignore
 
             if pint.Unit(left.unit).is_compatible_with(pint.Unit(right.unit)):
-                if "dimensionless" in (left.unit, right.unit):
-                    conv_value = 1
-                else:
-                    conv_value = pint.Unit(left.unit).from_(pint.Unit(right.unit)).m
+                conv_value = pint.Unit(left.unit).from_(pint.Unit(right.unit)).m
                 new_node = ast.BinOp(
                     left.node,
                     node.op,
@@ -480,11 +493,13 @@ class Visitor(ast.NodeTransformer):
                 if signature:
                     fun_signature = list(signature.items())[:-1]
                 else:
-                    return None
+                    return node
                 for i, arg in enumerate(node.args):
                     if (received := self.get_node_unit(arg).unit) != (expected := fun_signature[i][1]):
                         if is_annotated(expected):
                             expected = expected.__metadata__[0]  # type: ignore
+                        if received is None:
+                            return node
                         if pint.Unit(received).is_compatible_with(pint.Unit(expected)):
                             if "dimensionless" in (received, expected):
                                 conv_value = 1
@@ -585,14 +600,9 @@ class Visitor(ast.NodeTransformer):
             expected_unit = get_annotation_unit(expected)
             if is_annotated(received):
                 received = received.__metadata__[0]  # type: ignore
-            if received == "dimensionless":
-                new_node = node
 
-            elif pint.Unit(received).is_compatible_with(pint.Unit(expected_unit)):
-                if "dimensionless" in (received, expected_unit):
-                    conv_value = 1
-                else:
-                    conv_value = pint.Unit(expected_unit).from_(pint.Unit(received)).m
+            if pint.Unit(received).is_compatible_with(pint.Unit(expected_unit)):
+                conv_value = pint.Unit(expected_unit).from_(pint.Unit(received)).m
                 new_value = ast.BinOp(
                     node.value,
                     ast.Mult(),
@@ -649,6 +659,9 @@ class Visitor(ast.NodeTransformer):
     def visit_Assign(self, node: ast.Assign) -> Any:
 
         value = self.get_node_unit(node.value)
+
+        if value.unit is None:
+            return node
         if value.node != node.value:
 
             new_node = ast.Assign(
@@ -657,62 +670,71 @@ class Visitor(ast.NodeTransformer):
             )
             node = ast.copy_location(new_node, node)
 
-        if isinstance(node.value, ast.Call):
-            for target in node.targets:
-                if isinstance(target, ast.Tuple):
-                    if isinstance(node.value.func, ast.Name):
-                        func_name = node.value.func.id
-                    elif isinstance(node.value.func, ast.Attribute):
-                        if isinstance(node.value.func.value, ast.Name):
-                            func_name = (
-                                self.vars[node.value.func.value.id]
-                                if node.value.func.value.id in self.vars
-                                else node.value.func.value.id
-                            )
-                        func_name += "." + node.value.func.attr
-                    for i, elem in enumerate(target.elts):
-                        # if return values are tuples
-                        if isinstance(elem, ast.Name):
-                            if (sign := self.get_annotations(func_name)) is not None:
-                                if is_annotated(sign["return"].__args__[i]):
-                                    self.vars[elem.id] = sign["return"].__args__[i].__metadata__[0]
-                                else:
-                                    self.vars[elem.id] = sign["return"].__args__[i].__forward_value__
-                elif isinstance(target, ast.Name):
-                    if isinstance(node.value.func, ast.Name):
-                        func_name = node.value.func.id
-                    elif isinstance(node.value.func, ast.Attribute):
-                        if isinstance(node.value.func.value, ast.Name):
-                            func_name = (
-                                self.vars[node.value.func.value.id]
-                                if node.value.func.value.id in self.vars
-                                else node.value.func.value.id
-                            )
-                        func_name += "." + node.value.func.attr
-                elif isinstance(target, ast.Attribute):
-                    if isinstance(target.value, ast.Name):
-                        if target.value.id == "self":
-                            self.class_attr[target.attr] = value.unit
-            new_node = node
+        # if isinstance(node.value, ast.Call):
+        #     for target in node.targets:
+        #         if isinstance(target, ast.Tuple):
+        #             if isinstance(node.value.func, ast.Name):
+        #                 func_name = node.value.func.id
+        #             elif isinstance(node.value.func, ast.Attribute):
+        #                 if isinstance(node.value.func.value, ast.Name):
+        #                     func_name = (
+        #                         self.vars[node.value.func.value.id]
+        #                         if node.value.func.value.id in self.vars
+        #                         else node.value.func.value.id
+        #                     )
+        #                 func_name += "." + node.value.func.attr
+        #             for i, elem in enumerate(target.elts):
+        #                 # if return values are tuples
+        #                 if isinstance(elem, ast.Name):
+        #                     if (sign := self.get_annotations(func_name)) is not None:
+        #                         if is_annotated(sign["return"].__args__[i]):
+        #                             self.vars[elem.id] = sign["return"].__args__[i].__metadata__[0]
+        #                         else:
+        #                             self.vars[elem.id] = sign["return"].__args__[i].__forward_value__
+        #         elif isinstance(target, ast.Name):
+        #             if isinstance(node.value.func, ast.Name):
+        #                 func_name = node.value.func.id
+        #             elif isinstance(node.value.func, ast.Attribute):
+        #                 if isinstance(node.value.func.value, ast.Name):
+        #                     func_name = (
+        #                         self.vars[node.value.func.value.id]
+        #                         if node.value.func.value.id in self.vars
+        #                         else node.value.func.value.id
+        #                     )
+        #                 func_name += "." + node.value.func.attr
+        #             if (sign := self.get_annotations(func_name)) is not None:
+        #                 if is_annotated(sign["return"].__args__[0]):
+        #                     self.vars[target.id] = sign["return"].__args__[0].__metadata__[0]
+        #                 else:
+        #                     pass
+        #         elif isinstance(target, ast.Attribute):
+        #             if isinstance(target.value, ast.Name):
+        #                 if target.value.id == "self":
+        #                     self.class_attr[target.attr] = value.unit
+        #     new_node = node
 
-        else:
-            new_node = ast.Assign(
-                targets=node.targets,
-                value=value.node,
-                type_comment=f"unit: {value.unit}",
-            )
-            for target in node.targets:
-                if isinstance(target, ast.Tuple):
-                    for i, elem in enumerate(target.elts):
-                        if isinstance(elem, ast.Name):
+        new_node = ast.Assign(
+            targets=node.targets,
+            value=value.node,
+            type_comment=f"unit: {value.unit}",
+        )
+
+        for target in node.targets:
+            if isinstance(target, ast.Tuple):
+                for i, elem in enumerate(target.elts):
+                    if isinstance(elem, ast.Name):
+                        if isinstance(value.unit, list):
                             self.vars[elem.id] = value.unit[i]
-
-                elif isinstance(target, ast.Name):
-                    self.vars[target.id] = value.unit
-                elif isinstance(target, ast.Attribute):
-                    if isinstance(target.value, ast.Name):
-                        if target.value.id == "self":
-                            self.class_attr[target.attr] = value.unit
+                        elif is_annotated(value.unit.__args__[i]):
+                            self.vars[elem.id] = value.unit.__args__[i].__metadata__[0]
+                        else:
+                            self.vars[elem.id] = value.unit.__args__[i].__forward_value__
+            elif isinstance(target, ast.Name):
+                self.vars[target.id] = value.unit
+            elif isinstance(target, ast.Attribute):
+                if isinstance(target.value, ast.Name):
+                    if target.value.id == "self":
+                        self.class_attr[target.attr] = value.unit
 
         return ast.copy_location(new_node, node)
 

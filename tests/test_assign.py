@@ -28,6 +28,16 @@ dimensionless = Annotated[Any, "dimensionless"]
 global_alt: "m" = 1000
 
 
+@impunity
+def identity_m(h: Annotated[int, "m"]) -> Annotated[int, "m"]:
+    return h
+
+
+@impunity
+def identity_ft(h: Annotated[int, "ft"]) -> Annotated[int, "ft"]:
+    return h
+
+
 class Assign(unittest.TestCase):
     @impunity
     def test_assign_same_unit(self) -> None:
@@ -68,6 +78,20 @@ class Assign(unittest.TestCase):
         density_troposphere = np.maximum(1500, 6210)  # return None unit
         density: "Pa" = density_troposphere * np.exp(0)
         self.assertEqual(density, 6210)
+
+    @impunity
+    def test_no_unit(self) -> None:
+        no_unit = 0
+        self.assertEqual(identity_m(0), 0)
+        self.assertEqual(identity_m(no_unit), 0)
+
+    # def test_no_unit_conflict(self) -> None:
+    #     def test_no_unit_conflict() -> None:
+    #         no_unit = 0
+    #         identity_m(no_unit)
+    #         identity_ft(no_unit)
+
+    #     self.assertWarns(RuntimeWarning, lambda: impunity(test_no_unit_conflict))
 
 
 if __name__ == "__main__":
