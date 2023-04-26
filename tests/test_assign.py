@@ -67,7 +67,7 @@ class Assign(unittest.TestCase):
     def test_assign_incompatible_unit(self) -> None:
         def test_assign_incompatible_unit() -> None:
             alt_m: "m" = 1000
-            alt_ft: "K" = alt_m
+            alt_ft: "K" = alt_m  # type: ignore
 
         with self.assertLogs("impunity.visitor", level="WARNING") as cm:
             impunity(test_assign_incompatible_unit)
