@@ -617,7 +617,8 @@ class Visitor(ast.NodeTransformer):
                             received := self.get_node_unit(keyword.value).unit
                         ) != (expected := signature[keyword.arg]):
                             if is_annotated(expected):
-                                expected = expected.__metadata__[0]  # type: ignore
+                                x = expected.__metadata__[0]  # type: ignore
+                                expected = x
                             if not (
                                 isinstance(expected, str)
                                 and isinstance(received, str)
