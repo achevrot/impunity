@@ -1,7 +1,6 @@
 from __future__ import annotations
 
 import ast
-import collections
 import inspect
 import logging
 import sys
@@ -10,9 +9,10 @@ from numbers import Number
 from typing import Any, Dict, Optional, Union, cast
 
 if sys.version_info >= (3, 9):
-    from _collections_abc import Sequence
+    from _collections_abc import Callable, Sequence
 else:
     from typing import Sequence
+    from collections import Callable
 
 import pint
 from pint import UnitRegistry
@@ -56,7 +56,7 @@ class VarDict(dict):
             pass
         else:
             _log.warning(
-                f"The variable {key} is not annotated."
+                f"The variable {key} is not annotated. "
                 + "Defaulted to dimensionless"
             )
         return None
@@ -68,8 +68,8 @@ def get_annotation_unit(annotation: annotation_node | ast.expr) -> str:
         unit = annotation.value
     elif isinstance(annotation, ast.Subscript):
         if isinstance(annotation.slice, ast.Index):
-            if isinstance(annotation.slice.value, ast.Tuple):
-                unit_node = annotation.slice.value.elts[1]
+            if isinstance(annotation.slice.value, ast.Tuple):  # type: ignore
+                unit_node = annotation.slice.value.elts[1]  # type: ignore
         elif isinstance(annotation.slice, ast.Tuple):
             unit_node = annotation.slice.elts[1]
         if isinstance(unit_node, ast.Constant):
@@ -90,7 +90,7 @@ def is_annotated(
 
 
 class Visitor(ast.NodeTransformer):
-    couscous_func: dict[str, collections.Callable] = {}
+    couscous_func: dict[str, Callable] = {}
     ureg = UnitRegistry()
 
     def visit(self, root: ast.AST) -> Any:
@@ -162,7 +162,6 @@ class Visitor(ast.NodeTransformer):
                 else inspect._empty,
             )
         elif fun is not None:
-
             annotations = getattr(fun, "__annotations__", None)
             if annotations:
                 globals = list(cls.couscous_func.values())[-1].__globals__
@@ -194,7 +193,6 @@ class Visitor(ast.NodeTransformer):
         return cls.couscous_func.get(name)
 
     def __init__(self, fun) -> None:
-
         self.nested_flag = False
 
         # For class decorators
@@ -212,7 +210,6 @@ class Visitor(ast.NodeTransformer):
             self.add_func(fun)
 
     def visit_FunctionDef(self, node: ast.FunctionDef) -> Any:
-
         if not self.nested_flag:
             self.func_flush()
         # check for couscous decorator:
@@ -277,7 +274,7 @@ class Visitor(ast.NodeTransformer):
                     _log.warning(
                         f"In function {self.fun.__module__}/"
                         + f"{self.fun.__name__}: "
-                        + "Signature of annotated functions must be"
+                        + "Signature of annotated functions must be "
                         + "of type string or typing.Annotated"
                     )
 
@@ -325,7 +322,7 @@ class Visitor(ast.NodeTransformer):
                     _log.warning(
                         f"In function {self.fun.__module__}"
                         + f"/{self.fun.__name__}"
-                        + ": Type inside list must be the same."
+                        + ": Type inside list must be the same. "
                         + "Defaulted to dimensionless"
                     )
                     return QuantityNode(node, "dimensionless")
@@ -380,7 +377,7 @@ class Visitor(ast.NodeTransformer):
             else:
                 _log.warning(
                     f"In function {self.fun.__module__}/{self.fun.__name__}: "
-                    + f"Type {left.unit} and {right.unit}"
+                    + f"Type {left.unit} and {right.unit} "
                     + "are not compatible. Defaulted to dimensionless"
                 )
                 return QuantityNode(node, "dimensionless")
@@ -451,7 +448,7 @@ class Visitor(ast.NodeTransformer):
 
             if body.unit != orelse.unit:
                 _log.warning(
-                    f"In function {self.fun.__module__}/{self.fun.__name__}:"
+                    f"In function {self.fun.__module__}/{self.fun.__name__}: "
                     + "Ternary operator with mixed units"
                 )
                 return QuantityNode(ast.copy_location(new_node, node), None)
@@ -461,7 +458,6 @@ class Visitor(ast.NodeTransformer):
                 )
 
         elif isinstance(node, ast.Call):
-
             if isinstance(node.func, ast.Name):
                 id = node.func.id
             elif isinstance(node.func, ast.Attribute):
@@ -526,7 +522,7 @@ class Visitor(ast.NodeTransformer):
                             _log.warning(
                                 f"In function {self.fun.__module__}/"
                                 + f"{self.fun.__name__}: "
-                                + f"Function {id} expected unit {expected}"
+                                + f"Function {id} expected unit {expected} "
                                 + f"but received incompatible unit {received}."
                             )
                     else:
@@ -556,9 +552,7 @@ class Visitor(ast.NodeTransformer):
             return QuantityNode(node, None)
 
     def visit_Call(self, node: ast.Call) -> Any:
-
         if isinstance(node.func, ast.Name):
-
             if node.func.id in __builtins__.keys():  # type: ignore
                 return node
 
@@ -642,8 +636,8 @@ class Visitor(ast.NodeTransformer):
                                     f"In function {self.fun.__module__}"
                                     + f"/{self.fun.__name__}: "
                                     + f"Function {node.func.id} "
-                                    + f"expected unit {expected}"
-                                    + "but received incompatible"
+                                    + f"expected unit {expected} "
+                                    + "but received incompatible "
                                     + f"unit {received}."
                                 )
                                 return node
@@ -676,7 +670,6 @@ class Visitor(ast.NodeTransformer):
         return node
 
     def visit_AnnAssign(self, node: ast.AnnAssign) -> Any:
-
         value = self.get_node_unit(node.value)
 
         if value is None:
@@ -702,7 +695,6 @@ class Visitor(ast.NodeTransformer):
         elif (received := value.unit) != (
             expected := cast(annotation_node, node.annotation)
         ):
-
             expected_unit = get_annotation_unit(expected)
             if is_annotated(received):
                 received = received.__metadata__[0]  # type: ignore
@@ -728,7 +720,7 @@ class Visitor(ast.NodeTransformer):
             else:
                 _log.warning(
                     f"In function {self.fun.__module__}/{self.fun.__name__}: "
-                    + f"Assignement expected unit {expected_unit}"
+                    + f"Assignement expected unit {expected_unit} "
                     + f"but received incompatible unit {received}."
                 )
                 return node
@@ -770,13 +762,11 @@ class Visitor(ast.NodeTransformer):
         return node
 
     def visit_Assign(self, node: ast.Assign) -> Any:
-
         value = self.get_node_unit(node.value)
 
         if value.unit is None:
             return node
         if value.node != node.value:
-
             new_node = ast.Assign(
                 targets=node.targets,
                 value=value.node,
@@ -873,7 +863,7 @@ class Visitor(ast.NodeTransformer):
 
         if return_annotation is inspect._empty:
             _log.warning(
-                f"In function {self.fun.__module__}/{self.fun.__name__}:"
+                f"In function {self.fun.__module__}/{self.fun.__name__}: "
                 + "Some return annotations are missing"
             )
 
