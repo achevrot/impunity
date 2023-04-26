@@ -58,6 +58,16 @@ class Arithmetic(unittest.TestCase):
 
         self.assertAlmostEqual(result_2, 4609.6, delta=1e-2)
 
+    @impunity
+    def test_value_BinOp(self) -> None:
+        alt_m: "m" = 1000
+        alt_ft: "ft" = 2000
+        alt_m2: "m" = 3000
+        res_1 = alt_m + alt_ft + alt_m2
+        self.assertAlmostEqual(res_1, 4609.6, delta=1e-2)
+        res_2: "ft" = 3000 + alt_m
+        self.assertAlmostEqual(res_2, 13123.36, delta=1e-2)
+
 
 if __name__ == "__main__":
     unittest.main()
