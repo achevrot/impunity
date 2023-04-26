@@ -35,6 +35,18 @@ class Wrapper(unittest.TestCase):
         result: "m" = alt_m + alt_ft + alt_m2
         self.assertAlmostEqual(result, 6000, delta=1e-2)
 
+    @impunity(ignore=True)
+    def test_wrapper_ignore(self) -> None:
+        alt_m: "m" = 1000
+        alt_ft: "ft" = alt_m
+        self.assertEqual(alt_ft, 1000)
+
+    @impunity(rewrite="log.log")
+    def test_rewrite_relative(self) -> None:
+        alt_m: "m" = 1000
+        alt_ft: "ft" = alt_m
+        self.assertAlmostEqual(alt_ft, 3280.83, delta=1e-2)
+
 
 if __name__ == "__main__":
     unittest.main()
