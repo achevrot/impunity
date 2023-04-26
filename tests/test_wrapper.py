@@ -18,6 +18,15 @@ kts = Annotated[Any, "kts"]
 dimensionless = Annotated[Any, "dimensionless"]
 
 
+@impunity
+class WrappedClass:
+    class_alt: Annotated[Any, "m"] = 1000
+
+    def f(self, h: Annotated[Any, "m"]) -> Annotated[Any, "ft"]:
+        alt_ft: Annotated[Any, "ft"] = h
+        return alt_ft
+
+
 class Wrapper(unittest.TestCase):
     @impunity
     def test_convert_units(self) -> None:
@@ -46,6 +55,10 @@ class Wrapper(unittest.TestCase):
         alt_m: "m" = 1000
         alt_ft: "ft" = alt_m
         self.assertAlmostEqual(alt_ft, 3280.83, delta=1e-2)
+
+    def test_class(self) -> None:
+        c = WrappedClass()
+        self.assertAlmostEqual(c.f(c.class_alt), 3280.83, delta=1e-2)
 
 
 if __name__ == "__main__":

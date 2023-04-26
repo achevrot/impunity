@@ -97,25 +97,56 @@ def impunity(
                 getattr(new_fun, func)
                 for func in dir(new_fun)
                 if callable(getattr(new_fun, func))
-                # TODO Add Init
                 and not func.startswith("__")
             ]
             for new_method in method_list:
                 origin_method = getattr(fun, new_method.__name__)
                 co_consts = new_method.__code__.co_consts
                 co_lnotab = new_method.__code__.co_lnotab
-                co_firstlineno = fun.__code__.co_firstlineno + 1
                 for const in origin_method.__code__.co_consts:
                     if const not in co_consts:
                         co_consts = (*co_consts, const)
-                cocode = new_method.__code__.co_code
 
-                origin_method.__code__ = origin_method.__code__.replace(
-                    co_code=cocode,
-                    co_consts=co_consts,
-                    co_lnotab=co_lnotab,
-                    co_firstlineno=co_firstlineno,
-                )
+                if sys.version_info >= (3, 11):
+                    origin_method.__code__ = types.CodeType(
+                        origin_method.__code__.co_argcount,
+                        origin_method.__code__.co_posonlyargcount,
+                        origin_method.__code__.co_kwonlyargcount,
+                        origin_method.__code__.co_nlocals,
+                        origin_method.__code__.co_stacksize,
+                        origin_method.__code__.co_flags,
+                        new_method.__code__.co_code,
+                        co_consts,
+                        origin_method.__code__.co_names,
+                        origin_method.__code__.co_varnames,
+                        origin_method.__code__.co_filename,
+                        origin_method.__code__.co_name,
+                        origin_method.__code__.co_qualname,
+                        origin_method.__code__.co_firstlineno,
+                        new_method.__code__.co_linetable,
+                        origin_method.__code__.co_exceptiontable,
+                        origin_method.__code__.co_freevars,
+                        origin_method.__code__.co_cellvars,
+                    )
+                else:
+                    origin_method.__code__ = types.CodeType(
+                        origin_method.__code__.co_argcount,
+                        origin_method.__code__.co_posonlyargcount,
+                        origin_method.__code__.co_kwonlyargcount,
+                        origin_method.__code__.co_nlocals,
+                        origin_method.__code__.co_stacksize,
+                        origin_method.__code__.co_flags,
+                        new_method.__code__.co_code,
+                        co_consts,
+                        origin_method.__code__.co_names,
+                        origin_method.__code__.co_varnames,
+                        origin_method.__code__.co_filename,
+                        origin_method.__code__.co_name,
+                        origin_method.__code__.co_firstlineno,
+                        new_method.__code__.co_lnotab,
+                        origin_method.__code__.co_freevars,
+                        origin_method.__code__.co_cellvars,
+                    )
 
         else:
             co_consts = new_fun.__code__.co_consts

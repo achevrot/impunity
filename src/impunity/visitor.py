@@ -98,7 +98,9 @@ class Visitor(ast.NodeTransformer):
         for node in ast.walk(root):
             for child in ast.iter_child_nodes(node):
                 child.parent = node  # type: ignore
-        return super().visit(root)
+        method = "visit_" + root.__class__.__name__
+        visitor = getattr(self, method, self.generic_visit)
+        return visitor(root)
 
     @classmethod
     def add_func(cls, fun):
@@ -194,6 +196,8 @@ class Visitor(ast.NodeTransformer):
 
     def __init__(self, fun) -> None:
         self.nested_flag = False
+        x: Dict[str, str] = {}
+        self.vars = VarDict(x)
 
         # For class decorators
         if isinstance(fun, type):
@@ -232,8 +236,6 @@ class Visitor(ast.NodeTransformer):
             self.nested_flag = True
             self.fun = fun
             self.fun_globals = fun.__globals__
-            x: Dict[str, str] = {}
-            self.vars = VarDict(x)
             if getattr(self, "class_attr", False):
                 self.vars.update(self.class_attr)
         elif self.nested_flag:
@@ -296,7 +298,7 @@ class Visitor(ast.NodeTransformer):
         new_node: Union[ast.BinOp, ast.IfExp, ast.Call]
 
         if isinstance(node, ast.Constant):
-            return QuantityNode(node, self.vars[node.value])
+            return QuantityNode(node, None)  # self.vars[node.value])
         if isinstance(node, ast.Subscript):
             return QuantityNode(node, self.get_node_unit(node.value).unit)
         elif isinstance(node, ast.Tuple):
