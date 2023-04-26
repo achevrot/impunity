@@ -53,7 +53,6 @@ class Arithmetic(unittest.TestCase):
         alt_m: "m" = 1000
         alt_ft: "ft" = 2000
         alt_m2: "m" = 3000
-        # TODO explain what you mean?
         _, result_2 = (alt_m + alt_ft + alt_m2, alt_m + alt_ft + alt_m2)
 
         self.assertAlmostEqual(result_2, 4609.6, delta=1e-2)
@@ -67,6 +66,25 @@ class Arithmetic(unittest.TestCase):
         self.assertAlmostEqual(res_1, 4609.6, delta=1e-2)
         res_2: "ft" = 3000 + alt_m
         self.assertAlmostEqual(res_2, 13123.36, delta=1e-2)
+
+    def test_addition_wrong(self) -> None:
+        def test_addition_wrong() -> None:
+            alt_m: "m" = 1000
+            alt_ft: "K" = 2000
+            res = alt_m + alt_ft
+            self.assertEqual(res, 3000)
+
+        with self.assertLogs("impunity.visitor", level="WARNING") as cm:
+            impunity(test_addition_wrong)
+
+        self.assertEqual(
+            cm.output,
+            [
+                "WARNING:impunity.visitor:In function tests.test_arithmetic"
+                + "/test_addition_wrong: Type m and K are not compatible. "
+                + "Defaulted to dimensionless"
+            ],
+        )
 
 
 if __name__ == "__main__":

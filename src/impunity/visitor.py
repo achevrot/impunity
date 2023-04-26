@@ -62,7 +62,9 @@ class VarDict(dict):
         return None
 
 
-def get_annotation_unit(annotation: annotation_node | ast.expr) -> str:
+def get_annotation_unit(
+    annotation: annotation_node | ast.expr,
+) -> Optional[str]:
     unit = None
     if isinstance(annotation, ast.Constant):
         unit = annotation.value
@@ -75,12 +77,7 @@ def get_annotation_unit(annotation: annotation_node | ast.expr) -> str:
         if isinstance(unit_node, ast.Constant):
             unit = unit_node.value
 
-    if unit is not None:
-        return unit
-    else:
-        raise TypeError(
-            f"{annotation} is not an annotation type expected by impunity"
-        )
+    return unit
 
 
 def is_annotated(
@@ -270,7 +267,7 @@ class Visitor(ast.NodeTransformer):
         for arg in node.args.args:
             if arg.annotation is not None:
                 anno_unit = get_annotation_unit(arg.annotation)
-                if anno_unit in self.ureg:
+                if anno_unit is not None and anno_unit in self.ureg:
                     self.vars[arg.arg] = anno_unit
                 else:
                     _log.warning(
