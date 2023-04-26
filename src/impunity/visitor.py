@@ -11,8 +11,8 @@ from typing import Any, Dict, Optional, Union, cast
 if sys.version_info >= (3, 9):
     from _collections_abc import Callable, Sequence
 else:
-    from typing import Sequence
     from collections import Callable
+    from typing import Sequence
 
 import pint
 from pint import UnitRegistry
