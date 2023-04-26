@@ -15,7 +15,12 @@
     "python.formatting.provider": "black",
     // Testing
     "python.testing.unittestEnabled": true,
-    "python.testing.unittestArgs": ["-v", "-s", ".", "-p", "tests/test*.py"],
+    "python.testing.unittestArgs": [
+      "-s",
+      ".",
+      "-p",
+      "tests/test*.py"
+    ],
     "python.testing.pytestEnabled": false,
     // File list
     "files.exclude": {

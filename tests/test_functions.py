@@ -14,16 +14,35 @@ else:
 m = Annotated[Any, "m"]
 K = Annotated[Any, "K"]
 ft = Annotated[Any, "ft"]
+s = Annotated[Any, "s"]
 cm = Annotated[Any, "cm"]
 Pa = Annotated[Any, "Pa"]
 kts = Annotated[Any, "kts"]
 dimensionless = Annotated[Any, "dimensionless"]
+
+STRATOSPHERE_TEMP: Annotated[float, "K"] = 216.65
 
 # -----------------------
 # du : different units
 # wu : wrong units
 # bin : Binary operator in func call
 # -----------------------
+
+
+@impunity
+def atmosphere(h: Annotated[Any, "m"]) -> Tuple[Annotated[Any, "Pa"], Annotated[Any, "kg * m^-3"], Annotated[Any, "K"]]:
+    """Pressure of ISA atmosphere
+
+    :param h: the altitude (by default in meters), :math:`0 < h < 84852`
+        (will be clipped when outside range, integer input allowed)
+
+    :return: a tuple (pressure, density, temperature)
+
+    """
+    temp: Annotated[Any, "K"] = 288.15 - 0.0065 * h
+    den: Annotated[Any, "kg * m^-3"] = 10
+    press: Annotated[Any, "Pa"] = 10
+    return press, den, temp
 
 
 @impunity
@@ -44,6 +63,19 @@ def temperature_3(altitude_m: "m") -> Annotated[Any, "celsius"]:
     temp = temperature(altitude_m)
     temp2: Annotated[Any, "celsius"] = temp
     return temp2
+
+
+@impunity
+def tas2mach(tas: Annotated[Any, "kts"], h: Annotated[Any, "ft"]) -> Annotated[Any, "dimensionless"]:
+    """
+    :param tas: True Air Speed, (by default in kts)
+    :param h: altitude, (by default in ft)
+
+    :return: Mach number (dimensionless)
+    """
+    a: "m/s" = 343
+    M: Annotated[Any, "dimensionless"] = tas / a
+    return M
 
 
 class Functions(unittest.TestCase):
@@ -85,13 +117,10 @@ class Functions(unittest.TestCase):
         # TODO: radian / celsius
         self.assertAlmostEqual(temp, 286.17, delta=1e-1)
 
-    # def test_weird_signature(self)-> None:
-    #     @impunity
-    #     def test_weird_signature(self)-> None:
-    #         alt_ft: "ft" = 1000
-    #         press, density, temp = isa.atmosphere(alt_ft)
-
-    #     test_weird_signature()
+    @impunity
+    def test_weird_signature(self) -> None:
+        alt_ft: "ft" = 1000
+        press, density, temp = atmosphere(alt_ft)
 
     @impunity
     def test_binOp(self) -> None:
@@ -99,60 +128,44 @@ class Functions(unittest.TestCase):
         temp = temperature(alt_ft * 3)
         self.assertAlmostEqual(temp, 282.21, delta=1e-1)
 
-    # def test_call_multi_args(self)-> None:
-    #     @impunity
-    #     def test_call_multi_args(self)-> None:
-    #         alt_m: "m" = 1000
-    #         tas: "kts" = 200
-    #         res: "dimensionless" = aero.tas2mach(tas, alt_m)
+    @impunity
+    def test_call_multi_args(self) -> None:
+        alt_m: "m" = 1000
+        tas: "kts" = 200
+        res: "dimensionless" = tas2mach(tas, alt_m)
 
-    #     test_call_multi_args()
+    def test_call_np(self) -> None:
+        @impunity
+        def test_call_np(h: "m") -> "K":
 
-    # def test_call_np(self)-> None:
-    #     @impunity
-    #     def test_call_np(h: "m") -> "K":
+            temp_0: "K" = 288.15
+            c: "K/m" = 0.0065
+            temp: "K" = np.maximum(
+                temp_0 - c * h,
+                216.65,
+            )
+            return temp
 
-    #         temp_0: "K" = 288.15
-    #         c: "K/m" = 0.0065
-    #         temp: "K" = np.maximum(
-    #             temp_0 - c * h,
-    #             216.65,
-    #         )
-    #         return temp
+        m_res: "m" = 11000
+        res = test_call_np(m_res)
+        self.assertAlmostEqual(res, 216.65, delta=1e-1)
 
-    #     m: "m" = 11000
-    #     res = test_call_np(m)
-    #     assert res == pytest.approx(isa.STRATOSPHERE_TEMP, delta=1e-1)
+    def test_using_globals(self) -> None:
+        @impunity
+        def test_using_globals(h: "m") -> "K":
 
-    # def test_using_globals(self)-> None:
-    #     @impunity
-    #     def test_using_globals(h: "m") -> "K":
+            temp_0: "K" = 288.15
+            c: "K/m" = 0.0065
+            e = STRATOSPHERE_TEMP
+            temp: "K" = np.maximum(
+                temp_0 - c * h,
+                e,
+            )
+            return temp
 
-    #         temp_0: "K" = 288.15
-    #         c: "K/m" = 0.0065
-    #         e = isa.STRATOSPHERE_TEMP
-    #         temp: "K" = np.maximum(
-    #             temp_0 - c * h,
-    #             e,
-    #         )
-    #         return temp
-
-    #     m: "m" = 11000
-    #     res = test_using_globals(m)
-    #     assert res == pytest.approx(isa.STRATOSPHERE_TEMP, delta=1e-1)
-
-    # @impunity
-    # def test_wrong_units(self) -> None:
-    #     with self.assertLogs(_log):
-    #         alt_ft: "K" = 1000
-    #         temperature(alt_ft)
-
-    # @impunity
-    # def test_wrong_units1(self) -> None:
-    #     alt_ft: "ft" = 1000
-    #     with self.assertLogs() as captured:
-    #         res: "ft" = temperature(alt_ft)
-    #     self.assertEqual(len(captured.records), 1)
+        m_res: "m" = 11000
+        res = test_using_globals(m_res)
+        self.assertAlmostEqual(res, STRATOSPHERE_TEMP, delta=1e-1)
 
 
 if __name__ == "__main__":

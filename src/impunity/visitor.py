@@ -38,16 +38,17 @@ annotation_node = Union[ast.Subscript, ast.Name, ast.Constant]
 
 annot_type = type(Annotated[int, "spam"])
 
-_log = logging.getLogger(__name__)
 
 logging.basicConfig(
     level=logging.WARNING,
     format="%(asctime)s [%(levelname)s] %(message)s",
     handlers=[
-        logging.FileHandler("debug.log"),
+        # Creates a file "todays_date.py" with warnings
         logging.StreamHandler(sys.stdout),
     ],
 )
+
+_log = logging.getLogger(__name__)
 
 
 class VarDict(dict):
@@ -277,10 +278,13 @@ class Visitor(ast.NodeTransformer):
             return QuantityNode(node, self.get_node_unit(node.value).unit)
         elif isinstance(node, ast.Tuple):
             elems = list(map(self.get_node_unit, node.elts))
-            return QuantityNode(
-                ast.Tuple([elem.node for elem in elems], ctx=node.ctx),
-                cast(Sequence[Unit], [elem.unit for elem in elems]),
-            )
+            if len(elems) == 1:
+                return QuantityNode(elems[0].node, elems[0].unit)
+            else:
+                return QuantityNode(
+                    ast.Tuple([elem.node for elem in elems], ctx=node.ctx),
+                    cast(Sequence[Unit], [elem.unit for elem in elems]),
+                )
         elif isinstance(node, ast.List):
             if not node.elts:
                 return QuantityNode(node, None)
@@ -618,7 +622,7 @@ class Visitor(ast.NodeTransformer):
             else:
                 _log.warning(
                     f"In function {self.fun.__module__}/{self.fun.__name__}: "
-                    f"Assignement expected unit {expected} but received incompatible unit {received}."
+                    f"Assignement expected unit {expected_unit} but received incompatible unit {received}."
                 )
                 return node
         else:

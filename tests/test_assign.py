@@ -64,15 +64,19 @@ class Assign(unittest.TestCase):
         alt_ft: "ft" = alt_m
         self.assertAlmostEqual(alt_ft, 3280.84, delta=1e-2)
 
-        # test fails with this one
-        # global_ft: "ft" = global_alt
-        # assert global_ft == pytest.approx(3280.84, rel=1e-2)
+    def test_assign_incompatible_unit(self) -> None:
+        def test_assign_incompatible_unit() -> None:
+            alt_m: "m" = 1000
+            invalid: "K" = alt_m
 
-    # @impunity
-    # def test_assign_incompatible_unit(self) -> None:
-    #     with self.assertRaises(pint.errors.DimensionalityError):
-    #         alt_m: "m" = 1000
-    #         invalid: "K" = alt_m
+        with self.assertLogs("impunity.visitor", level="WARNING") as cm:
+            impunity(test_assign_incompatible_unit)
+        self.assertEqual(
+            cm.output,
+            [
+                "WARNING:impunity.visitor:In function tests.test_assign/test_assign_incompatible_unit: Assignement expected unit K but received incompatible unit m."
+            ],
+        )
 
     @impunity
     def test_assign_wo_annotation(self) -> None:
@@ -86,13 +90,21 @@ class Assign(unittest.TestCase):
         self.assertEqual(identity_m(0), 0)
         self.assertEqual(identity_m(no_unit), 0)
 
-    # def test_no_unit_conflict(self) -> None:
-    #     def test_no_unit_conflict() -> None:
-    #         no_unit = 0
-    #         identity_m(no_unit)
-    #         identity_ft(no_unit)
+    def test_no_unit_conflict(self) -> None:
+        def test_no_unit_conflict() -> None:
+            no_unit = 0
+            identity_m(no_unit)
+            identity_ft(no_unit)
 
-    #     self.assertWarns(RuntimeWarning, lambda: impunity(test_no_unit_conflict))
+        with self.assertLogs("impunity.visitor", level="WARNING") as cm:
+            impunity(test_no_unit_conflict)
+        self.assertEqual(
+            cm.output,
+            [
+                "WARNING:impunity.visitor:The variable no_unit is not annotated. Defaulted to dimensionless",
+                "WARNING:impunity.visitor:The variable no_unit is not annotated. Defaulted to dimensionless",
+            ],
+        )
 
 
 if __name__ == "__main__":
