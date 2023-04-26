@@ -143,7 +143,6 @@ class Functions(unittest.TestCase):
     def test_call_np(self) -> None:
         @impunity
         def test_call_np(h: "m") -> "K":
-
             temp_0: "K" = 288.15
             c: Annotated[Any, "K/m"] = 0.0065
             temp: "K" = np.maximum(
@@ -159,7 +158,6 @@ class Functions(unittest.TestCase):
     def test_using_globals(self) -> None:
         @impunity
         def test_using_globals(h: "m") -> "K":
-
             temp_0: "K" = 288.15
             c: Annotated[Any, "K/m"] = 0.0065
             e = STRATOSPHERE_TEMP
