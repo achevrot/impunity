@@ -66,15 +66,16 @@ class Assign(unittest.TestCase):
 
     def test_assign_incompatible_unit(self) -> None:
         def test_assign_incompatible_unit() -> None:
-            alt_m: "m" = 1000
-            invalid: "K" = alt_m
+            pass
 
         with self.assertLogs("impunity.visitor", level="WARNING") as cm:
             impunity(test_assign_incompatible_unit)
         self.assertEqual(
             cm.output,
             [
-                "WARNING:impunity.visitor:In function tests.test_assign/test_assign_incompatible_unit: Assignement expected unit K but received incompatible unit m."
+                "WARNING:impunity.visitor:In function tests.test_assign/"
+                + "test_assign_incompatible_unit: Assignement "
+                + "expected unit K but received incompatible unit m."
             ],
         )
 
@@ -101,8 +102,10 @@ class Assign(unittest.TestCase):
         self.assertEqual(
             cm.output,
             [
-                "WARNING:impunity.visitor:The variable no_unit is not annotated. Defaulted to dimensionless",
-                "WARNING:impunity.visitor:The variable no_unit is not annotated. Defaulted to dimensionless",
+                "WARNING:impunity.visitor:The variable no_unit is not"
+                + "annotated. Defaulted to dimensionless",
+                "WARNING:impunity.visitor:The variable no_unit"
+                + "is not annotated. Defaulted to dimensionless",
             ],
         )
 

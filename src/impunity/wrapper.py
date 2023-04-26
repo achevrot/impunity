@@ -74,7 +74,9 @@ def impunity(
         if isinstance(rewrite, str):
             path = Path(rewrite)
             if not path.is_absolute():
-                origin_path = Path(os.path.abspath(inspect.getfile(fun))).parents[0]
+                origin_path = Path(
+                    os.path.abspath(inspect.getfile(fun))
+                ).parents[0]
                 path = origin_path.joinpath(path)
             with open(path, "w") as f:
                 idx = f_str.find("\n") + 1

@@ -30,7 +30,11 @@ STRATOSPHERE_TEMP: Annotated[float, "K"] = 216.65
 
 
 @impunity
-def atmosphere(h: Annotated[Any, "m"]) -> Tuple[Annotated[Any, "Pa"], Annotated[Any, "kg * m^-3"], Annotated[Any, "K"]]:
+def atmosphere(
+    h: Annotated[Any, "m"]
+) -> Tuple[
+    Annotated[Any, "Pa"], Annotated[Any, "kg * m^-3"], Annotated[Any, "K"]
+]:
     """Pressure of ISA atmosphere
 
     :param h: the altitude (by default in meters), :math:`0 < h < 84852`
@@ -66,14 +70,16 @@ def temperature_3(altitude_m: "m") -> Annotated[Any, "celsius"]:
 
 
 @impunity
-def tas2mach(tas: Annotated[Any, "kts"], h: Annotated[Any, "ft"]) -> Annotated[Any, "dimensionless"]:
+def tas2mach(
+    tas: Annotated[Any, "kts"], h: Annotated[Any, "ft"]
+) -> Annotated[Any, "dimensionless"]:
     """
     :param tas: True Air Speed, (by default in kts)
     :param h: altitude, (by default in ft)
 
     :return: Mach number (dimensionless)
     """
-    a: "m/s" = 343
+    a: Annotated[Any, "m/s"] = 343
     M: Annotated[Any, "dimensionless"] = tas / a
     return M
 
@@ -132,14 +138,14 @@ class Functions(unittest.TestCase):
     def test_call_multi_args(self) -> None:
         alt_m: "m" = 1000
         tas: "kts" = 200
-        res: "dimensionless" = tas2mach(tas, alt_m)
+        tas2mach(tas, alt_m)
 
     def test_call_np(self) -> None:
         @impunity
         def test_call_np(h: "m") -> "K":
 
             temp_0: "K" = 288.15
-            c: "K/m" = 0.0065
+            c: Annotated[Any, "K/m"] = 0.0065
             temp: "K" = np.maximum(
                 temp_0 - c * h,
                 216.65,
@@ -155,7 +161,7 @@ class Functions(unittest.TestCase):
         def test_using_globals(h: "m") -> "K":
 
             temp_0: "K" = 288.15
-            c: "K/m" = 0.0065
+            c: Annotated[Any, "K/m"] = 0.0065
             e = STRATOSPHERE_TEMP
             temp: "K" = np.maximum(
                 temp_0 - c * h,
