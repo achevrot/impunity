@@ -1,6 +1,6 @@
 import sys
 import unittest
-from typing import Any, Tuple
+from typing import Any
 
 from impunity import impunity
 
@@ -8,7 +8,10 @@ import numpy as np
 
 if sys.version_info >= (3, 9):
     from typing import Annotated
+
 else:
+    from typing import Tuple as tuple
+
     from typing_extensions import Annotated
 
 m = Annotated[Any, "m"]
@@ -32,7 +35,7 @@ STRATOSPHERE_TEMP: Annotated[float, "K"] = 216.65
 @impunity
 def atmosphere(
     h: Annotated[Any, "m"]
-) -> Tuple[
+) -> tuple[
     Annotated[Any, "Pa"], Annotated[Any, "kg * m^-3"], Annotated[Any, "K"]
 ]:
     """Pressure of ISA atmosphere
@@ -56,7 +59,7 @@ def temperature(altitude_m: "m") -> "K":
 
 
 @impunity
-def temperature_2(altitude_m: "m", altitude_ft: "ft") -> Tuple["K", "K"]:
+def temperature_2(altitude_m: "m", altitude_ft: "ft") -> tuple["K", "K"]:
     temp_m: "K" = np.maximum(288.15 - 0.0065 * altitude_m, 216.65)
     temp_ft: "K" = np.maximum(288.15 - 0.0065 * altitude_ft * 0.3048, 216.65)
     return temp_m, temp_ft
@@ -170,6 +173,30 @@ class Functions(unittest.TestCase):
         m_res: "m" = 11000
         res = test_using_globals(m_res)
         self.assertAlmostEqual(res, STRATOSPHERE_TEMP, delta=1e-1)
+
+    def test_empty_return(self) -> None:
+        @impunity
+        def test_empty_return(self):  # type: ignore
+            return 0
+
+        with self.assertLogs("impunity.visitor", level="WARNING") as cm:
+            impunity(test_empty_return)
+        self.assertEqual(
+            cm.output,
+            [
+                f"WARNING:impunity.visitor:In function {__name__}"
+                + "/test_empty_return: Some return annotations are missing"
+            ],
+        )
+
+    def test_return_convert(self) -> None:
+        @impunity
+        def test_return_convert() -> Annotated[Any, "ft"]:
+            alt_ft: "ft" = 1000
+            alt_m: "m" = alt_ft
+            return alt_m
+
+        self.assertAlmostEqual(test_return_convert(), 1000, delta=1e-2)
 
 
 if __name__ == "__main__":

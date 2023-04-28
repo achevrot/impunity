@@ -97,7 +97,8 @@ class Visitor(ast.NodeTransformer):
                 child.parent = node  # type: ignore
         method = "visit_" + root.__class__.__name__
         visitor = getattr(self, method, self.generic_visit)
-        return visitor(root)
+        new_node = visitor(root)
+        return new_node
 
     @classmethod
     def add_func(cls, fun):
@@ -106,20 +107,20 @@ class Visitor(ast.NodeTransformer):
         else:
             cls.couscous_func[fun.__name__] = fun
 
-    @classmethod
-    def insert_node_above(cls, original_node, new_node) -> None:
-        parent_function: ast.AST = original_node.parent
-        line_node: ast.AST = original_node
-        while not isinstance(parent_function, ast.FunctionDef):
-            line_node = parent_function
-            # TODO Inherit AST NODE to get parents. Ignored as for now
-            parent_function = parent_function.parent  # type: ignore
+    # @classmethod
+    # def insert_node_above(cls, original_node, new_node) -> None:
+    #     parent_function: ast.AST = original_node.parent
+    #     line_node: ast.AST = original_node
+    #     while not isinstance(parent_function, ast.FunctionDef):
+    #         line_node = parent_function
+    #         # TODO Inherit AST NODE to get parents. Ignored as for now
+    #         parent_function = parent_function.parent  # type: ignore
 
-        new_body = parent_function.body.copy()
-        for i, node in enumerate(parent_function.body):
-            if line_node == node:
-                new_body.insert(i, new_node)
-        parent_function.body = new_body
+    #     new_body = parent_function.body.copy()
+    #     for i, node in enumerate(parent_function.body):
+    #         if line_node == node:
+    #             new_body.insert(i, new_node)
+    #     parent_function.body = new_body
 
     @classmethod
     def func_flush(cls):
@@ -134,33 +135,33 @@ class Visitor(ast.NodeTransformer):
         #         return get_ann(name, eval_str=True)
         #     else:
         #         return cls.couscous_func.get(name)
-        if isinstance(fun := cls.couscous_func.get(name), ast.FunctionDef):
-            params = {}
-            for arg in fun.args.args:
-                ann = arg.annotation
-                annotation = inspect.Parameter.empty
-                if isinstance(ann, ast.Constant):
-                    annotation = ann.value
-                elif isinstance(ann, ast.Name):
-                    annotation = ann.id
-                elif isinstance(ann, ast.Subscript):
-                    data_type = eval(ann.slice.elts[0].id)
-                    annotation = ann.slice.elts[1].value
-                    annotation = Annotated[data_type, annotation]
-                params.append(
-                    inspect.Parameter(
-                        arg.arg,
-                        inspect.Parameter.POSITIONAL_OR_KEYWORD,
-                        annotation=annotation,
-                    )
-                )
-            return inspect.Signature(
-                params,
-                return_annotation=fun.returns.value
-                if not getattr(fun, "returns", False)
-                else inspect._empty,
-            )
-        elif fun is not None:
+        # if isinstance(fun := cls.couscous_func.get(name), ast.FunctionDef):
+        #     params = {}
+        #     for arg in fun.args.args:
+        #         ann = arg.annotation
+        #         annotation = inspect.Parameter.empty
+        #         if isinstance(ann, ast.Constant):
+        #             annotation = ann.value
+        #         elif isinstance(ann, ast.Name):
+        #             annotation = ann.id
+        #         elif isinstance(ann, ast.Subscript):
+        #             data_type = eval(ann.slice.elts[0].id)
+        #             annotation = ann.slice.elts[1].value
+        #             annotation = Annotated[data_type, annotation]
+        #         params.append(
+        #             inspect.Parameter(
+        #                 arg.arg,
+        #                 inspect.Parameter.POSITIONAL_OR_KEYWORD,
+        #                 annotation=annotation,
+        #             )
+        #         )
+        #     return inspect.Signature(
+        #         params,
+        #         return_annotation=fun.returns.value
+        #         if not getattr(fun, "returns", False)
+        #         else inspect._empty,
+        #     )
+        if (fun := cls.couscous_func.get(name)) is not None:
             annotations = getattr(fun, "__annotations__", None)
             if annotations:
                 globals = list(cls.couscous_func.values())[-1].__globals__
@@ -270,6 +271,7 @@ class Visitor(ast.NodeTransformer):
                 if anno_unit is not None and anno_unit in self.ureg:
                     self.vars[arg.arg] = anno_unit
                 else:
+                    self.vars[arg.arg] = None
                     _log.warning(
                         f"In function {self.fun.__module__}/"
                         + f"{self.fun.__name__}: "
@@ -827,18 +829,20 @@ class Visitor(ast.NodeTransformer):
 
         for target in node.targets:
             if isinstance(target, ast.Tuple):
+                received = (
+                    [
+                        arg.__metadata__  # type: ignore
+                        if is_annotated(arg)
+                        else arg
+                        for arg in value.unit.__args__
+                    ]
+                    if hasattr(value.unit, "__args__")
+                    else value.unit
+                )
                 for i, elem in enumerate(target.elts):
                     if isinstance(elem, ast.Name):
-                        if isinstance(value.unit, list):
-                            self.vars[elem.id] = value.unit[i]
-                        elif is_annotated(value.unit.__args__[i]):
-                            self.vars[elem.id] = value.unit.__args__[
-                                i
-                            ].__metadata__[0]
-                        else:
-                            self.vars[elem.id] = value.unit.__args__[
-                                i
-                            ].__forward_value__
+                        self.vars[elem.id] = received[i]
+
             elif isinstance(target, ast.Name):
                 self.vars[target.id] = value.unit
             elif isinstance(target, ast.Attribute):
@@ -860,24 +864,39 @@ class Visitor(ast.NodeTransformer):
             new_node = ast.Return(value=value.node)
             node = ast.copy_location(new_node, node)
 
-        if return_annotation is inspect._empty:
+        if return_annotation is inspect._empty or return_annotation is None:
             _log.warning(
                 f"In function {self.fun.__module__}/{self.fun.__name__}: "
                 + "Some return annotations are missing"
             )
+            new_node = node
+            return ast.copy_location(new_node, node)
 
-        if is_annotated(return_annotation):
-            expected = return_annotation.__metadata__[1]  # type: ignore
-        elif isinstance(return_annotation, str):
-            expected = return_annotation
+        if isinstance(return_annotation, Dict):
+            if len(return_annotation["return"].__args__) > 1:
+                expected = [
+                    x.__metadata__[0] if is_annotated(x) else x  # type: ignore
+                    for x in return_annotation["return"].__args__
+                ]
+            else:
+                ret = return_annotation["return"]
+                if is_annotated(ret):
+                    expected = ret.__metadata__[0]  # type: ignore
+                elif isinstance(ret, str):
+                    expected = [return_annotation]
         else:
             _log.warning(
                 f"In function {self.fun.__module__}/{self.fun.__name__}: "
                 "Type of the return annotation not supported yet"
             )
-            return node
+            new_node = node
+            return ast.copy_location(new_node, node)
 
         if (received := value.unit) != expected:
+            # TODO : Change that to include tuple signature
+            if isinstance(received, list):
+                return node
+
             if pint.Unit(received).is_compatible_with(pint.Unit(expected)):
                 if "dimensionless" in (received, expected):
                     conv_value = 1

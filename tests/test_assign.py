@@ -75,7 +75,7 @@ class Assign(unittest.TestCase):
         self.assertEqual(
             cm.output,
             [
-                "WARNING:impunity.visitor:In function tests.test_assign/"
+                f"WARNING:impunity.visitor:In function {__name__}/"
                 + "test_assign_incompatible_unit: Assignement "
                 + "expected unit K but received incompatible unit m."
             ],

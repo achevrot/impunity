@@ -62,12 +62,13 @@ class Wrapper(unittest.TestCase):
 
     def test_unknown_annotation(self) -> None:
         @impunity
-        def weird_f(h: int, h_2: "m") -> "m":
+        def test_unknown_annotation(h: int, h_2: "ft") -> "m":
             res: "ft" = h + h_2
-            return res
+            res2: "m" = res
+            return res2
 
-        res = weird_f(1000, 1000)
-        self.assertAlmostEqual(res, 6561.67, delta=1e-2)
+        res = test_unknown_annotation(1000, 1000)
+        self.assertAlmostEqual(res, 609.60, delta=1e-2)
 
         # TODO : Adding check for the warning
 

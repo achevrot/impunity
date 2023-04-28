@@ -80,7 +80,7 @@ class Arithmetic(unittest.TestCase):
         self.assertEqual(
             cm.output,
             [
-                "WARNING:impunity.visitor:In function tests.test_arithmetic"
+                f"WARNING:impunity.visitor:In function {__name__}"
                 + "/test_addition_wrong: Type m and K are not compatible. "
                 + "Defaulted to dimensionless"
             ],
