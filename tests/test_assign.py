@@ -76,8 +76,8 @@ class Assign(unittest.TestCase):
             cm.output,
             [
                 f"WARNING:impunity.visitor:In function {__name__}/"
-                + "test_assign_incompatible_unit: Assignement "
-                + "expected unit K but received incompatible unit m."
+                + "test_assign_incompatible_unit: "
+                + "Expected unit K but received incompatible unit m."
             ],
         )
 

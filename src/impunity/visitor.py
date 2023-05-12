@@ -111,12 +111,12 @@ class Visitor(ast.NodeTransformer):
     def node_convert(self, expected_unit, received_unit, received_node):
         if (
             received_unit != expected_unit
-            or "dimensionless"
+            and "dimensionless"
             not in (
                 received_unit,
                 expected_unit,
             )
-            or received_unit is None
+            and received_unit is not None
         ):
             if pint.Unit(received_unit).is_compatible_with(
                 pint.Unit(expected_unit)
@@ -133,7 +133,7 @@ class Visitor(ast.NodeTransformer):
                 _log.warning(
                     f"In function {self.fun.__module__}/"
                     + f"{self.fun.__name__}: "
-                    + f"Function {id} expected unit {expected_unit} "
+                    + f"Expected unit {expected_unit} "
                     + f"but received incompatible unit {received_unit}."
                 )
                 new_node = received_node
