@@ -4,6 +4,8 @@ from typing import Any
 
 from impunity import impunity
 
+import numpy as np
+
 if sys.version_info >= (3, 9):
     from typing import Annotated
 else:
@@ -56,6 +58,32 @@ class Arithmetic(unittest.TestCase):
         _, result_2 = (alt_m + alt_ft + alt_m2, alt_m + alt_ft + alt_m2)
 
         self.assertAlmostEqual(result_2, 4609.6, delta=1e-2)
+
+    def test_operation_list(self) -> None:
+        def test_operation_list() -> None:
+            alt_m: "m" = [1000, 2000, 3000]
+            alt_ft: "ft" = alt_m
+            res = alt_ft[0] + alt_ft[1] + alt_ft[2]
+            self.assertAlmostEqual(res, 6000, delta=1e-2)
+
+        with self.assertLogs("impunity.visitor", level="WARNING") as cm:
+            impunity(test_operation_list)
+
+        self.assertEqual(
+            cm.output,
+            [
+                f"WARNING:impunity.visitor:In function {__name__}"
+                + "/test_operation_list: List not supported by impunity. "
+                + "Please use numpy arrays."
+            ],
+        )
+
+    @impunity
+    def test_operation_array(self) -> None:
+        alt_m: "m" = np.array([1000, 2000, 3000])
+        alt_ft: "ft" = alt_m
+        res = alt_ft[0] + alt_ft[1] + alt_ft[2]
+        self.assertAlmostEqual(res, 19685.039, delta=1e-2)
 
     @impunity
     def test_value_BinOp(self) -> None:

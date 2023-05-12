@@ -5,6 +5,7 @@ import inspect
 import logging
 import sys
 import types
+import typing
 from numbers import Number
 from typing import Any, Dict, Optional, Union, cast
 
@@ -106,6 +107,61 @@ class Visitor(ast.NodeTransformer):
             cls.couscous_func[fun.name] = fun
         else:
             cls.couscous_func[fun.__name__] = fun
+
+    def node_convert(self, expected_unit, received_unit, received_node):
+        if (
+            received_unit != expected_unit
+            or "dimensionless"
+            not in (
+                received_unit,
+                expected_unit,
+            )
+            or received_unit is None
+        ):
+            if pint.Unit(received_unit).is_compatible_with(
+                pint.Unit(expected_unit)
+            ):
+                conv_value = (
+                    pint.Unit(expected_unit).from_(pint.Unit(received_unit)).m
+                )
+                new_node = ast.BinOp(
+                    received_node,
+                    ast.Mult(),
+                    ast.Constant(conv_value),
+                )
+            else:
+                _log.warning(
+                    f"In function {self.fun.__module__}/"
+                    + f"{self.fun.__name__}: "
+                    + f"Function {id} expected unit {expected_unit} "
+                    + f"but received incompatible unit {received_unit}."
+                )
+                new_node = received_node
+        else:
+            new_node = received_node
+        return new_node
+
+        # # Converting by multiplying
+        # if conv_type == "mul":
+        #     if isinstance(original_node, ast.List):
+        #         # converted_node = ast.Expression(
+        #         #     body=ast.GeneratorExp(elt=ast.BinOp(
+        #         #         (left=ast.Name(id='n', ctx=Load()),
+        #         #          op=ast.(), right=Num(n=conv_value)), generators=
+
+        #         # ))))
+        #         pass
+        #     else:
+        #         converted_node = ast.BinOp(
+        #             original_node, ast.Mult(), ast.Constant(conv_value)
+        #         )
+
+        # if conv_type == "add":
+        #     pass
+        # if conv_type == "log":
+        #     pass
+
+        # return ast.copy_location(converted_node, original_node)
 
     # @classmethod
     # def insert_node_above(cls, original_node, new_node) -> None:
@@ -313,20 +369,13 @@ class Visitor(ast.NodeTransformer):
             if not node.elts:
                 return QuantityNode(node, None)
             else:
-                elems = list(map(self.get_node_unit, node.elts))
-                if all(elem.unit == elems[0].unit for elem in elems):
-                    return QuantityNode(
-                        ast.List([elem.node for elem in elems], ctx=node.ctx),
-                        elems[0].unit,
-                    )
-                else:
-                    _log.warning(
-                        f"In function {self.fun.__module__}"
-                        + f"/{self.fun.__name__}"
-                        + ": Type inside list must be the same. "
-                        + "Defaulted to dimensionless"
-                    )
-                    return QuantityNode(node, "dimensionless")
+                _log.warning(
+                    f"In function {self.fun.__module__}"
+                    + f"/{self.fun.__name__}"
+                    + ": List not supported by impunity. "
+                    + "Please use numpy arrays."
+                )
+                return QuantityNode(node, "dimensionless")
 
         elif isinstance(node, ast.Set):
             elems = list(map(self.get_node_unit, node.elts))
@@ -494,40 +543,22 @@ class Visitor(ast.NodeTransformer):
                         + f"{expected} but received unitless quantity"
                     )
 
-                    if (received := self.get_node_unit(arg).unit) is None:
+                    if (received := self.get_node_unit(arg)).unit is None:
                         if expected is not inspect._empty:
                             _log.warning(msg)
-                        new_args.append(node.args[i])
+                        new_args.append(arg)
                         continue
-                    if is_annotated(received):
-                        received = received.__metadata__[0]  # type: ignore
-                    if received != expected:
-                        if pint.Unit(received).is_compatible_with(
-                            pint.Unit(expected)
-                        ):
-                            if "dimensionless" in (received, expected):
-                                conv_value = 1
-                            else:
-                                conv_value = (
-                                    pint.Unit(expected)
-                                    .from_(pint.Unit(received))
-                                    .m
-                                )
-                            new_arg = ast.BinOp(
-                                node.args[i],
-                                ast.Mult(),
-                                ast.Constant(conv_value),
-                            )
-                            new_args.append(new_arg)
-                        else:
-                            _log.warning(
-                                f"In function {self.fun.__module__}/"
-                                + f"{self.fun.__name__}: "
-                                + f"Function {id} expected unit {expected} "
-                                + f"but received incompatible unit {received}."
-                            )
-                    else:
-                        new_args.append(node.args[i])
+
+                    received.unit = (
+                        received.unit.__metadata__[0]  # type: ignore
+                        if is_annotated(received.unit)
+                        else received.unit
+                    )
+
+                    new_arg = self.node_convert(
+                        expected, received.unit, received.node
+                    )
+                    new_args.append(new_arg)
 
             new_node = (
                 node
@@ -569,84 +600,35 @@ class Visitor(ast.NodeTransformer):
                 else:
                     return node
                 for i, arg in enumerate(node.args):
-                    if (received := self.get_node_unit(arg).unit) != (
+                    if (received := self.get_node_unit(arg)).unit != (
                         expected := fun_signature[i][1]
                     ):
                         if is_annotated(expected):
                             expected = expected.__metadata__[0]  # type: ignore
-                        if received is None:
-                            return node
-                        if pint.Unit(received).is_compatible_with(
-                            pint.Unit(expected)
-                        ):
-                            if "dimensionless" in (received, expected):
-                                conv_value = 1
-                            else:
-                                conv_value = (
-                                    pint.Unit(expected)
-                                    .from_(pint.Unit(received))
-                                    .m
-                                )
-                        else:
-                            _log.warning(
-                                f"In function {self.fun.__module__}"
-                                + f"/{self.fun.__name__}: "
-                                + f"Function {node.func.id} "
-                                + f"expected unit {expected} "
-                                + f"but received incompatible unit {received}."
-                            )
-                            return node
-
-                        new_arg = ast.BinOp(
-                            arg,
-                            ast.Mult(),
-                            ast.Constant(conv_value),
+                        new_arg = self.node_convert(
+                            expected, received.unit, received.node
                         )
                         new_args.append(new_arg)
-                    else:
-                        new_args.append(arg)
 
                 for keyword in node.keywords:
                     if keyword.arg:
-                        if (
-                            received := self.get_node_unit(keyword.value).unit
-                        ) != (expected := signature[keyword.arg]):
+                        if (received := self.get_node_unit(keyword.value)) != (
+                            expected := signature[keyword.arg]
+                        ):
                             if is_annotated(expected):
                                 x = expected.__metadata__[0]  # type: ignore
                                 expected = x
                             if not (
                                 isinstance(expected, str)
-                                and isinstance(received, str)
+                                and isinstance(received.unit, str)
                             ):
                                 # TODO To avoid annoying typing for now
                                 return node
 
-                            if pint.Unit(received).is_compatible_with(
-                                pint.Unit(expected)
-                            ):
-                                if "dimensionless" in (received, expected):
-                                    conv_value = 1
-                                else:
-                                    conv_value = (
-                                        pint.Unit(expected)
-                                        .from_(pint.Unit(received))
-                                        .m
-                                    )
-                            else:
-                                _log.warning(
-                                    f"In function {self.fun.__module__}"
-                                    + f"/{self.fun.__name__}: "
-                                    + f"Function {node.func.id} "
-                                    + f"expected unit {expected} "
-                                    + "but received incompatible "
-                                    + f"unit {received}."
-                                )
-                                return node
-                            new_value = ast.BinOp(
-                                keyword.value,
-                                ast.Mult(),
-                                ast.Constant(conv_value),
+                            new_value = self.node_convert(
+                                expected, received.unit, received.node
                             )
+
                             new_keyword = cast(
                                 ast.expr,
                                 ast.keyword(
@@ -656,10 +638,8 @@ class Visitor(ast.NodeTransformer):
                             )
 
                             new_keywords.append(new_keyword)
-                        else:
-                            new_args.append(arg)
 
-            if new_args:
+            if new_args or new_keywords:
                 new_node = ast.Call(
                     func=node.func,
                     args=new_args,
@@ -693,40 +673,52 @@ class Visitor(ast.NodeTransformer):
             # )
             new_node = node
 
-        elif (received := value.unit) != (
+        elif (received := value).unit != (
             expected := cast(annotation_node, node.annotation)
         ):
             expected_unit = get_annotation_unit(expected)
-            if is_annotated(received):
-                received = received.__metadata__[0]  # type: ignore
+            if is_annotated(received.unit):
+                received.unit = received.unit.__metadata__[0]  # type: ignore
 
-            if pint.Unit(received).is_compatible_with(
-                pint.Unit(expected_unit)
-            ):
-                conv_value = (
-                    pint.Unit(expected_unit).from_(pint.Unit(received)).m
-                )
-                new_value = ast.BinOp(
-                    node.value,
-                    ast.Mult(),
-                    ast.Constant(conv_value),
-                )
-                new_node = ast.AnnAssign(
-                    target=node.target,
-                    annotation=node.annotation,
-                    value=new_value,
-                    simple=node.simple,
-                )
+            new_value = self.node_convert(
+                expected_unit, received.unit, received.node
+            )
+            new_node = ast.AnnAssign(
+                target=node.target,
+                annotation=node.annotation,
+                value=new_value,
+                simple=node.simple,
+            )
 
-            else:
-                _log.warning(
-                    f"In function {self.fun.__module__}/{self.fun.__name__}: "
-                    + f"Assignement expected unit {expected_unit} "
-                    + f"but received incompatible unit {received}."
-                )
-                return node
-        else:
-            new_node = node
+        #     if "dimensionless" in (received.unit, expected_unit):
+        #         received = expected_unit
+        #     if pint.Unit(received).is_compatible_with(
+        #         pint.Unit(expected_unit)
+        #     ):
+        #         conv_value = (
+        #             pint.Unit(expected_unit).from_(pint.Unit(received)).m
+        #         )
+        #         new_value = ast.BinOp(
+        #             node.value,
+        #             ast.Mult(),
+        #             ast.Constant(conv_value),
+        #         )
+        #         new_node = ast.AnnAssign(
+        #             target=node.target,
+        #             annotation=node.annotation,
+        #             value=new_value,
+        #             simple=node.simple,
+        #         )
+
+        #     else:
+        #         _log.warning(
+        #             f"In function {self.fun.__module__}/{self.fun.__name__}:"
+        #             + f"Assignement expected unit {expected_unit} "
+        #             + f"but received incompatible unit {received}."
+        #         )
+        #         return node
+        # else:
+        #     new_node = node
 
         if isinstance(node.target, ast.Attribute):
             if isinstance(node.target.value, ast.Name):
@@ -841,7 +833,10 @@ class Visitor(ast.NodeTransformer):
                 )
                 for i, elem in enumerate(target.elts):
                     if isinstance(elem, ast.Name):
-                        self.vars[elem.id] = received[i]
+                        if isinstance(received[i], typing.ForwardRef):
+                            self.vars[elem.id] = received[i].__forward_arg__
+                        else:
+                            self.vars[elem.id] = received[i][0]
 
             elif isinstance(target, ast.Name):
                 self.vars[target.id] = value.unit
@@ -858,10 +853,10 @@ class Visitor(ast.NodeTransformer):
                 fun = frameinfo.frame.f_locals["node"].name
                 break
         return_annotation = self.get_annotations(fun)
-        value = self.get_node_unit(node.value)
+        received = self.get_node_unit(node.value)
 
-        if value.node != node.value:
-            new_node = ast.Return(value=value.node)
+        if received.node != node.value:
+            new_node = ast.Return(value=received.node)
             node = ast.copy_location(new_node, node)
 
         if return_annotation is inspect._empty or return_annotation is None:
@@ -892,25 +887,15 @@ class Visitor(ast.NodeTransformer):
             new_node = node
             return ast.copy_location(new_node, node)
 
-        if (received := value.unit) != expected:
-            # TODO : Change that to include tuple signature
-            if isinstance(received, list):
-                return node
+        if is_annotated(received.unit):
+            received.unit = received.unit.__metadata__[0]  # type: ignore
 
-            if pint.Unit(received).is_compatible_with(pint.Unit(expected)):
-                if "dimensionless" in (received, expected):
-                    conv_value = 1
-                else:
-                    conv_value = (
-                        pint.Unit(expected).from_(pint.Unit(received)).m
-                    )
-                new_value = ast.BinOp(
-                    node.value,
-                    ast.Mult(),
-                    ast.Constant(conv_value),
-                )
-                new_node = ast.Return(value=new_value)
-        else:
+        if isinstance(received.unit, list):
             new_node = node
+        else:
+            new_value = self.node_convert(
+                expected, received.unit, received.node
+            )
+            new_node = ast.Return(value=new_value)
 
         return ast.copy_location(new_node, node)
