@@ -27,6 +27,7 @@ dimensionless = Annotated[Any, "dimensionless"]
 # -----------------------
 
 global_alt: "m" = 1000
+global_alt_2: Annotated[Any, "m"] = 1000
 
 
 @impunity
@@ -56,7 +57,7 @@ class Assign(unittest.TestCase):
         assert alt_m == alt_m2
 
         global_copy: Annotated[float, "m"] = global_alt
-        assert global_copy == global_alt
+        assert global_copy == global_alt_2
 
     @impunity
     def test_assign_compatible_unit(self) -> None:

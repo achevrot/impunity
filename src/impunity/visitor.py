@@ -276,7 +276,7 @@ class Visitor(ast.NodeTransformer):
                 if isinstance(decorator, ast.Call) and isinstance(
                     decorator.func, ast.Name
                 ):
-                    if decorator.func.id == "couscous":
+                    if decorator.func.id == "impunity":
                         for kw in decorator.keywords:
                             if hasattr(kw, "value"):
                                 if (
@@ -366,16 +366,13 @@ class Visitor(ast.NodeTransformer):
                     cast(Sequence[Unit], [elem.unit for elem in elems]),
                 )
         elif isinstance(node, ast.List):
-            if not node.elts:
-                return QuantityNode(node, None)
-            else:
-                _log.warning(
-                    f"In function {self.fun.__module__}"
-                    + f"/{self.fun.__name__}"
-                    + ": List not supported by impunity. "
-                    + "Please use numpy arrays."
-                )
-                return QuantityNode(node, "dimensionless")
+            _log.warning(
+                f"In function {self.fun.__module__}"
+                + f"/{self.fun.__name__}"
+                + ": List not supported by impunity. "
+                + "Please use numpy arrays."
+            )
+            return QuantityNode(node, "dimensionless")
 
         elif isinstance(node, ast.Set):
             elems = list(map(self.get_node_unit, node.elts))
