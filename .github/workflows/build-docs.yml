@@ -53,10 +53,11 @@ jobs:
         run: |
           poetry install
           
-      - name: Deploy pages
-        uses: peaceiris/actions-gh-pages@v3
+      - name: Running the Sphinx to gh-pages Action
+        uses: uibcdf/action-sphinx-docs-to-gh-pages@v1.1.0
         with:
-          deploy_key: ${{ secrets.ACTIONS_DEPLOY_KEY }}
-          external_repository: achevrot/achevrot.github.io
-          publish_branch: master
-          publish_dir: docs/_build/html
+          branch: main
+          dir_docs: docs
+          sphinxapiopts: '--separate -o . ../'
+          sphinxapiexclude: '../*setup* ../*.ipynb'
+          sphinxopts: ''
