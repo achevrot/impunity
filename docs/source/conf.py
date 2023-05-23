@@ -14,10 +14,10 @@ release = "0.1"
 # -- General configuration ---------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#general-configuration
 
-extensions = []
+extensions = []  # type: ignore
 
 templates_path = ["_templates"]
-exclude_patterns = []
+exclude_patterns = []  # type: ignore
 
 
 # -- Options for HTML output -------------------------------------------------

@@ -8,15 +8,23 @@ Welcome to Impunity's documentation!
 
 Source code on `github <https://github.com/achevrot/impunity>`_
 
-**Impunity** (/ɪmˈpjuː.nə.ti/) is a Python library for the users of physical
-quantities.
+**Impunity** (/ɪmˈpjuː.nə.ti/) is a Python library that enables static analysis of code 
+annotations to ensure coherence and consistency of physical units. It 
+provides a framework for developers to annotate their Python code with 
+physical units and automatically verifies if the units are compatible and 
+adhere to predefined coherence rules.
 
-Its main purpose is to check the consistency of physical units with minimal
-overhead. It uses *flexible variable and function annotations* 
-(`PEP 593 <https://peps.python.org/pep-0593/>`_) to check *before* runtime the 
-consistency between variables and arguments of functions. If physical units 
-are consistent, impunity rewrites the code by automatically applying 
-conversions in the code of the function.
+Features
+====================================
+
+* Automatic verification of physical unit coherence in annotated Python code.
+* Support for various annotation styles, including type hints, or custom annotations.
+* Flexible and extensible rule-based system using the Pint library.
+* Integration with popular Python development environments and build systems as mypy.
+* Fast and efficient parsing and analysis of annotations using Python's abstract syntax tree (AST).
+* Detailed error reporting with actionable suggestions for resolving unit coherence issues.
+* Easy integration into existing workflows and projects.
+
 
 Contents
 ========
@@ -24,12 +32,9 @@ Contents
 .. toctree::
    :maxdepth: 1
 
-   installation
    quickstart
    user_guide
-   gallery
-   api_reference
-   publications
+   contribute
 
 .. note::
 
