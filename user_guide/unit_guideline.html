@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Guidelines for Choosing Appropriate Units &mdash; Impunity 0.1 documentation</title>
+      <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
+        <script src="../_static/doctools.js"></script>
+        <script src="../_static/sphinx_highlight.js"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Impunity Decorator Guide" href="decorator_guide.html" />
+    <link rel="prev" title="Supported Annotation Styles" href="code_annotation.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../index.html" class="icon icon-home">
+            Impunity
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../quickstart.html">Getting started</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../user_guide.html">User Guide</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="../user_guide.html#annotating-code-with-physical-units">Annotating Code with Physical Units</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="code_annotation.html">Supported Annotation Styles</a></li>
+<li class="toctree-l3 current"><a class="current reference internal" href="#">Guidelines for Choosing Appropriate Units</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#consistency">Consistency</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#base-units">Base Units</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#unit-conversions">Unit Conversions</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#physical-context">Physical Context</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#readability">Readability</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#documentation">Documentation</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../user_guide.html#how-to-use-impunity">How to use <strong>Impunity</strong></a></li>
+<li class="toctree-l2"><a class="reference internal" href="../user_guide.html#advanced-topics">Advanced Topics</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../contribute.html">Contribute to impunity</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">Impunity</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../user_guide.html">User Guide</a></li>
+      <li class="breadcrumb-item active">Guidelines for Choosing Appropriate Units</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../_sources/user_guide/unit_guideline.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="guidelines-for-choosing-appropriate-units">
+<h1>Guidelines for Choosing Appropriate Units<a class="headerlink" href="#guidelines-for-choosing-appropriate-units" title="Permalink to this heading"></a></h1>
+<p>Choosing appropriate units is crucial for ensuring the accuracy and coherence of
+physical quantities in your code. <strong>Impunity</strong> leverages the functionality of
+the Pint library to provide unit coherence and conversions. As a consequence,
+<strong>only units supported by the Pint library can be used with Impunity</strong>.
+Follow these guidelines to select suitable units for your code:</p>
+<section id="consistency">
+<h2>Consistency<a class="headerlink" href="#consistency" title="Permalink to this heading"></a></h2>
+<p>Maintain consistency throughout your codebase by using the same units for similar quantities.
+This consistency enhances code readability and reduces the chances of introducing errors.
+For example, if you’re working with lengths, consistently use meters or kilometers
+instead of mixing different units like feet or inches.</p>
+</section>
+<section id="base-units">
+<h2>Base Units<a class="headerlink" href="#base-units" title="Permalink to this heading"></a></h2>
+<p>Prefer using base units whenever possible. Base units are fundamental units of measurement
+that are defined independently of other units. Examples of base units include meters for length,
+seconds for time, and kilograms for mass. Using base units simplifies calculations and conversions.</p>
+</section>
+<section id="unit-conversions">
+<h2>Unit Conversions<a class="headerlink" href="#unit-conversions" title="Permalink to this heading"></a></h2>
+<p>Whenever needed, <strong>Impunity</strong> will use the power of the Pint library to perform unit conversions effortlessly.
+Pint provides a comprehensive set of predefined units and allows you to define
+custom units as well. This ensures consistency and accuracy when working
+with physical quantities.</p>
+<p><strong>FUTURE WORK : Define the user-defined set of unit to use in Impunity</strong></p>
+</section>
+<section id="physical-context">
+<h2>Physical Context<a class="headerlink" href="#physical-context" title="Permalink to this heading"></a></h2>
+<p>Consider the physical context in which your code operates.
+Choose units that are relevant and meaningful to the problem domain.
+For example, when working with astronomical distances, using astronomical units (AU)
+or light-years might be more appropriate than meters or kilometers.</p>
+</section>
+<section id="readability">
+<h2>Readability<a class="headerlink" href="#readability" title="Permalink to this heading"></a></h2>
+<p>Opt for units that improve code readability and comprehension.
+Choose units that are widely recognized and commonly used in the field.
+Additionally, consider using unit symbols or abbreviations that are easily
+understood by domain experts.</p>
+</section>
+<section id="documentation">
+<h2>Documentation<a class="headerlink" href="#documentation" title="Permalink to this heading"></a></h2>
+<p>Document the units used in your code to provide clarity and avoid confusion.
+Clearly specify the units for variables, function parameters, and return types
+in your code documentation. This helps other developers understand the expected
+units and promotes correct usage of your library.</p>
+<p>By following these guidelines, you can ensure the appropriate choice of units in your code,
+enhance the clarity of your codebase, and maintain coherence and accuracy in physical quantities.</p>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="code_annotation.html" class="btn btn-neutral float-left" title="Supported Annotation Styles" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="decorator_guide.html" class="btn btn-neutral float-right" title="Impunity Decorator Guide" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2023, Antoine Chevrot.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

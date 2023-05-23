@@ -4,7 +4,7 @@
   <meta charset="utf-8" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Installation &mdash; Impunity 0.1 documentation</title>
+  <title>Contribute to impunity &mdash; Impunity 0.1 documentation</title>
       <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
   <!--[if lt IE 9]>
@@ -17,8 +17,7 @@
     <script src="_static/js/theme.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
-    <link rel="next" title="Getting started" href="quickstart.html" />
-    <link rel="prev" title="Welcome to Impunity’s documentation!" href="index.html" /> 
+    <link rel="prev" title="Static Unit Coherence Checking and AST Modification" href="user_guide/perf_improvement.html" /> 
 </head>
 
 <body class="wy-body-for-nav"> 
@@ -41,11 +40,9 @@
 </div>
         </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
               <ul class="current">
-<li class="toctree-l1 current"><a class="current reference internal" href="#">Installation</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="#contribute-to-impunity">Contribute to impunity</a></li>
-</ul>
-</li>
 <li class="toctree-l1"><a class="reference internal" href="quickstart.html">Getting started</a></li>
+<li class="toctree-l1"><a class="reference internal" href="user_guide.html">User Guide</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Contribute to impunity</a></li>
 </ul>
 
         </div>
@@ -62,9 +59,9 @@
           <div role="navigation" aria-label="Page navigation">
   <ul class="wy-breadcrumbs">
       <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
-      <li class="breadcrumb-item active">Installation</li>
+      <li class="breadcrumb-item active">Contribute to impunity</li>
       <li class="wy-breadcrumbs-aside">
-            <a href="_sources/installation.rst.txt" rel="nofollow"> View page source</a>
+            <a href="_sources/contribute.rst.txt" rel="nofollow"> View page source</a>
       </li>
   </ul>
   <hr/>
@@ -72,21 +69,8 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
              
-  <section id="installation">
-<h1>Installation<a class="headerlink" href="#installation" title="Permalink to this heading"></a></h1>
-<p>The impunity library checks statically for any unit annotation in the code
-and eventually modify it to add conversions if necessary. To do so, it uses
-the <a class="reference external" href="https://pint.readthedocs.io/en/stable/">Pint</a> to check if units in
-annotations are compatible.</p>
-<p>The best way to install impunity is to use pip in a Python &gt;= 3.8 environment:</p>
-<blockquote>
-<div><div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="c1"># installation</span>
-pip<span class="w"> </span>install<span class="w"> </span>impunity
-</pre></div>
-</div>
-</div></blockquote>
-<section id="contribute-to-impunity">
-<h2>Contribute to impunity<a class="headerlink" href="#contribute-to-impunity" title="Permalink to this heading"></a></h2>
+  <section id="contribute-to-impunity">
+<h1>Contribute to impunity<a class="headerlink" href="#contribute-to-impunity" title="Permalink to this heading"></a></h1>
 <p>If you intend to contribute to impunity or file a pull request, the best way to
 ensure continuous integration does not break is to reproduce an environment with
 the same exact versions of all dependency libraries.</p>
@@ -109,14 +93,12 @@ poetry<span class="w"> </span>install<span class="w"> </span>-E<span class="w"> 
 </li>
 </ul>
 </section>
-</section>
 
 
            </div>
           </div>
           <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
-        <a href="index.html" class="btn btn-neutral float-left" title="Welcome to Impunity’s documentation!" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
-        <a href="quickstart.html" class="btn btn-neutral float-right" title="Getting started" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+        <a href="user_guide/perf_improvement.html" class="btn btn-neutral float-left" title="Static Unit Coherence Checking and AST Modification" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
     </div>
 
   <hr/>

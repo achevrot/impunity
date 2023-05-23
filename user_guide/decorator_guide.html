@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Impunity Decorator Guide &mdash; Impunity 0.1 documentation</title>
+      <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
+        <script src="../_static/doctools.js"></script>
+        <script src="../_static/sphinx_highlight.js"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Decorator Parameters" href="decorator_options.html" />
+    <link rel="prev" title="Guidelines for Choosing Appropriate Units" href="unit_guideline.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../index.html" class="icon icon-home">
+            Impunity
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../quickstart.html">Getting started</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../user_guide.html">User Guide</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="../user_guide.html#annotating-code-with-physical-units">Annotating Code with Physical Units</a></li>
+<li class="toctree-l2 current"><a class="reference internal" href="../user_guide.html#how-to-use-impunity">How to use <strong>Impunity</strong></a><ul class="current">
+<li class="toctree-l3 current"><a class="current reference internal" href="#">Impunity Decorator Guide</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#introduction">Introduction</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#usage">Usage</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#examples">Examples</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#conclusion">Conclusion</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="decorator_options.html">Decorator Parameters</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../user_guide.html#advanced-topics">Advanced Topics</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../contribute.html">Contribute to impunity</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">Impunity</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../user_guide.html">User Guide</a></li>
+      <li class="breadcrumb-item active">Impunity Decorator Guide</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../_sources/user_guide/decorator_guide.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="impunity-decorator-guide">
+<h1><a class="toc-backref" href="#id1" role="doc-backlink">Impunity Decorator Guide</a><a class="headerlink" href="#impunity-decorator-guide" title="Permalink to this heading"></a></h1>
+<nav class="contents" id="contents">
+<p class="topic-title">Contents</p>
+<ul class="simple">
+<li><p><a class="reference internal" href="#impunity-decorator-guide" id="id1">Impunity Decorator Guide</a></p>
+<ul>
+<li><p><a class="reference internal" href="#introduction" id="id2">Introduction</a></p></li>
+<li><p><a class="reference internal" href="#usage" id="id3">Usage</a></p></li>
+<li><p><a class="reference internal" href="#examples" id="id4">Examples</a></p>
+<ul>
+<li><p><a class="reference internal" href="#example-1-converting-between-meters-and-kilometers" id="id5">Example 1: Converting between meters and kilometers</a></p></li>
+<li><p><a class="reference internal" href="#example-2-coherence-checking-with-multiple-parameters" id="id6">Example 2: Coherence checking with multiple parameters</a></p></li>
+<li><p><a class="reference internal" href="#example-3-coherence-checking-with-custom-units" id="id7">Example 3: Coherence checking with custom units</a></p></li>
+</ul>
+</li>
+<li><p><a class="reference internal" href="#conclusion" id="id8">Conclusion</a></p></li>
+</ul>
+</li>
+</ul>
+</nav>
+<section id="introduction">
+<h2><a class="toc-backref" href="#id2" role="doc-backlink">Introduction</a><a class="headerlink" href="#introduction" title="Permalink to this heading"></a></h2>
+<p>The <strong>Impunity</strong> library provides a powerful decorator that performs
+static analysis of annotations in your Python code, ensuring coherence
+and consistency of physical units. By applying the <cite>&#64;impunity</cite> decorator
+to your functions or methods, <strong>Impunity</strong> automatically detects unit
+inconsistencies and rewrites the code with proper conversion values
+taken from the Pint library.</p>
+</section>
+<section id="usage">
+<h2><a class="toc-backref" href="#id3" role="doc-backlink">Usage</a><a class="headerlink" href="#usage" title="Permalink to this heading"></a></h2>
+<p>Using the <strong>Impunity</strong> decorator is straightforward. Follow the steps
+below to apply the decorator to your functions or methods:</p>
+<ol class="arabic">
+<li><p>Import the <cite>impunity</cite> decorator from the <strong>Impunity</strong> library:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">impunity</span> <span class="kn">import</span> <span class="n">impunity</span>
+</pre></div>
+</div>
+</li>
+</ol>
+<p>2. Apply the <cite>&#64;impunity</cite> decorator to the functions or methods you
+want to check for unit coherence:</p>
+<blockquote>
+<div><div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="nd">@impunity</span>
+<span class="k">def</span> <span class="nf">calculate_speed</span><span class="p">(</span><span class="n">distance</span><span class="p">:</span> <span class="s2">&quot;meters&quot;</span><span class="p">,</span> <span class="n">time</span><span class="p">:</span> <span class="s2">&quot;seconds&quot;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">&quot;m/s&quot;</span><span class="p">:</span>
+    <span class="k">return</span> <span class="n">distance</span> <span class="o">/</span> <span class="n">time</span>
+</pre></div>
+</div>
+<p>The <strong>Impunity</strong> decorator will analyze the annotations of the
+function parameters and return type, automatically detecting
+any unit inconsistencies.</p>
+</div></blockquote>
+<ol class="arabic" start="3">
+<li><p>Run your code:</p>
+<p>Execute your code as usual. If any unit inconsistencies are
+detected by <strong>Impunity</strong>, it will rewrite the code with proper
+conversion values and execute the modified version.</p>
+</li>
+<li><p>Review the modified code:</p>
+<p>After executing the decorated function or method, <strong>Impunity</strong>
+will modify the code to include the necessary conversions for
+unit coherence. The modified code will be executed, ensuring coherent results.</p>
+</li>
+</ol>
+</section>
+<section id="examples">
+<h2><a class="toc-backref" href="#id4" role="doc-backlink">Examples</a><a class="headerlink" href="#examples" title="Permalink to this heading"></a></h2>
+<p>Here are a few examples to illustrate how the <strong>Impunity</strong> decorator works:</p>
+<section id="example-1-converting-between-meters-and-kilometers">
+<h3><a class="toc-backref" href="#id5" role="doc-backlink">Example 1: Converting between meters and kilometers</a><a class="headerlink" href="#example-1-converting-between-meters-and-kilometers" title="Permalink to this heading"></a></h3>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">impunity</span> <span class="kn">import</span> <span class="n">impunity</span>
+
+<span class="nd">@impunity</span>
+<span class="k">def</span> <span class="nf">calculate_distance_in_km</span><span class="p">(</span><span class="n">distance</span><span class="p">:</span> <span class="s2">&quot;meters&quot;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">&quot;kilometers&quot;</span><span class="p">:</span>
+    <span class="k">return</span> <span class="n">distance</span>
+</pre></div>
+</div>
+<p>In this example, the <cite>calculate_distance_in_km</cite> function
+is decorated with <cite>&#64;impunity</cite>. If the <cite>distance</cite> parameter
+is annotated with the unit “meters”, <strong>Impunity</strong> will automatically
+rewrite the code to include the conversion from meters to kilometers.</p>
+</section>
+<section id="example-2-coherence-checking-with-multiple-parameters">
+<h3><a class="toc-backref" href="#id6" role="doc-backlink">Example 2: Coherence checking with multiple parameters</a><a class="headerlink" href="#example-2-coherence-checking-with-multiple-parameters" title="Permalink to this heading"></a></h3>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">impunity</span> <span class="kn">import</span> <span class="n">impunity</span>
+
+<span class="nd">@impunity</span>
+<span class="k">def</span> <span class="nf">calculate_velocity</span><span class="p">(</span><span class="n">distance</span><span class="p">:</span> <span class="s2">&quot;meters&quot;</span><span class="p">,</span> <span class="n">time</span><span class="p">:</span> <span class="s2">&quot;seconds&quot;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">&quot;m/s&quot;</span><span class="p">:</span>
+    <span class="k">return</span> <span class="n">distance</span> <span class="o">/</span> <span class="n">time</span>
+</pre></div>
+</div>
+<p>In this example, the <cite>calculate_velocity</cite> function is decorated with
+<cite>&#64;impunity</cite>. <strong>Impunity</strong> analyzes the annotations of both the <cite>distance</cite>
+and <cite>time</cite> parameters and ensures that their units are coherent. If any
+unit inconsistencies are detected, the decorator rewrites the code with
+the proper conversion values to ensure that meters per second are returned.</p>
+</section>
+<section id="example-3-coherence-checking-with-custom-units">
+<h3><a class="toc-backref" href="#id7" role="doc-backlink">Example 3: Coherence checking with custom units</a><a class="headerlink" href="#example-3-coherence-checking-with-custom-units" title="Permalink to this heading"></a></h3>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="o">**</span><span class="n">Impunity</span><span class="o">**</span> <span class="kn">import</span> <span class="nn">impunity</span>
+
+<span class="n">meters</span> <span class="o">=</span> <span class="s2">&quot;meters&quot;</span>
+<span class="n">kilometers</span> <span class="o">=</span> <span class="s2">&quot;kilometers&quot;</span>
+
+<span class="nd">@impunity</span>
+<span class="k">def</span> <span class="nf">calculate_distance_in_km</span><span class="p">(</span><span class="n">distance</span><span class="p">:</span> <span class="nb">float</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
+    <span class="k">return</span> <span class="n">distance</span> <span class="o">/</span> <span class="mi">1000</span>
+</pre></div>
+</div>
+<p>In this example, custom units are defined as strings (<cite>meters</cite>
+and <cite>kilometers</cite>). The <cite>calculate_distance_in_km</cite> function is decorated
+with <cite>&#64;impunity</cite>, and <strong>Impunity</strong> ensures coherence between the annotated
+unit of <cite>distance</cite> and the expected unit.</p>
+</section>
+</section>
+<section id="conclusion">
+<h2><a class="toc-backref" href="#id8" role="doc-backlink">Conclusion</a><a class="headerlink" href="#conclusion" title="Permalink to this heading"></a></h2>
+<p>The <strong>Impunity</strong> decorator is a powerful tool for maintaining unit coherence
+and consistency in your Python codebase. By automatically analyzing annotations
+and rewriting the code with proper conversion values, it helps catch unit
+inconsistencies and ensures accurate results. Incorporate the <strong>Impunity</strong>
+decorator into your code to work confidently with physical quantities.</p>
+<p>Make sure to thoroughly test your code and review the modified code produced
+by the decorator. <strong>Impunity</strong> uses the Pint library to perform unit
+conversions, providing accurate and reliable results. With <strong>Impunity</strong>,
+you can focus on developing your application while ensuring unit coherence
+in a hassle-free manner.</p>
+<p>Next, you may want to explore the <a class="reference internal" href="decorator_options.html"><span class="doc">Decorator Parameters</span></a>
+provided by the <cite>&#64;impunity</cite> decorator further enhance your unit
+coherence checking capabilities.</p>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="unit_guideline.html" class="btn btn-neutral float-left" title="Guidelines for Choosing Appropriate Units" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="decorator_options.html" class="btn btn-neutral float-right" title="Decorator Parameters" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2023, Antoine Chevrot.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>
