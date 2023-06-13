@@ -4,9 +4,10 @@
   <meta charset="utf-8" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>User Guide &mdash; Impunity 0.1 documentation</title>
+  <title>Base api &mdash; Impunity 0.1 documentation</title>
       <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+      <link rel="stylesheet" href="_static/design-style.1e8bd061cd6da7fc9cf755528e8ffc24.min.css" type="text/css" />
   <!--[if lt IE 9]>
     <script src="_static/js/html5shiv.min.js"></script>
   <![endif]-->
@@ -16,10 +17,11 @@
         <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
         <script src="_static/doctools.js"></script>
         <script src="_static/sphinx_highlight.js"></script>
+        <script src="_static/design-tabs.js"></script>
     <script src="_static/js/theme.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
-    <link rel="next" title="Supported Annotation Styles" href="user_guide/code_annotation.html" />
+    <link rel="next" title="String Annotations" href="string_annotation.html" />
     <link rel="prev" title="Getting started" href="quickstart.html" /> 
 </head>
 
@@ -42,25 +44,24 @@
   </form>
 </div>
         </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
-              <ul class="current">
+              <ul>
 <li class="toctree-l1"><a class="reference internal" href="quickstart.html">Getting started</a></li>
-<li class="toctree-l1 current"><a class="current reference internal" href="#">User Guide</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="#annotating-code-with-physical-units">Annotating Code with Physical Units</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="user_guide/code_annotation.html">Supported Annotation Styles</a></li>
-<li class="toctree-l3"><a class="reference internal" href="user_guide/unit_guideline.html">Guidelines for Choosing Appropriate Units</a></li>
 </ul>
-</li>
-<li class="toctree-l2"><a class="reference internal" href="#how-to-use-impunity">How to use <strong>Impunity</strong></a><ul>
-<li class="toctree-l3"><a class="reference internal" href="user_guide/decorator_guide.html">Impunity Decorator Guide</a></li>
-<li class="toctree-l3"><a class="reference internal" href="user_guide/decorator_options.html">Decorator Parameters</a></li>
+<p class="caption" role="heading"><span class="caption-text">API</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Base api</a></li>
 </ul>
-</li>
-<li class="toctree-l2"><a class="reference internal" href="#advanced-topics">Advanced Topics</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="user_guide/perf_improvement.html">Static Unit Coherence Checking and AST Modification</a></li>
+<p class="caption" role="heading"><span class="caption-text">Annotations</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="string_annotation.html">String Annotations</a></li>
+<li class="toctree-l1"><a class="reference internal" href="annotated.html">The Annotated object</a></li>
 </ul>
-</li>
+<p class="caption" role="heading"><span class="caption-text">Advanced Topic</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="how.html">How Does It Work ?</a></li>
+<li class="toctree-l1"><a class="reference internal" href="perf_improvement.html">Performance Analysis</a></li>
 </ul>
-</li>
+<ul>
 <li class="toctree-l1"><a class="reference internal" href="contribute.html">Contribute to impunity</a></li>
 </ul>
 
@@ -78,9 +79,9 @@
           <div role="navigation" aria-label="Page navigation">
   <ul class="wy-breadcrumbs">
       <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
-      <li class="breadcrumb-item active">User Guide</li>
+      <li class="breadcrumb-item active">Base api</li>
       <li class="wy-breadcrumbs-aside">
-            <a href="_sources/user_guide.rst.txt" rel="nofollow"> View page source</a>
+            <a href="_sources/api.rst.txt" rel="nofollow"> View page source</a>
       </li>
   </ul>
   <hr/>
@@ -88,36 +89,8 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
              
-  <section id="user-guide">
-<h1>User Guide<a class="headerlink" href="#user-guide" title="Permalink to this heading"></a></h1>
-<p>The User Guide provides detailed information on how to use <strong>Impunity</strong> effectively. It covers the following topics:</p>
-<section id="annotating-code-with-physical-units">
-<h2>Annotating Code with Physical Units<a class="headerlink" href="#annotating-code-with-physical-units" title="Permalink to this heading"></a></h2>
-<div class="toctree-wrapper compound">
-<ul>
-<li class="toctree-l1"><a class="reference internal" href="user_guide/code_annotation.html">Supported Annotation Styles</a></li>
-<li class="toctree-l1"><a class="reference internal" href="user_guide/unit_guideline.html">Guidelines for Choosing Appropriate Units</a></li>
-</ul>
-</div>
-</section>
-<section id="how-to-use-impunity">
-<h2>How to use <strong>Impunity</strong><a class="headerlink" href="#how-to-use-impunity" title="Permalink to this heading"></a></h2>
-<div class="toctree-wrapper compound">
-<ul>
-<li class="toctree-l1"><a class="reference internal" href="user_guide/decorator_guide.html">Impunity Decorator Guide</a></li>
-<li class="toctree-l1"><a class="reference internal" href="user_guide/decorator_options.html">Decorator Parameters</a></li>
-</ul>
-</div>
-</section>
-<section id="advanced-topics">
-<h2>Advanced Topics<a class="headerlink" href="#advanced-topics" title="Permalink to this heading"></a></h2>
-<p><strong>Future Work : Configuring code analysis settings to have automatic unit checking</strong></p>
-<div class="toctree-wrapper compound">
-<ul>
-<li class="toctree-l1"><a class="reference internal" href="user_guide/perf_improvement.html">Static Unit Coherence Checking and AST Modification</a></li>
-</ul>
-</div>
-</section>
+  <section id="base-api">
+<h1>Base api<a class="headerlink" href="#base-api" title="Permalink to this heading"></a></h1>
 </section>
 
 
@@ -125,7 +98,7 @@
           </div>
           <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
         <a href="quickstart.html" class="btn btn-neutral float-left" title="Getting started" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
-        <a href="user_guide/code_annotation.html" class="btn btn-neutral float-right" title="Supported Annotation Styles" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+        <a href="string_annotation.html" class="btn btn-neutral float-right" title="String Annotations" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
     </div>
 
   <hr/>

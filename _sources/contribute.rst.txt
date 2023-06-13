@@ -1,6 +1,8 @@
 Contribute to impunity
 ============
 
+Source code on `github <https://github.com/achevrot/impunity>`_
+
 If you intend to contribute to impunity or file a pull request, the best way to
 ensure continuous integration does not break is to reproduce an environment with
 the same exact versions of all dependency libraries.

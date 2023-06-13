@@ -1,10 +1,17 @@
 Getting started
 ===============
 
+**Impunity** (/ɪmˈpjuː.nə.ti/) is a Python library that enables static analysis of code 
+annotations to ensure coherence and consistency of physical units. It 
+provides a framework for developers to annotate their Python code with 
+physical units and automatically verifies if the units are compatible and 
+adhere to predefined coherence rules.
+
+
 This guide will help you get started with using **Impunity** to ensure
 coherence and consistency of physical units in your Python code. To do so, it uses
-the `Pint <https://pint.readthedocs.io/en/stable/>`_ to check if units in
-annotations are compatible. 
+the `Pint <https://pint.readthedocs.io/en/stable/>`_ library to check if units in
+annotations are compatible between each other. 
 
 Installation
 ------------
@@ -13,7 +20,6 @@ The best way to install impunity is to use pip in a Python >= 3.8 environment:
 
  .. code-block:: bash
 
-    # installation
     pip install impunity
 
 
@@ -22,90 +28,47 @@ Usage
 
 Using **Impunity** is straightforward. Follow the steps below to integrate it into your code:
 
-1. Import the necessary decorator from the **Impunity** library:
-
    .. code-block:: python
 
-       from impunity import impunity
+        # 1: Import the necessary decorator from the Impunity library:
 
-2. Annotate your code with appropriate units:
+        from impunity import impunity
 
-   Use annotations to specify the units for variables, function parameters, and return types. For example:
+        # 2: Annotate your code with appropriate units:
 
-   .. code-block:: python
+        distance: "meters" = 10
+        time: "seconds" = 10
+        
+        # 3: Apply the @impunity decorator to functions or methods that you want to check
 
-       distance: "meters"
-       time: "seconds"
+        @impunity
+        def speed(distance: "meters", time: "seconds") -> "meters / seconds":
+            return distance / time
 
-3. Use the **Impunity** decorator:
+        speed(distance, time) # return 1
 
-   Apply the `@impunity` decorator to functions or methods that you want to check for unit coherence. For example:
+**Impunity** checks the units in annotations statically, **before** execution.
+When inconsistencies are found in the decorated code, conversion
+are performed under the hood when possible:
 
    .. code-block:: python
 
        @impunity
-       def calculate_speed(distance: "meters", time: "seconds") -> "meters / seconds":
-           return distance / time
+        def speed(distance: "meters", time: "seconds") -> "km / h":
+            return distance / time
+        
+        speed(distance, time) # return 3.6
 
-   The **Impunity** decorator will analyze the annotations and automatically correct the code if any unit inconsistencies are found.
-
-5. Review the feedback:
-
-   When running **Impunity**, it will analyze your code and provide feedback
-   on any detected unit inconsistencies. The feedback will include information
-   on the source of the inconsistency and any applied conversions.
-
-   .. note::
-
-      **Impunity** performs static analysis, provides feedback and modify the code executed directly.
-      Manual review may be necessary to ensure correctness.
-
-Examples
---------
-
-Here are a few examples to illustrate how to use **Impunity**:
-
-1. Basic Unit Checking:
+When inconsistencies cannot be fixed through conversion, warnings are raised
+with hints on how to correct the code:
 
    .. code-block:: python
 
-       from impunity import impunity
-
        @impunity
-       def calculate_speed(distance: "meters", time: "seconds") -> "meters / seconds":
+       def speed(distance: "meters", time: "seconds") -> "kelvin":
            return distance / time
 
-   In this example, the `calculate_speed` function is decorated with
-   `@impunity`. **Impunity** will analyze the annotations of the
-   `distance` and `time` parameters and ensure unit coherence. In this case,
-   nothing is changed as the units are coherent.
-
-2. Unit Conversion:
-
-   .. code-block:: python
-
-       from impunity import impunity
-
-       @impunity
-       def calculate_speed(distance: "meters", time: "seconds") -> "kilometers / hour":
-           return distance / time
-
-   In this example, the `calculate_speed` function is also decorated with
-   `@impunity`. **Impunity** will find the inconsistency between the parameters
-   of the function and its return value. It will automatically apply a conversion
-   value to both `distance` and `time` in order to return the correct units.
-
-Conclusion
-----------
-
-Congratulations! You have successfully installed and started using **Impunity** to 
-ensure unit coherence and consistency in your Python code. By leveraging annotations 
-and automatic unit conversion, **Impunity** helps catch unit inconsistencies early 
-in the development process, leading to more accurate and reliable code.
-
-Next, you can explore the :doc:`user_guide`
-
-
+        Warning: "Incompatible unit returned"
 
 
 .. - The most simple usage consists of using units placed as annotations. The code is checked and rewritten if need be when decorated.

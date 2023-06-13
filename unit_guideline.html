@@ -4,23 +4,23 @@
   <meta charset="utf-8" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Guidelines for Choosing Appropriate Units &mdash; Impunity 0.1 documentation</title>
-      <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
-      <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+  <title>Unit Guideline &mdash; Impunity 0.1 documentation</title>
+      <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+      <link rel="stylesheet" href="_static/design-style.1e8bd061cd6da7fc9cf755528e8ffc24.min.css" type="text/css" />
   <!--[if lt IE 9]>
-    <script src="../_static/js/html5shiv.min.js"></script>
+    <script src="_static/js/html5shiv.min.js"></script>
   <![endif]-->
   
-        <script src="../_static/jquery.js"></script>
-        <script src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
-        <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
-        <script src="../_static/doctools.js"></script>
-        <script src="../_static/sphinx_highlight.js"></script>
-    <script src="../_static/js/theme.js"></script>
-    <link rel="index" title="Index" href="../genindex.html" />
-    <link rel="search" title="Search" href="../search.html" />
-    <link rel="next" title="Impunity Decorator Guide" href="decorator_guide.html" />
-    <link rel="prev" title="Supported Annotation Styles" href="code_annotation.html" /> 
+        <script src="_static/jquery.js"></script>
+        <script src="_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
+        <script src="_static/doctools.js"></script>
+        <script src="_static/sphinx_highlight.js"></script>
+        <script src="_static/design-tabs.js"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" /> 
 </head>
 
 <body class="wy-body-for-nav"> 
@@ -31,38 +31,36 @@
 
           
           
-          <a href="../index.html" class="icon icon-home">
+          <a href="index.html" class="icon icon-home">
             Impunity
           </a>
 <div role="search">
-  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
     <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
     <input type="hidden" name="check_keywords" value="yes" />
     <input type="hidden" name="area" value="default" />
   </form>
 </div>
         </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
-              <ul class="current">
-<li class="toctree-l1"><a class="reference internal" href="../quickstart.html">Getting started</a></li>
-<li class="toctree-l1 current"><a class="reference internal" href="../user_guide.html">User Guide</a><ul class="current">
-<li class="toctree-l2 current"><a class="reference internal" href="../user_guide.html#annotating-code-with-physical-units">Annotating Code with Physical Units</a><ul class="current">
-<li class="toctree-l3"><a class="reference internal" href="code_annotation.html">Supported Annotation Styles</a></li>
-<li class="toctree-l3 current"><a class="current reference internal" href="#">Guidelines for Choosing Appropriate Units</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="#consistency">Consistency</a></li>
-<li class="toctree-l4"><a class="reference internal" href="#base-units">Base Units</a></li>
-<li class="toctree-l4"><a class="reference internal" href="#unit-conversions">Unit Conversions</a></li>
-<li class="toctree-l4"><a class="reference internal" href="#physical-context">Physical Context</a></li>
-<li class="toctree-l4"><a class="reference internal" href="#readability">Readability</a></li>
-<li class="toctree-l4"><a class="reference internal" href="#documentation">Documentation</a></li>
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="quickstart.html">Getting started</a></li>
 </ul>
-</li>
+<p class="caption" role="heading"><span class="caption-text">API</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="api.html">Base api</a></li>
 </ul>
-</li>
-<li class="toctree-l2"><a class="reference internal" href="../user_guide.html#how-to-use-impunity">How to use <strong>Impunity</strong></a></li>
-<li class="toctree-l2"><a class="reference internal" href="../user_guide.html#advanced-topics">Advanced Topics</a></li>
+<p class="caption" role="heading"><span class="caption-text">Annotations</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="string_annotation.html">String Annotations</a></li>
+<li class="toctree-l1"><a class="reference internal" href="annotated.html">The Annotated object</a></li>
 </ul>
-</li>
-<li class="toctree-l1"><a class="reference internal" href="../contribute.html">Contribute to impunity</a></li>
+<p class="caption" role="heading"><span class="caption-text">Advanced Topic</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="how.html">How Does It Work ?</a></li>
+<li class="toctree-l1"><a class="reference internal" href="perf_improvement.html">Performance Analysis</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="contribute.html">Contribute to impunity</a></li>
 </ul>
 
         </div>
@@ -71,18 +69,17 @@
 
     <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
           <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
-          <a href="../index.html">Impunity</a>
+          <a href="index.html">Impunity</a>
       </nav>
 
       <div class="wy-nav-content">
         <div class="rst-content">
           <div role="navigation" aria-label="Page navigation">
   <ul class="wy-breadcrumbs">
-      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
-          <li class="breadcrumb-item"><a href="../user_guide.html">User Guide</a></li>
-      <li class="breadcrumb-item active">Guidelines for Choosing Appropriate Units</li>
+      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">Unit Guideline</li>
       <li class="wy-breadcrumbs-aside">
-            <a href="../_sources/user_guide/unit_guideline.rst.txt" rel="nofollow"> View page source</a>
+            <a href="_sources/unit_guideline.rst.txt" rel="nofollow"> View page source</a>
       </li>
   </ul>
   <hr/>
@@ -90,8 +87,16 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
              
-  <section id="guidelines-for-choosing-appropriate-units">
-<h1>Guidelines for Choosing Appropriate Units<a class="headerlink" href="#guidelines-for-choosing-appropriate-units" title="Permalink to this heading"></a></h1>
+  <section id="unit-guideline">
+<h1>Unit Guideline<a class="headerlink" href="#unit-guideline" title="Permalink to this heading"></a></h1>
+<p><strong>Impunity</strong> supports various annotation styles for denoting physical units in code.
+This section provides an overview of the supported styles along with syntax examples
+and guidelines for their usage.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p><strong>Impunity</strong> is not yet compatible with all the different syntaxes introduced
+in the <a class="reference external" href="https://peps.python.org/pep-0484/">PEP 484</a>.</p>
+</div>
 <p>Choosing appropriate units is crucial for ensuring the accuracy and coherence of
 physical quantities in your code. <strong>Impunity</strong> leverages the functionality of
 the Pint library to provide unit coherence and conversions. As a consequence,
@@ -146,10 +151,7 @@ enhance the clarity of your codebase, and maintain coherence and accuracy in phy
 
            </div>
           </div>
-          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
-        <a href="code_annotation.html" class="btn btn-neutral float-left" title="Supported Annotation Styles" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
-        <a href="decorator_guide.html" class="btn btn-neutral float-right" title="Impunity Decorator Guide" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
-    </div>
+          <footer>
 
   <hr/>
 

@@ -4,9 +4,10 @@
   <meta charset="utf-8" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Welcome to Impunity’s documentation! &mdash; Impunity 0.1 documentation</title>
+  <title>Impunity &mdash; Impunity 0.1 documentation</title>
       <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+      <link rel="stylesheet" href="_static/design-style.1e8bd061cd6da7fc9cf755528e8ffc24.min.css" type="text/css" />
   <!--[if lt IE 9]>
     <script src="_static/js/html5shiv.min.js"></script>
   <![endif]-->
@@ -16,6 +17,7 @@
         <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
         <script src="_static/doctools.js"></script>
         <script src="_static/sphinx_highlight.js"></script>
+        <script src="_static/design-tabs.js"></script>
     <script src="_static/js/theme.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
@@ -43,7 +45,22 @@
         </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
               <ul>
 <li class="toctree-l1"><a class="reference internal" href="quickstart.html">Getting started</a></li>
-<li class="toctree-l1"><a class="reference internal" href="user_guide.html">User Guide</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">API</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="api.html">Base api</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Annotations</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="string_annotation.html">String Annotations</a></li>
+<li class="toctree-l1"><a class="reference internal" href="annotated.html">The Annotated object</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Advanced Topic</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="how.html">How Does It Work ?</a></li>
+<li class="toctree-l1"><a class="reference internal" href="perf_improvement.html">Performance Analysis</a></li>
+</ul>
+<ul>
 <li class="toctree-l1"><a class="reference internal" href="contribute.html">Contribute to impunity</a></li>
 </ul>
 
@@ -61,7 +78,7 @@
           <div role="navigation" aria-label="Page navigation">
   <ul class="wy-breadcrumbs">
       <li><a href="#" class="icon icon-home" aria-label="Home"></a></li>
-      <li class="breadcrumb-item active">Welcome to Impunity’s documentation!</li>
+      <li class="breadcrumb-item active">Impunity</li>
       <li class="wy-breadcrumbs-aside">
             <a href="_sources/index.rst.txt" rel="nofollow"> View page source</a>
       </li>
@@ -71,35 +88,86 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
              
-  <section id="welcome-to-impunity-s-documentation">
-<h1>Welcome to Impunity’s documentation!<a class="headerlink" href="#welcome-to-impunity-s-documentation" title="Permalink to this heading"></a></h1>
-<p>Source code on <a class="reference external" href="https://github.com/achevrot/impunity">github</a></p>
-<p><strong>Impunity</strong> (/ɪmˈpjuː.nə.ti/) is a Python library that enables static analysis of code
-annotations to ensure coherence and consistency of physical units. It
-provides a framework for developers to annotate their Python code with
-physical units and automatically verifies if the units are compatible and
-adhere to predefined coherence rules.</p>
-</section>
-<section id="features">
-<h1>Features<a class="headerlink" href="#features" title="Permalink to this heading"></a></h1>
-<ul class="simple">
-<li><p>Automatic verification of physical unit coherence in annotated Python code.</p></li>
-<li><p>Support for various annotation styles, including type hints, or custom annotations.</p></li>
-<li><p>Flexible and extensible rule-based system using the Pint library.</p></li>
-<li><p>Integration with popular Python development environments and build systems as mypy.</p></li>
-<li><p>Fast and efficient parsing and analysis of annotations using Python’s abstract syntax tree (AST).</p></li>
-<li><p>Detailed error reporting with actionable suggestions for resolving unit coherence issues.</p></li>
-<li><p>Easy integration into existing workflows and projects.</p></li>
-</ul>
-</section>
-<section id="contents">
-<h1>Contents<a class="headerlink" href="#contents" title="Permalink to this heading"></a></h1>
+  <section id="impunity">
+<h1 class="sd-d-none">Impunity<a class="headerlink" href="#impunity" title="Permalink to this heading"></a></h1>
+<div class="sd-bg-primary docutils">
+<div class="sd-container-fluid sd-sphinx-override sd-mt-4 sd-mb-4 sd-ml-1 sd-mr-2 docutils">
+<div class="sd-row sd-g-2 sd-g-xs-2 sd-g-sm-3 sd-g-md-3 sd-g-lg-3 sd-flex-row-reverse docutils">
+<div class="sd-col sd-d-flex-column sd-col-12 sd-col-xs-12 sd-col-sm-4 sd-col-md-4 sd-col-lg-4 sd-align-major-justify sd-text-white sd-fs-3 docutils">
+</div>
+<div class="sd-col sd-d-flex-column sd-col-12 sd-col-xs-12 sd-col-sm-8 sd-col-md-8 sd-col-lg-8 sd-align-major-justify sd-text-white sd-fs-3 docutils">
+<p>A Python library to check your physical units effortlessly.</p>
+<p><a class="sd-sphinx-override sd-btn sd-text-wrap sd-btn-outline-white sd-px-4 sd-fs-5 reference internal" href="quickstart.html"><span class="doc">Getting started</span></a></p>
+</div>
+</div>
+</div>
+</div>
+<dl class="simple">
+<dt>Easy to use</dt><dd><p>Based on a decorator, to add on any annotated function or class</p>
+</dd>
+<dt>Support for various annotation styles</dt><dd><p>Usable with Annotated object or string annotations</p>
+</dd>
+<dt>Integration with popular Python type checkers.</dt><dd><p>Can be used along mypy for powerful typing systems</p>
+</dd>
+<dt>No additional runtime overhead</dt><dd><p>Impunity works directly on the AST for a static analysis of your code</p>
+</dd>
+</dl>
+<div class="sd-container-fluid sd-sphinx-override sd-mb-4 docutils">
+<div class="sd-row sd-row-cols-2 sd-row-cols-xs-2 sd-row-cols-sm-2 sd-row-cols-md-2 sd-row-cols-lg-2 docutils">
+<div class="sd-col sd-d-flex-column docutils">
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="nd">@impunity</span>
+<span class="k">def</span> <span class="nf">speed</span><span class="p">(</span><span class="n">d</span><span class="p">:</span> <span class="s2">&quot;m&quot;</span><span class="p">,</span> <span class="n">t</span><span class="p">:</span> <span class="s2">&quot;s&quot;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">&quot;m / s&quot;</span><span class="p">:</span>
+   <span class="k">return</span> <span class="n">d</span> <span class="o">/</span> <span class="n">t</span>
+
+<span class="n">speed</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="mi">10</span><span class="p">)</span> <span class="c1"># returns 1</span>
+</pre></div>
+</div>
+</div>
+<div class="sd-col sd-d-flex-column docutils">
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="nd">@impunity</span>
+<span class="k">def</span> <span class="nf">speed</span><span class="p">(</span><span class="n">d</span><span class="p">:</span> <span class="s2">&quot;m&quot;</span><span class="p">,</span> <span class="n">t</span><span class="p">:</span> <span class="s2">&quot;s&quot;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">&quot;km / h&quot;</span><span class="p">:</span>
+   <span class="k">return</span> <span class="n">d</span> <span class="o">/</span> <span class="n">t</span>
+
+<span class="n">speed</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="mi">10</span><span class="p">)</span> <span class="c1"># returns 3.6</span>
+</pre></div>
+</div>
+</div>
+<div class="sd-col sd-d-flex-column docutils">
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="nd">@impunity</span>
+<span class="k">def</span> <span class="nf">speed</span><span class="p">(</span><span class="n">d</span><span class="p">:</span> <span class="s2">&quot;m&quot;</span><span class="p">,</span> <span class="n">t</span><span class="p">:</span> <span class="s2">&quot;s&quot;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">&quot;feet&quot;</span><span class="p">:</span>
+   <span class="k">return</span> <span class="n">d</span> <span class="o">/</span> <span class="n">t</span>
+
+<span class="c1"># Warning: &quot;Incompatible unit returned&quot;</span>
+</pre></div>
+</div>
+</div>
+<div class="sd-col sd-d-flex-column docutils">
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="nd">@impunity</span>
+<span class="k">def</span> <span class="nf">speed</span><span class="p">(</span><span class="n">d</span><span class="p">:</span> <span class="s2">&quot;m&quot;</span><span class="p">,</span> <span class="n">t</span><span class="p">:</span> <span class="s2">&quot;s&quot;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">&quot;m / s&quot;</span><span class="p">:</span>
+   <span class="k">return</span> <span class="n">d</span> <span class="o">+</span> <span class="n">t</span>
+
+<span class="ne">Warning</span><span class="p">:</span> <span class="s2">&quot;Types are not compatible&quot;</span>
+</pre></div>
+</div>
+</div>
+</div>
+</div>
 <div class="toctree-wrapper compound">
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="quickstart.html">Getting started</a></li>
-<li class="toctree-l1"><a class="reference internal" href="user_guide.html">User Guide</a></li>
-<li class="toctree-l1"><a class="reference internal" href="contribute.html">Contribute to impunity</a></li>
+<li class="toctree-l1"><a class="reference internal" href="quickstart.html">Getting started</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="quickstart.html#installation">Installation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="quickstart.html#usage">Usage</a></li>
 </ul>
+</li>
+</ul>
+</div>
+<div class="toctree-wrapper compound">
+</div>
+<div class="toctree-wrapper compound">
+</div>
+<div class="toctree-wrapper compound">
+</div>
+<div class="toctree-wrapper compound">
 </div>
 <div class="admonition note">
 <p class="admonition-title">Note</p>

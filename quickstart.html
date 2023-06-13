@@ -7,6 +7,7 @@
   <title>Getting started &mdash; Impunity 0.1 documentation</title>
       <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+      <link rel="stylesheet" href="_static/design-style.1e8bd061cd6da7fc9cf755528e8ffc24.min.css" type="text/css" />
   <!--[if lt IE 9]>
     <script src="_static/js/html5shiv.min.js"></script>
   <![endif]-->
@@ -16,11 +17,12 @@
         <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
         <script src="_static/doctools.js"></script>
         <script src="_static/sphinx_highlight.js"></script>
+        <script src="_static/design-tabs.js"></script>
     <script src="_static/js/theme.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
-    <link rel="next" title="User Guide" href="user_guide.html" />
-    <link rel="prev" title="Welcome to Impunity’s documentation!" href="index.html" /> 
+    <link rel="next" title="Base api" href="api.html" />
+    <link rel="prev" title="Impunity" href="index.html" /> 
 </head>
 
 <body class="wy-body-for-nav"> 
@@ -46,11 +48,24 @@
 <li class="toctree-l1 current"><a class="current reference internal" href="#">Getting started</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="#installation">Installation</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#usage">Usage</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#examples">Examples</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#conclusion">Conclusion</a></li>
 </ul>
 </li>
-<li class="toctree-l1"><a class="reference internal" href="user_guide.html">User Guide</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">API</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="api.html">Base api</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Annotations</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="string_annotation.html">String Annotations</a></li>
+<li class="toctree-l1"><a class="reference internal" href="annotated.html">The Annotated object</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Advanced Topic</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="how.html">How Does It Work ?</a></li>
+<li class="toctree-l1"><a class="reference internal" href="perf_improvement.html">Performance Analysis</a></li>
+</ul>
+<ul>
 <li class="toctree-l1"><a class="reference internal" href="contribute.html">Contribute to impunity</a></li>
 </ul>
 
@@ -80,16 +95,20 @@
              
   <section id="getting-started">
 <h1>Getting started<a class="headerlink" href="#getting-started" title="Permalink to this heading"></a></h1>
+<p><strong>Impunity</strong> (/ɪmˈpjuː.nə.ti/) is a Python library that enables static analysis of code
+annotations to ensure coherence and consistency of physical units. It
+provides a framework for developers to annotate their Python code with
+physical units and automatically verifies if the units are compatible and
+adhere to predefined coherence rules.</p>
 <p>This guide will help you get started with using <strong>Impunity</strong> to ensure
 coherence and consistency of physical units in your Python code. To do so, it uses
-the <a class="reference external" href="https://pint.readthedocs.io/en/stable/">Pint</a> to check if units in
-annotations are compatible.</p>
+the <a class="reference external" href="https://pint.readthedocs.io/en/stable/">Pint</a> library to check if units in
+annotations are compatible between each other.</p>
 <section id="installation">
 <h2>Installation<a class="headerlink" href="#installation" title="Permalink to this heading"></a></h2>
 <p>The best way to install impunity is to use pip in a Python &gt;= 3.8 environment:</p>
 <blockquote>
-<div><div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="c1"># installation</span>
-pip<span class="w"> </span>install<span class="w"> </span>impunity
+<div><div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>pip<span class="w"> </span>install<span class="w"> </span>impunity
 </pre></div>
 </div>
 </div></blockquote>
@@ -97,81 +116,49 @@ pip<span class="w"> </span>install<span class="w"> </span>impunity
 <section id="usage">
 <h2>Usage<a class="headerlink" href="#usage" title="Permalink to this heading"></a></h2>
 <p>Using <strong>Impunity</strong> is straightforward. Follow the steps below to integrate it into your code:</p>
-<ol class="arabic">
-<li><p>Import the necessary decorator from the <strong>Impunity</strong> library:</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">impunity</span> <span class="kn">import</span> <span class="n">impunity</span>
-</pre></div>
-</div>
-</li>
-<li><p>Annotate your code with appropriate units:</p>
-<p>Use annotations to specify the units for variables, function parameters, and return types. For example:</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">distance</span><span class="p">:</span> <span class="s2">&quot;meters&quot;</span>
-<span class="n">time</span><span class="p">:</span> <span class="s2">&quot;seconds&quot;</span>
-</pre></div>
-</div>
-</li>
-<li><p>Use the <strong>Impunity</strong> decorator:</p>
-<p>Apply the <cite>&#64;impunity</cite> decorator to functions or methods that you want to check for unit coherence. For example:</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="nd">@impunity</span>
-<span class="k">def</span> <span class="nf">calculate_speed</span><span class="p">(</span><span class="n">distance</span><span class="p">:</span> <span class="s2">&quot;meters&quot;</span><span class="p">,</span> <span class="n">time</span><span class="p">:</span> <span class="s2">&quot;seconds&quot;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">&quot;meters / seconds&quot;</span><span class="p">:</span>
-    <span class="k">return</span> <span class="n">distance</span> <span class="o">/</span> <span class="n">time</span>
-</pre></div>
-</div>
-<p>The <strong>Impunity</strong> decorator will analyze the annotations and automatically correct the code if any unit inconsistencies are found.</p>
-</li>
-</ol>
-<ol class="arabic" start="5">
-<li><p>Review the feedback:</p>
-<p>When running <strong>Impunity</strong>, it will analyze your code and provide feedback
-on any detected unit inconsistencies. The feedback will include information
-on the source of the inconsistency and any applied conversions.</p>
-<div class="admonition note">
-<p class="admonition-title">Note</p>
-<p><strong>Impunity</strong> performs static analysis, provides feedback and modify the code executed directly.
-Manual review may be necessary to ensure correctness.</p>
-</div>
-</li>
-</ol>
-</section>
-<section id="examples">
-<h2>Examples<a class="headerlink" href="#examples" title="Permalink to this heading"></a></h2>
-<p>Here are a few examples to illustrate how to use <strong>Impunity</strong>:</p>
-<ol class="arabic">
-<li><p>Basic Unit Checking:</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">impunity</span> <span class="kn">import</span> <span class="n">impunity</span>
+<blockquote>
+<div><div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># 1: Import the necessary decorator from the Impunity library:</span>
+
+<span class="kn">from</span> <span class="nn">impunity</span> <span class="kn">import</span> <span class="n">impunity</span>
+
+<span class="c1"># 2: Annotate your code with appropriate units:</span>
+
+<span class="n">distance</span><span class="p">:</span> <span class="s2">&quot;meters&quot;</span> <span class="o">=</span> <span class="mi">10</span>
+<span class="n">time</span><span class="p">:</span> <span class="s2">&quot;seconds&quot;</span> <span class="o">=</span> <span class="mi">10</span>
+
+<span class="c1"># 3: Apply the @impunity decorator to functions or methods that you want to check</span>
 
 <span class="nd">@impunity</span>
-<span class="k">def</span> <span class="nf">calculate_speed</span><span class="p">(</span><span class="n">distance</span><span class="p">:</span> <span class="s2">&quot;meters&quot;</span><span class="p">,</span> <span class="n">time</span><span class="p">:</span> <span class="s2">&quot;seconds&quot;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">&quot;meters / seconds&quot;</span><span class="p">:</span>
+<span class="k">def</span> <span class="nf">speed</span><span class="p">(</span><span class="n">distance</span><span class="p">:</span> <span class="s2">&quot;meters&quot;</span><span class="p">,</span> <span class="n">time</span><span class="p">:</span> <span class="s2">&quot;seconds&quot;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">&quot;meters / seconds&quot;</span><span class="p">:</span>
     <span class="k">return</span> <span class="n">distance</span> <span class="o">/</span> <span class="n">time</span>
-</pre></div>
-</div>
-<p>In this example, the <cite>calculate_speed</cite> function is decorated with
-<cite>&#64;impunity</cite>. <strong>Impunity</strong> will analyze the annotations of the
-<cite>distance</cite> and <cite>time</cite> parameters and ensure unit coherence. In this case,
-nothing is changed as the units are coherent.</p>
-</li>
-<li><p>Unit Conversion:</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">impunity</span> <span class="kn">import</span> <span class="n">impunity</span>
 
-<span class="nd">@impunity</span>
-<span class="k">def</span> <span class="nf">calculate_speed</span><span class="p">(</span><span class="n">distance</span><span class="p">:</span> <span class="s2">&quot;meters&quot;</span><span class="p">,</span> <span class="n">time</span><span class="p">:</span> <span class="s2">&quot;seconds&quot;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">&quot;kilometers / hour&quot;</span><span class="p">:</span>
-    <span class="k">return</span> <span class="n">distance</span> <span class="o">/</span> <span class="n">time</span>
+<span class="n">speed</span><span class="p">(</span><span class="n">distance</span><span class="p">,</span> <span class="n">time</span><span class="p">)</span> <span class="c1"># return 1</span>
 </pre></div>
 </div>
-<p>In this example, the <cite>calculate_speed</cite> function is also decorated with
-<cite>&#64;impunity</cite>. <strong>Impunity</strong> will find the inconsistency between the parameters
-of the function and its return value. It will automatically apply a conversion
-value to both <cite>distance</cite> and <cite>time</cite> in order to return the correct units.</p>
-</li>
-</ol>
-</section>
-<section id="conclusion">
-<h2>Conclusion<a class="headerlink" href="#conclusion" title="Permalink to this heading"></a></h2>
-<p>Congratulations! You have successfully installed and started using <strong>Impunity</strong> to
-ensure unit coherence and consistency in your Python code. By leveraging annotations
-and automatic unit conversion, <strong>Impunity</strong> helps catch unit inconsistencies early
-in the development process, leading to more accurate and reliable code.</p>
-<p>Next, you can explore the <a class="reference internal" href="user_guide.html"><span class="doc">User Guide</span></a></p>
+</div></blockquote>
+<p><strong>Impunity</strong> checks the units in annotations statically, <strong>before</strong> execution.
+When inconsistencies are found in the decorated code, conversion
+are performed under the hood when possible:</p>
+<blockquote>
+<div><div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="nd">@impunity</span>
+ <span class="k">def</span> <span class="nf">speed</span><span class="p">(</span><span class="n">distance</span><span class="p">:</span> <span class="s2">&quot;meters&quot;</span><span class="p">,</span> <span class="n">time</span><span class="p">:</span> <span class="s2">&quot;seconds&quot;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">&quot;km / h&quot;</span><span class="p">:</span>
+     <span class="k">return</span> <span class="n">distance</span> <span class="o">/</span> <span class="n">time</span>
+
+ <span class="n">speed</span><span class="p">(</span><span class="n">distance</span><span class="p">,</span> <span class="n">time</span><span class="p">)</span> <span class="c1"># return 3.6</span>
+</pre></div>
+</div>
+</div></blockquote>
+<p>When inconsistencies cannot be fixed through conversion, warnings are raised
+with hints on how to correct the code:</p>
+<blockquote>
+<div><div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="nd">@impunity</span>
+<span class="k">def</span> <span class="nf">speed</span><span class="p">(</span><span class="n">distance</span><span class="p">:</span> <span class="s2">&quot;meters&quot;</span><span class="p">,</span> <span class="n">time</span><span class="p">:</span> <span class="s2">&quot;seconds&quot;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">&quot;kelvin&quot;</span><span class="p">:</span>
+    <span class="k">return</span> <span class="n">distance</span> <span class="o">/</span> <span class="n">time</span>
+
+ <span class="ne">Warning</span><span class="p">:</span> <span class="s2">&quot;Incompatible unit returned&quot;</span>
+</pre></div>
+</div>
+</div></blockquote>
 </section>
 </section>
 
@@ -179,8 +166,8 @@ in the development process, leading to more accurate and reliable code.</p>
            </div>
           </div>
           <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
-        <a href="index.html" class="btn btn-neutral float-left" title="Welcome to Impunity’s documentation!" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
-        <a href="user_guide.html" class="btn btn-neutral float-right" title="User Guide" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+        <a href="index.html" class="btn btn-neutral float-left" title="Impunity" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="api.html" class="btn btn-neutral float-right" title="Base api" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
     </div>
 
   <hr/>
