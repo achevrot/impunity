@@ -122,9 +122,11 @@ class Visitor(ast.NodeTransformer):
                 pint.Unit(expected_unit)
             ):
                 # temperatures :
-                # if pint.Unit(received_unit).is_compatible_with(pint.Unit("K")):
+                # if pint.Unit(received_unit).is_compatible_with(pint.
+                # Unit("K")):
                 #     conv_value = (
-                #         pint.Unit(expected_unit).from_(pint.Unit(received_unit)).m
+                #         pint.Unit(expected_unit).from_(pint.Unit(
+                # received_unit)).m
                 #     )
                 #     new_node = ast.BinOp(
                 #         received_node,
