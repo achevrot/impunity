@@ -1,5 +1,5 @@
-Static Unit Coherence Checking and AST Modification
-======================================================
+Performance Analysis
+=====================
 
 .. contents::
 

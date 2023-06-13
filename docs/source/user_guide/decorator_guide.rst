@@ -67,9 +67,14 @@ Example 1: Converting between meters and kilometers
         return distance
 
 In this example, the `calculate_distance_in_km` function
-is decorated with `@impunity`. If the `distance` parameter
+is decorated with `@impunity`. As the `distance` parameter
 is annotated with the unit "meters", **Impunity** will automatically
 rewrite the code to include the conversion from meters to kilometers.
+
+.. note::
+
+    **Impunity** will check and convert your code to ensure consistency. 
+    However, we recommend you follow our :doc:`Unit Guideline<unit_guideline>`.
 
 Example 2: Coherence checking with multiple parameters
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -116,12 +121,11 @@ and rewriting the code with proper conversion values, it helps catch unit
 inconsistencies and ensures accurate results. Incorporate the **Impunity** 
 decorator into your code to work confidently with physical quantities.
 
-Make sure to thoroughly test your code and review the modified code produced 
-by the decorator. **Impunity** uses the Pint library to perform unit 
-conversions, providing accurate and reliable results. With **Impunity**, 
+**Impunity** uses the Pint library to perform unit 
+conversions, providing accurate and reliable results. With its decorator, 
 you can focus on developing your application while ensuring unit coherence 
 in a hassle-free manner.
 
 Next, you may want to explore the :doc:`decorator_options` 
-provided by the `@impunity` decorator further enhance your unit 
+provided by the `@impunity` decorator to further enhance your unit 
 coherence checking capabilities.

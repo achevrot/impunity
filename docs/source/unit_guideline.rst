@@ -1,5 +1,14 @@
-Guidelines for Choosing Appropriate Units
+Unit Guideline
 ========================================
+
+**Impunity** supports various annotation styles for denoting physical units in code.
+This section provides an overview of the supported styles along with syntax examples 
+and guidelines for their usage.
+
+.. note::
+
+    **Impunity** is not yet compatible with all the different syntaxes introduced
+    in the `PEP 484 <https://peps.python.org/pep-0484/>`_.
 
 Choosing appropriate units is crucial for ensuring the accuracy and coherence of
 physical quantities in your code. **Impunity** leverages the functionality of
