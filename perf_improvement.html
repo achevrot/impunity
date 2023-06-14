@@ -59,17 +59,7 @@
 <p class="caption" role="heading"><span class="caption-text">Advanced Topic</span></p>
 <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="how.html">How Does It Work ?</a></li>
-<li class="toctree-l1 current"><a class="current reference internal" href="#">Performance Analysis</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="#introduction">Introduction</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#performance-advantages">Performance Advantages</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#examples">Examples</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="#example-1-loop-with-dynamic-conversion-using-pint">Example 1: Loop with Dynamic Conversion using Pint</a></li>
-<li class="toctree-l3"><a class="reference internal" href="#example-2-loop-with-static-coherence-checking-and-ast-modification">Example 2: Loop with Static Coherence Checking and AST Modification</a></li>
-</ul>
-</li>
-<li class="toctree-l2"><a class="reference internal" href="#conclusion">Conclusion</a></li>
-</ul>
-</li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Performance Analysis</a></li>
 </ul>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="contribute.html">Contribute to impunity</a></li>
@@ -100,132 +90,60 @@
            <div itemprop="articleBody">
              
   <section id="performance-analysis">
-<h1><a class="toc-backref" href="#id1" role="doc-backlink">Performance Analysis</a><a class="headerlink" href="#performance-analysis" title="Permalink to this heading"></a></h1>
-<nav class="contents" id="contents">
-<p class="topic-title">Contents</p>
+<h1>Performance Analysis<a class="headerlink" href="#performance-analysis" title="Permalink to this heading"></a></h1>
+<p>Python-enclined scientists do not use any Units of Measures (UoM) checking
+library with the computation overhead they often induce during execution.
+Python is a dynamic language, and most tools provide dynamic checking of
+the UoM, every time a function is called with potentially different
+parameters and different units of measures.</p>
+<p>impunity statically checks the UoM of variables in the code based on
+annotations and modifies the AST at definition time. We show in the
+following that impunity is a lot quicker than four existing libraries,
+chosen among other Python libraries dealing with UoM for their support,
+regular updates and community.</p>
 <ul class="simple">
-<li><p><a class="reference internal" href="#performance-analysis" id="id1">Performance Analysis</a></p>
-<ul>
-<li><p><a class="reference internal" href="#introduction" id="id2">Introduction</a></p></li>
-<li><p><a class="reference internal" href="#performance-advantages" id="id3">Performance Advantages</a></p></li>
-<li><p><a class="reference internal" href="#examples" id="id4">Examples</a></p>
-<ul>
-<li><p><a class="reference internal" href="#example-1-loop-with-dynamic-conversion-using-pint" id="id5">Example 1: Loop with Dynamic Conversion using Pint</a></p></li>
-<li><p><a class="reference internal" href="#example-2-loop-with-static-coherence-checking-and-ast-modification" id="id6">Example 2: Loop with Static Coherence Checking and AST Modification</a></p></li>
+<li><p><a class="reference external" href="https://github.com/sbyrnes321/numericalunits/">numericalunits</a> uses
+a complete set of independent base units (meters, kilograms, seconds,
+coulombs, kelvins) that are defined as <em>randomly-chosen positive
+floating-point</em> numbers, different for all executions. If units are consistent,
+the randomness disappears; if not, two executions of the same code return
+different values. All other units and constants are defined in terms of
+those. In a dimensionally-correct calculation, the units all cancel out,
+so the final answer is deterministic, not random. In a dimensionally-incorrect
+calculations, there will be random factors causing a randomly-varying
+final answer.</p></li>
+<li><p><a class="reference external" href="https://github.com/sbyrnes321/numericalunits/">astropy</a>
+is a Python package offering functionalities aimed at astronomers
+and astrophysicists. It also includes an implementation of the
+quantity design pattern. astropy also implements a decorator to check
+calls of functions with quantity parameters.</p></li>
+<li><p><a class="reference external" href="https://github.com/hgrecco/pint/">Pint</a>
+also provides an implementation of the quantity
+design pattern as a standalone library. It is
+flexible and provides good integration with other
+scientific libraries like Pandas (through extension types) or NumPy.</p></li>
+<li><p><a class="reference external" href="https://github.com/python-quantities/python-quantities">Quantities</a>
+is designed to handle arithmetic and conversions of physical quantities,
+which have a magnitude, dimensionality specified by various units,
+and possibly an uncertainty. Quantities builds on the popular NumPy
+library and is designed to work with NumPy’s standard ufuncs,
+many of which are already supported.</p></li>
 </ul>
-</li>
-<li><p><a class="reference internal" href="#conclusion" id="id7">Conclusion</a></p></li>
-</ul>
-</li>
-</ul>
-</nav>
-<section id="introduction">
-<h2><a class="toc-backref" href="#id2" role="doc-backlink">Introduction</a><a class="headerlink" href="#introduction" title="Permalink to this heading"></a></h2>
-<p>In the <strong>Impunity</strong> library, we emphasize the importance of statically
-checking unit coherence and modifying the Abstract Syntax Tree (AST)
-for improved performance. This advanced topic explains why this approach
-is superior to dynamic methods, such as using if statements directly
-with the Pint library.</p>
-</section>
-<section id="performance-advantages">
-<h2><a class="toc-backref" href="#id3" role="doc-backlink">Performance Advantages</a><a class="headerlink" href="#performance-advantages" title="Permalink to this heading"></a></h2>
-<p>Statically checking unit coherence and modifying the AST offers several
-performance advantages over dynamic approaches. Let’s explore these
-advantages in detail:</p>
-<ol class="arabic">
-<li><p>Early Detection of Unit Inconsistencies:</p>
-<p>Static analysis of annotations allows for early detection of unit
-inconsistencies during the compilation phase. This enables developers
-to catch and address unit errors before executing the code. In contrast,
-dynamic methods relying on if statements and Pint conversions only identify
-unit inconsistencies at runtime, potentially causing errors during execution.</p>
-</li>
-<li><p>Efficient and Optimized Execution:</p>
-<p>By modifying the AST, <strong>Impunity</strong> ensures that the code executes with
-coherent units, eliminating the need for runtime unit conversions. This
-results in more efficient and optimized execution, as the conversions are
-handled during the compilation process rather than repeatedly during runtime.</p>
-</li>
-<li><p>Reduced Overhead and Computational Costs:</p>
-<p>Statically checking the coherence of units and applying conversions at
-compile-time significantly reduces the overhead and computational costs
-associated with dynamic conversions. This can lead to improved performance,
-especially in code segments that involve complex calculations or loops.</p>
-</li>
-</ol>
-</section>
-<section id="examples">
-<h2><a class="toc-backref" href="#id4" role="doc-backlink">Examples</a><a class="headerlink" href="#examples" title="Permalink to this heading"></a></h2>
-<p>To better understand the performance advantages of static unit coherence
-checking and AST modification, let’s consider a couple of examples:</p>
-<section id="example-1-loop-with-dynamic-conversion-using-pint">
-<h3><a class="toc-backref" href="#id5" role="doc-backlink">Example 1: Loop with Dynamic Conversion using Pint</a><a class="headerlink" href="#example-1-loop-with-dynamic-conversion-using-pint" title="Permalink to this heading"></a></h3>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">pint</span>
-
-<span class="n">ureg</span> <span class="o">=</span> <span class="n">pint</span><span class="o">.</span><span class="n">UnitRegistry</span><span class="p">()</span>
-<span class="n">Q_</span> <span class="o">=</span> <span class="n">ureg</span><span class="o">.</span><span class="n">Quantity</span>
-
-<span class="k">def</span> <span class="nf">calculate_velocity</span><span class="p">(</span><span class="n">distance</span><span class="p">:</span> <span class="s2">&quot;feet&quot;</span><span class="p">,</span> <span class="n">time</span><span class="p">:</span> <span class="s2">&quot;minutes&quot;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">&quot;ft / mn&quot;</span><span class="p">:</span>
-    <span class="n">converted_distance</span> <span class="o">=</span> <span class="n">Q_</span><span class="p">(</span><span class="n">distance</span><span class="p">,</span> <span class="n">ureg</span><span class="o">.</span><span class="n">feet</span><span class="p">)</span>
-    <span class="n">converted_time</span> <span class="o">=</span> <span class="n">Q_</span><span class="p">(</span><span class="n">time</span><span class="p">,</span> <span class="n">ureg</span><span class="o">.</span><span class="n">minutes</span><span class="p">)</span>
-    <span class="k">return</span> <span class="n">converted_distance</span> <span class="o">/</span> <span class="n">converted_time</span>
-
-<span class="n">distance</span> <span class="o">=</span> <span class="n">Q_</span><span class="p">([</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">],</span> <span class="n">ureg</span><span class="o">.</span><span class="n">meter</span><span class="p">)</span>
-<span class="n">time</span> <span class="o">=</span> <span class="n">Q_</span><span class="p">([</span><span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">4</span><span class="p">],</span> <span class="n">ureg</span><span class="o">.</span><span class="n">second</span><span class="p">)</span>
-
-<span class="k">for</span> <span class="n">d</span><span class="p">,</span> <span class="n">t</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">distance</span><span class="p">,</span> <span class="n">time</span><span class="p">):</span>
-    <span class="n">velocity</span> <span class="o">=</span> <span class="n">calculate_velocity</span><span class="p">(</span><span class="n">d</span><span class="p">,</span> <span class="n">t</span><span class="p">)</span>
-    <span class="nb">print</span><span class="p">(</span><span class="n">velocity</span><span class="p">)</span>
-</pre></div>
-</div>
-<p>In this example, a loop iterates over lists of <cite>distance</cite> and <cite>time</cite>
-values. To perform unit conversion, each value is multiplied by the
-respective Pint unit (<cite>ureg.feet</cite> and <cite>ureg.minutes</cite>). The overhead of
-repeatedly performing conversions within the loop can impact performance,
-especially for large datasets as it needs to check each value one by one.
-It is also prone to Dimensionality Errors if <cite>calculate_velocity</cite> is not given
-a length quantity.</p>
-</section>
-<section id="example-2-loop-with-static-coherence-checking-and-ast-modification">
-<h3><a class="toc-backref" href="#id6" role="doc-backlink">Example 2: Loop with Static Coherence Checking and AST Modification</a><a class="headerlink" href="#example-2-loop-with-static-coherence-checking-and-ast-modification" title="Permalink to this heading"></a></h3>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">impunity</span> <span class="kn">import</span> <span class="n">impunity</span>
-
-<span class="nd">@impunity</span>
-<span class="k">def</span> <span class="nf">calculate_velocity</span><span class="p">(</span><span class="n">distance</span><span class="p">:</span> <span class="s2">&quot;feet&quot;</span><span class="p">,</span> <span class="n">time</span><span class="p">:</span> <span class="s2">&quot;minutes&quot;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">&quot;ft / mn&quot;</span><span class="p">:</span>
-    <span class="k">return</span> <span class="n">distance</span> <span class="o">/</span> <span class="n">time</span>
-
-<span class="nd">@impunity</span>
-<span class="k">def</span> <span class="nf">test_impunity</span><span class="p">():</span>
-    <span class="n">distance</span><span class="p">:</span> <span class="s2">&quot;meters&quot;</span> <span class="o">=</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">]</span>
-    <span class="n">time</span><span class="p">:</span> <span class="s2">&quot;seconds&quot;</span> <span class="o">=</span> <span class="p">[</span><span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">4</span><span class="p">]</span>
-
-    <span class="k">for</span> <span class="n">d</span><span class="p">,</span> <span class="n">t</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">distance</span><span class="p">,</span> <span class="n">time</span><span class="p">):</span>
-        <span class="n">velocity</span> <span class="o">=</span> <span class="n">calculate_velocity</span><span class="p">(</span><span class="n">d</span><span class="p">,</span> <span class="n">t</span><span class="p">)</span>
-        <span class="nb">print</span><span class="p">(</span><span class="n">velocity</span><span class="p">)</span>
-
-<span class="n">test_impunity</span><span class="p">()</span>
-</pre></div>
-</div>
-<p>In this example, the <cite>calculate_velocity</cite> function is decorated with
-<cite>&#64;impunity</cite> to ensure unit coherence. The loop iterates over the lists
-of <cite>distance</cite> and <cite>time</cite>, invoking the decorated function for each pair.
-The static unit coherence checking and AST modification performed by
-<strong>Impunity</strong> eliminate the need for explicit conversions within the
-loop, resulting in improved performance.</p>
-</section>
-</section>
-<section id="conclusion">
-<h2><a class="toc-backref" href="#id7" role="doc-backlink">Conclusion</a><a class="headerlink" href="#conclusion" title="Permalink to this heading"></a></h2>
-<p>Static unit coherence checking and AST modification provided by the
-<strong>Impunity</strong> library offer significant performance advantages over
-dynamic approaches. By detecting unit inconsistencies early, ensuring
-efficient execution, and reducing overhead and computational costs,
-<strong>Impunity</strong> enables developers to work with coherent units
-seamlessly and achieve optimal performance.</p>
-<p>By adopting static coherence checking and AST modification,
-you can enhance the performance of your code, especially
-in scenarios involving complex calculations, loops, and large datasets.</p>
-</section>
+<p>For each library, two different use-cases are considered based on the example
+<em>speed</em> function. One with variables annotated with the correct units
+(meters and seconds), and one with different but commensurable units (meters
+and hours). In both cases, two NumPy arrays of shape (10000,) are sent as
+parameters. The computation time over 300 iterations is then averaged.
+Execution times for both use-cases are displayed here :</p>
+<figure class="align-default" id="my-custom-label">
+<img alt="_images/impunity_performance.svg" src="_images/impunity_performance.svg" /></figure>
+<p>As we can see, the overhead induced by impunity is minimal.
+This is mainly due to the difference between the dynamic
+checking of the other libraries and the static analysis
+done by impunity. By changing the AST directly before execution,
+impunity limits its overhead to the multiplications added to keep
+the units coherent between each others. This is also why, when
+UoM are identical, the overhead is non-existent.</p>
 </section>
 
 
