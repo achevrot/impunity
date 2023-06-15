@@ -897,7 +897,7 @@ class Visitor(ast.NodeTransformer):
         if isinstance(return_annotation, Dict):
             if is_annotated(return_annotation["return"]):
                 ret = return_annotation["return"]  # type: ignore
-                if len(ret) > 1:
+                if len(ret.__args__) > 1:
                     expected = [
                         x.__metadata__[0]  # type: ignore
                         if is_annotated(x)
