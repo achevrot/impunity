@@ -237,27 +237,27 @@ class Visitor(ast.NodeTransformer):
         if (fun := cls.couscous_func.get(name)) is not None:
             annotations = getattr(fun, "__annotations__", None)
             if annotations:
-                globals = list(cls.couscous_func.values())[-1].__globals__
-                locals = fun.__globals__
-                annotations = {
-                    k: v
-                    if not isinstance(v, str)
-                    else eval(v, globals, locals)
-                    for k, v in annotations.items()
-                }
+                # globals = list(cls.couscous_func.values())[-1].__globals__
+                # locals = fun.__globals__
+                # annotations = {
+                #     k: v
+                #     if not isinstance(v, str)
+                #     else eval(v, globals, locals)
+                #     for k, v in annotations.items()
+                # }
                 return cast(Dict, annotations)
         elif callable(name):
             annotations = getattr(name, "__annotations__", None)
             if annotations:
-                globals = list(cls.couscous_func.values())[-1].__globals__
-                locals = name.__globals__
-                annotations = {
-                    k: v
-                    if not isinstance(v, str)
-                    else eval(v, globals, locals)
-                    for k, v in annotations.items()
-                }
-            return cast(Dict, annotations)
+                # globals = list(cls.couscous_func.values())[-1].__globals__
+                # locals = name.__globals__
+                # annotations = {
+                #     k: v
+                #     if not isinstance(v, str)
+                #     else eval(v, globals, locals)
+                #     for k, v in annotations.items()
+                # }
+                return cast(Dict, annotations)
 
         return None
 
@@ -423,9 +423,13 @@ class Visitor(ast.NodeTransformer):
                     left.unit if left.unit is not None else right.unit,
                 )
 
-            if pint.Unit(left.unit).is_compatible_with(pint.Unit(right.unit)):
+            if pint.Unit(left.unit).is_compatible_with(  # type: ignore
+                pint.Unit(right.unit)  # type: ignore
+            ):
                 conv_value = (
-                    pint.Unit(left.unit).from_(pint.Unit(right.unit)).m
+                    pint.Unit(left.unit)  # type: ignore
+                    .from_(pint.Unit(right.unit))  # type: ignore
+                    .m
                 )
                 new_node = ast.BinOp(
                     left.node,
@@ -465,9 +469,13 @@ class Visitor(ast.NodeTransformer):
             if is_annotated(right.unit):
                 right.unit = right.unit.__metadata__[0]  # type: ignore
 
-            if pint.Unit(left.unit).is_compatible_with(pint.Unit(right.unit)):
+            if pint.Unit(left.unit).is_compatible_with(  # type: ignore
+                pint.Unit(right.unit)  # type: ignore
+            ):
                 conv_value = (
-                    pint.Unit(left.unit).from_(pint.Unit(right.unit)).m
+                    pint.Unit(left.unit)  # type: ignore
+                    .from_(pint.Unit(right.unit))  # type: ignore
+                    .m
                 )
                 new_node = ast.BinOp(
                     left.node,
@@ -600,11 +608,14 @@ class Visitor(ast.NodeTransformer):
     def visit_Call(self, node: ast.Call) -> Any:
         if isinstance(node.func, ast.Name):
             if node.func.id in __builtins__.keys():  # type: ignore
+                node = self.generic_visit(node)  # type: ignore
                 return node
 
             # parameters = inspect.getfullargspec(self.fun_globals[
             # node.func.id])
-            signature = self.get_annotations(self.fun_globals[node.func.id])
+            signature = self.get_annotations(
+                self.fun_globals[node.func.id]  # type: ignore
+            )
 
             new_args: list[ast.BinOp | ast.expr] = []
             new_keywords: list[ast.BinOp | ast.expr] = []
@@ -623,6 +634,8 @@ class Visitor(ast.NodeTransformer):
                             expected, received.unit, received.node
                         )
                         new_args.append(new_arg)
+                    else:
+                        new_args.append(arg)
 
                 for keyword in node.keywords:
                     if keyword.arg:
@@ -882,17 +895,19 @@ class Visitor(ast.NodeTransformer):
             return ast.copy_location(new_node, node)
 
         if isinstance(return_annotation, Dict):
-            if len(return_annotation["return"].__args__) > 1:
-                expected = [
-                    x.__metadata__[0] if is_annotated(x) else x  # type: ignore
-                    for x in return_annotation["return"].__args__
-                ]
-            else:
-                ret = return_annotation["return"]
-                if is_annotated(ret):
+            if is_annotated(return_annotation["return"]):
+                ret = return_annotation["return"]  # type: ignore
+                if len(ret) > 1:
+                    expected = [
+                        x.__metadata__[0]  # type: ignore
+                        if is_annotated(x)
+                        else x
+                        for x in ret.__args__  # type: ignore
+                    ]
+                else:
                     expected = ret.__metadata__[0]  # type: ignore
-                elif isinstance(ret, str):
-                    expected = [return_annotation]
+            else:  # string annotations
+                expected = return_annotation["return"]
         else:
             _log.warning(
                 f"In function {self.fun.__module__}/{self.fun.__name__}: "
@@ -904,12 +919,26 @@ class Visitor(ast.NodeTransformer):
         if is_annotated(received.unit):
             received.unit = received.unit.__metadata__[0]  # type: ignore
 
-        if isinstance(received.unit, list):
-            new_node = node
+        if isinstance(expected, list):
+            if isinstance(received.unit, list):
+                new_node = node
+            else:
+                _log.warning(
+                    f"In function {self.fun.__module__}/{self.fun.__name__}: "
+                    "Expected more than one return value"
+                )
+                new_node = node
         else:
-            new_value = self.node_convert(
-                expected, received.unit, received.node
-            )
-            new_node = ast.Return(value=new_value)
+            if isinstance(received.unit, list):
+                _log.warning(
+                    f"In function {self.fun.__module__}/{self.fun.__name__}: "
+                    "Expected more than one return value"
+                )
+                new_node = node
+            else:
+                new_value = self.node_convert(
+                    expected, received.unit, received.node
+                )
+                new_node = ast.Return(value=new_value)
 
         return ast.copy_location(new_node, node)
