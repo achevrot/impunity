@@ -6,9 +6,9 @@ import logging
 import sys
 import types
 import typing
+from math import isclose
 from numbers import Number
 from typing import Any, Dict, Optional, Union, cast
-from math import isclose
 
 if sys.version_info >= (3, 9):
     from _collections_abc import Callable, Sequence
