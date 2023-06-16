@@ -8,6 +8,7 @@ import types
 import typing
 from numbers import Number
 from typing import Any, Dict, Optional, Union, cast
+from math import isclose
 
 if sys.version_info >= (3, 9):
     from _collections_abc import Callable, Sequence
@@ -121,31 +122,60 @@ class Visitor(ast.NodeTransformer):
             if pint.Unit(received_unit).is_compatible_with(
                 pint.Unit(expected_unit)
             ):
-                # temperatures :
-                # if pint.Unit(received_unit).is_compatible_with(pint.
-                # Unit("K")):
-                #     conv_value = (
-                #         pint.Unit(expected_unit).from_(pint.Unit(
-                # received_unit)).m
-                #     )
-                #     new_node = ast.BinOp(
-                #         received_node,
-                #         ast.Mult(),
-                #         ast.Constant(conv_value),
-                #     )
-                # else:
-                conv_value = (
-                    pint.Unit(expected_unit).from_(pint.Unit(received_unit)).m
-                )
+                Q_ = self.ureg.Quantity
+                r0 = Q_(0, received_unit)
+                r1 = Q_(1, received_unit)
+                r10 = Q_(10, received_unit)
 
-                if conv_value == 1:
-                    new_node = received_node
-                else:
-                    new_node = ast.BinOp(
-                        received_node,
-                        ast.Mult(),
-                        ast.Constant(conv_value),
+                e0 = r0.to(expected_unit)
+                e1 = r1.to(expected_unit)
+                e10 = r10.to(expected_unit)
+
+                if r0.m == e0.m:
+                    conv_value = (
+                        pint.Unit(expected_unit)
+                        .from_(pint.Unit(received_unit))
+                        .m
                     )
+
+                    if conv_value == 1:
+                        new_node = received_node
+                    else:
+                        new_node = ast.BinOp(
+                            received_node,
+                            ast.Mult(),
+                            ast.Constant(conv_value),
+                        )
+
+                elif (e1.m - e0.m) == 1:
+                    conv_value = (
+                        pint.Unit(expected_unit)
+                        .from_(pint.Unit(received_unit))
+                        .m
+                    ) - 1
+
+                    if conv_value == 0:
+                        new_node = received_node
+                    else:
+                        new_node = ast.BinOp(
+                            received_node,
+                            ast.Add(),
+                            ast.Constant(conv_value),
+                        )
+
+                elif isclose(10 * (e1.m - e0.m) + e0.m, e10.m):
+                    new_node = ast.BinOp(
+                        ast.BinOp(
+                            received_node,
+                            ast.Mult(),
+                            ast.Constant((e1.m - e0.m)),
+                        ),
+                        ast.Add(),
+                        ast.Constant(e0.m),
+                    )
+                else:
+                    new_node = received_node  # log
+
             else:
                 _log.warning(
                     f"In function {self.fun.__module__}/"

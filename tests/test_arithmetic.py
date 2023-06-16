@@ -17,6 +17,8 @@ ft = Annotated[Any, "ft"]
 cm = Annotated[Any, "cm"]
 Pa = Annotated[Any, "Pa"]
 kts = Annotated[Any, "kts"]
+degC = Annotated[Any, "degC"]
+degF = Annotated[Any, "degF"]
 dimensionless = Annotated[Any, "dimensionless"]
 
 
@@ -38,6 +40,15 @@ class Arithmetic(unittest.TestCase):
         result: "m" = alt_m + alt_ft + alt_m2
 
         self.assertAlmostEqual(result, 4609.6, delta=1e-2)
+
+    @impunity
+    def test_temperatures(self) -> None:
+        temp_C: "degC" = 1000
+        temp_K: "K" = temp_C
+        temp_F: "degF" = temp_C
+
+        self.assertAlmostEqual(temp_K, 1273.15, delta=1e-2)
+        self.assertAlmostEqual(temp_F, 1832, delta=1e-2)
 
     @impunity
     def test_dimless_var(self) -> None:
