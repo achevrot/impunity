@@ -58,7 +58,10 @@
 </ul>
 <p class="caption" role="heading"><span class="caption-text">Advanced Topic</span></p>
 <ul class="current">
-<li class="toctree-l1 current"><a class="current reference internal" href="#">How Does It Work ?</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">How Does It Work ?</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#reminder-on-decorators">Reminder on Decorators</a></li>
+</ul>
+</li>
 <li class="toctree-l1"><a class="reference internal" href="perf_improvement.html">Performance Analysis</a></li>
 </ul>
 <ul>
@@ -91,6 +94,79 @@
              
   <section id="how-does-it-work">
 <h1>How Does It Work ?<a class="headerlink" href="#how-does-it-work" title="Permalink to this heading"></a></h1>
+<section id="reminder-on-decorators">
+<h2>Reminder on Decorators<a class="headerlink" href="#reminder-on-decorators" title="Permalink to this heading"></a></h2>
+<p>In Python, a decorator function in Python is a higher order function which changes the behaviour
+of a given function. Let’s consider an illustrative code snippet to understand how impunity operates
+in practice. Suppose we have the following Python function:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">speed</span><span class="p">(</span><span class="n">distance</span><span class="p">:</span> <span class="s2">&quot;meters&quot;</span><span class="p">,</span> <span class="n">duration</span><span class="p">:</span> <span class="s2">&quot;seconds&quot;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">&quot;km/h&quot;</span><span class="p">:</span>
+    <span class="n">res</span> <span class="o">=</span> <span class="n">distance</span> <span class="o">/</span> <span class="n">duration</span>
+    <span class="k">return</span> <span class="n">res</span>
+</pre></div>
+</div>
+<p>If we use the following decorator function, at definition time, the following code is executed and the
+same function is returned:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">decorator</span><span class="p">(</span><span class="n">function</span><span class="p">):</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Function definition for </span><span class="si">{</span><span class="n">function</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">function</span>
+
+<span class="nd">@decorator</span>
+<span class="k">def</span> <span class="nf">speed</span><span class="p">(</span><span class="n">distance</span><span class="p">:</span> <span class="s2">&quot;meters&quot;</span><span class="p">,</span> <span class="n">duration</span><span class="p">:</span> <span class="s2">&quot;seconds&quot;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">&quot;km/h&quot;</span><span class="p">:</span>
+    <span class="o">...</span>
+
+<span class="o">&gt;&gt;&gt;</span> <span class="n">speed</span> <span class="o">=</span> <span class="n">decorator</span><span class="p">(</span><span class="n">speed</span><span class="p">)</span>
+<span class="n">Function</span> <span class="n">definition</span> <span class="k">for</span> <span class="n">speed</span>
+</pre></div>
+</div>
+<p>In practice, decorator functions are mostly used to change the behaviour of functions at runtime. A
+common example is the logging of the execution of a function, or the timing of its execution. Then
+a new (nested) function must be defined based on the old one:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">logger</span><span class="p">(</span><span class="n">function</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">new_function</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">):</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Executing function </span><span class="si">{</span><span class="n">function</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s2"> with parameters </span><span class="si">{</span><span class="n">args</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">function</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">new_function</span>
+
+    <span class="nd">@logger</span>
+    <span class="k">def</span> <span class="nf">speed</span><span class="p">(</span><span class="n">distance</span><span class="p">:</span> <span class="s2">&quot;meters&quot;</span><span class="p">,</span> <span class="n">duration</span><span class="p">:</span> <span class="s2">&quot;seconds&quot;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">&quot;km/h&quot;</span><span class="p">:</span>
+        <span class="n">res</span> <span class="o">=</span> <span class="n">distance</span> <span class="o">/</span> <span class="n">duration</span>
+        <span class="k">return</span> <span class="n">res</span>
+
+    <span class="o">&gt;&gt;&gt;</span> <span class="n">speed</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>
+    <span class="n">Executing</span> <span class="n">function</span> <span class="n">speed</span> <span class="k">with</span> <span class="n">parameters</span> <span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>
+    <span class="mf">0.5</span>
+</pre></div>
+</div>
+<p>The impunity library provides the &#64;impunity decorator in order to check the coherence of physical
+units defined within the code: it traverses (and sometimes modifies) the Abstract Syntax Tree (AST)
+of the code for the function. Annotated variables and functions are logged for future reference. The
+AST of our speed function can be depicted in a visual representation, as shown below:</p>
+<figure class="align-default" id="my-custom-label">
+<img alt="_images/ast_origin.svg" src="_images/ast_origin.svg" /></figure>
+<p>As the decorator function walks through the AST, variables annotated with units of measures (i.e.
+distance and duration) are logged. Then, each time a call to an annotated function is detected,
+&#64;impunity compares the expected units of measures from function parameters and return values with
+the units specified in the function definition. When a mismatch is detected, indicating an
+inconsistency in units, impunity takes one of the following actions:</p>
+<ul class="simple">
+<li><p>if the two units are commensurable, &#64;impunity modifies the AST to include a conversion operation;</p></li>
+<li><p>if the two units are not commensurable, an IncommensurableUnits warning is raised.</p></li>
+</ul>
+<figure class="align-default" id="id1">
+<img alt="_images/test.svg" src="_images/test.svg" /></figure>
+<p>In the case of the speed function example, the expected return UoM is “km/h” while the UoM inferred
+from the division between distance and duration variables is “m/s”. impunity identifies this discrepancy</p>
+<blockquote>
+<div><p>and takes action by modifying the AST accordingly. It introduces a binary operation (BinOp)</p>
+</div></blockquote>
+<p>node to convert the result to the proper UoM, as depicted in red on this modified AST:</p>
+<figure class="align-default" id="id2">
+<img alt="_images/ast_modif.svg" src="_images/ast_modif.svg" /></figure>
+<p>Here, the constant value of 3.6 is calculated by determining the conversion factor between the two
+units “m/s” and “km/h”. Here, impunity leverages the capabilities of the sister Pint library: however,
+the Pint functionalities are called only once at definition time, and not at runtime (i.e. every time
+the function is executed) resulting in a tremendous gain in performance.</p>
+</section>
 </section>
 
 
