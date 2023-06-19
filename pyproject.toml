@@ -18,6 +18,7 @@ Pint = ">=0.19.2"
 astor = "^0.8.1"
 typing-extensions = { version=">=4.2.0,<5.0.0", python="<3.10" }
 poetry = "^1.5.1"
+sphinx-design = "^0.4.1"
 
 [tool.poetry.group.dev.dependencies]
 black = ">=21.6"
