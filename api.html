@@ -49,7 +49,39 @@
 </ul>
 <p class="caption" role="heading"><span class="caption-text">API</span></p>
 <ul class="current">
-<li class="toctree-l1 current"><a class="current reference internal" href="#">Base api</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Base api</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#impunity.visitor.VarDict"><code class="docutils literal notranslate"><span class="pre">VarDict</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#impunity.visitor.VarDict.clear"><code class="docutils literal notranslate"><span class="pre">VarDict.clear()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#impunity.visitor.VarDict.copy"><code class="docutils literal notranslate"><span class="pre">VarDict.copy()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#impunity.visitor.VarDict.fromkeys"><code class="docutils literal notranslate"><span class="pre">VarDict.fromkeys()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#impunity.visitor.VarDict.get"><code class="docutils literal notranslate"><span class="pre">VarDict.get()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#impunity.visitor.VarDict.items"><code class="docutils literal notranslate"><span class="pre">VarDict.items()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#impunity.visitor.VarDict.keys"><code class="docutils literal notranslate"><span class="pre">VarDict.keys()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#impunity.visitor.VarDict.pop"><code class="docutils literal notranslate"><span class="pre">VarDict.pop()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#impunity.visitor.VarDict.popitem"><code class="docutils literal notranslate"><span class="pre">VarDict.popitem()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#impunity.visitor.VarDict.setdefault"><code class="docutils literal notranslate"><span class="pre">VarDict.setdefault()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#impunity.visitor.VarDict.update"><code class="docutils literal notranslate"><span class="pre">VarDict.update()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#impunity.visitor.VarDict.values"><code class="docutils literal notranslate"><span class="pre">VarDict.values()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#impunity.visitor.Visitor"><code class="docutils literal notranslate"><span class="pre">Visitor</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#impunity.visitor.Visitor.add_func"><code class="docutils literal notranslate"><span class="pre">Visitor.add_func()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#impunity.visitor.Visitor.generic_visit"><code class="docutils literal notranslate"><span class="pre">Visitor.generic_visit()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#impunity.visitor.Visitor.get_annotations"><code class="docutils literal notranslate"><span class="pre">Visitor.get_annotations()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#impunity.visitor.Visitor.get_func"><code class="docutils literal notranslate"><span class="pre">Visitor.get_func()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#impunity.visitor.Visitor.get_node_unit"><code class="docutils literal notranslate"><span class="pre">Visitor.get_node_unit()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#impunity.visitor.Visitor.node_convert"><code class="docutils literal notranslate"><span class="pre">Visitor.node_convert()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#impunity.visitor.Visitor.visit"><code class="docutils literal notranslate"><span class="pre">Visitor.visit()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#impunity.visitor.Visitor.visit_AnnAssign"><code class="docutils literal notranslate"><span class="pre">Visitor.visit_AnnAssign()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#impunity.visitor.Visitor.visit_Call"><code class="docutils literal notranslate"><span class="pre">Visitor.visit_Call()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#impunity.visitor.Visitor.visit_ListComp"><code class="docutils literal notranslate"><span class="pre">Visitor.visit_ListComp()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#impunity.visitor.Visitor.visit_comprehension"><code class="docutils literal notranslate"><span class="pre">Visitor.visit_comprehension()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#impunity.visitor.get_annotation_unit"><code class="docutils literal notranslate"><span class="pre">get_annotation_unit()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#impunity.visitor.is_annotated"><code class="docutils literal notranslate"><span class="pre">is_annotated()</span></code></a></li>
+</ul>
+</li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">Annotations</span></p>
 <ul>
@@ -89,8 +121,313 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
              
-  <section id="base-api">
-<h1>Base api<a class="headerlink" href="#base-api" title="Permalink to this heading"></a></h1>
+  <section id="module-impunity.visitor">
+<span id="base-api"></span><h1>Base api<a class="headerlink" href="#module-impunity.visitor" title="Permalink to this heading"></a></h1>
+<dl class="py class">
+<dt class="sig sig-object py" id="impunity.visitor.VarDict">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">impunity.visitor.</span></span><span class="sig-name descname"><span class="pre">VarDict</span></span><a class="headerlink" href="#impunity.visitor.VarDict" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.11)"><code class="xref py py-class docutils literal notranslate"><span class="pre">dict</span></code></a></p>
+<dl class="py method">
+<dt class="sig sig-object py" id="impunity.visitor.VarDict.clear">
+<span class="sig-name descname"><span class="pre">clear</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None.</span>&#160; <span class="pre">Remove</span> <span class="pre">all</span> <span class="pre">items</span> <span class="pre">from</span> <span class="pre">D.</span></span></span><a class="headerlink" href="#impunity.visitor.VarDict.clear" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="impunity.visitor.VarDict.copy">
+<span class="sig-name descname"><span class="pre">copy</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">a</span> <span class="pre">shallow</span> <span class="pre">copy</span> <span class="pre">of</span> <span class="pre">D</span></span></span><a class="headerlink" href="#impunity.visitor.VarDict.copy" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="impunity.visitor.VarDict.fromkeys">
+<span class="sig-name descname"><span class="pre">fromkeys</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">value</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">/</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#impunity.visitor.VarDict.fromkeys" title="Permalink to this definition"></a></dt>
+<dd><p>Create a new dictionary with keys from iterable and values set to value.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="impunity.visitor.VarDict.get">
+<span class="sig-name descname"><span class="pre">get</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">key</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">default</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">/</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#impunity.visitor.VarDict.get" title="Permalink to this definition"></a></dt>
+<dd><p>Return the value for key if key is in the dictionary, else default.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="impunity.visitor.VarDict.items">
+<span class="sig-name descname"><span class="pre">items</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">a</span> <span class="pre">set-like</span> <span class="pre">object</span> <span class="pre">providing</span> <span class="pre">a</span> <span class="pre">view</span> <span class="pre">on</span> <span class="pre">D's</span> <span class="pre">items</span></span></span><a class="headerlink" href="#impunity.visitor.VarDict.items" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="impunity.visitor.VarDict.keys">
+<span class="sig-name descname"><span class="pre">keys</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">a</span> <span class="pre">set-like</span> <span class="pre">object</span> <span class="pre">providing</span> <span class="pre">a</span> <span class="pre">view</span> <span class="pre">on</span> <span class="pre">D's</span> <span class="pre">keys</span></span></span><a class="headerlink" href="#impunity.visitor.VarDict.keys" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="impunity.visitor.VarDict.pop">
+<span class="sig-name descname"><span class="pre">pop</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">k</span></span></em><span class="optional">[</span>, <em class="sig-param"><span class="n"><span class="pre">d</span></span></em><span class="optional">]</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">v,</span> <span class="pre">remove</span> <span class="pre">specified</span> <span class="pre">key</span> <span class="pre">and</span> <span class="pre">return</span> <span class="pre">the</span> <span class="pre">corresponding</span> <span class="pre">value.</span></span></span><a class="headerlink" href="#impunity.visitor.VarDict.pop" title="Permalink to this definition"></a></dt>
+<dd><p>If the key is not found, return the default if given; otherwise,
+raise a KeyError.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="impunity.visitor.VarDict.popitem">
+<span class="sig-name descname"><span class="pre">popitem</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#impunity.visitor.VarDict.popitem" title="Permalink to this definition"></a></dt>
+<dd><p>Remove and return a (key, value) pair as a 2-tuple.</p>
+<p>Pairs are returned in LIFO (last-in, first-out) order.
+Raises KeyError if the dict is empty.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="impunity.visitor.VarDict.setdefault">
+<span class="sig-name descname"><span class="pre">setdefault</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">key</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">default</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">/</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#impunity.visitor.VarDict.setdefault" title="Permalink to this definition"></a></dt>
+<dd><p>Insert key with a value of default if key is not in the dictionary.</p>
+<p>Return the value for key if key is in the dictionary, else default.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="impunity.visitor.VarDict.update">
+<span class="sig-name descname"><span class="pre">update</span></span><span class="sig-paren">(</span><span class="optional">[</span><em class="sig-param"><span class="n"><span class="pre">E</span></span></em>, <span class="optional">]</span><em class="sig-param"><span class="n"><span class="pre">**F</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None.</span>&#160; <span class="pre">Update</span> <span class="pre">D</span> <span class="pre">from</span> <span class="pre">dict/iterable</span> <span class="pre">E</span> <span class="pre">and</span> <span class="pre">F.</span></span></span><a class="headerlink" href="#impunity.visitor.VarDict.update" title="Permalink to this definition"></a></dt>
+<dd><p>If E is present and has a .keys() method, then does:  for k in E: D[k] = E[k]
+If E is present and lacks a .keys() method, then does:  for k, v in E: D[k] = v
+In either case, this is followed by: for k in F:  D[k] = F[k]</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="impunity.visitor.VarDict.values">
+<span class="sig-name descname"><span class="pre">values</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">an</span> <span class="pre">object</span> <span class="pre">providing</span> <span class="pre">a</span> <span class="pre">view</span> <span class="pre">on</span> <span class="pre">D's</span> <span class="pre">values</span></span></span><a class="headerlink" href="#impunity.visitor.VarDict.values" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="impunity.visitor.Visitor">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">impunity.visitor.</span></span><span class="sig-name descname"><span class="pre">Visitor</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">fun</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#impunity.visitor.Visitor" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/ast.html#ast.NodeTransformer" title="(in Python v3.11)"><code class="xref py py-class docutils literal notranslate"><span class="pre">NodeTransformer</span></code></a></p>
+<p>Impunity AST visitor class checking for Annotations
+to transform the code if necessary</p>
+<dl class="simple">
+<dt>Attributes:</dt><dd><dl class="simple">
+<dt>impunity_func<span class="classifier">dict[str, Callable]</span></dt><dd><p>Dictionnary of Callables to keep track of functions
+tracked by impunity</p>
+</dd>
+<dt>ureg<span class="classifier">pint.UnitRegistry</span></dt><dd><p>Unit Registry from Pint to manage UoMs.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="impunity.visitor.Visitor.add_func">
+<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">add_func</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">fun</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#impunity.visitor.Visitor.add_func" title="Permalink to this definition"></a></dt>
+<dd><p>Add function to the impunity function dictionnary</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="impunity.visitor.Visitor.generic_visit">
+<span class="sig-name descname"><span class="pre">generic_visit</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">node</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#impunity.visitor.Visitor.generic_visit" title="Permalink to this definition"></a></dt>
+<dd><p>Called if no explicit visitor function exists for a node.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="impunity.visitor.Visitor.get_annotations">
+<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">get_annotations</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#impunity.visitor.Visitor.get_annotations" title="Permalink to this definition"></a></dt>
+<dd><p>Get annotations of a function found in the impunity_func class dict.
+Returns None if the function is not annotated.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Optional" title="(in Python v3.11)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code></a>[<a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Dict" title="(in Python v3.11)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Dict</span></code></a>[<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.11)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>, <a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Any" title="(in Python v3.11)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Any</span></code></a>]]</p>
+</dd>
+</dl>
+<dl class="simple">
+<dt>Parameters:</dt><dd><ul class="simple">
+<li><dl class="simple">
+<dt>name<span class="classifier">str</span></dt><dd><p>name of the function for which annotations are required</p>
+</dd>
+</dl>
+</li>
+</ul>
+</dd>
+<dt>Returns:</dt><dd><ul class="simple">
+<li><p>Optional dict of annotations</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="impunity.visitor.Visitor.get_func">
+<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">get_func</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#impunity.visitor.Visitor.get_func" title="Permalink to this definition"></a></dt>
+<dd><p>getter function for the class dict</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="impunity.visitor.Visitor.get_node_unit">
+<span class="sig-name descname"><span class="pre">get_node_unit</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">node</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#impunity.visitor.Visitor.get_node_unit" title="Permalink to this definition"></a></dt>
+<dd><p>Method to induce the unit of a node through recursive
+calls on children if any.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">QuantityNode</span></code></p>
+</dd>
+</dl>
+<dl class="simple">
+<dt>Args:</dt><dd><p>node (ast.AST): input node</p>
+</dd>
+<dt>Returns:</dt><dd><p>QuantityNode: QuantityNode(node, induced_unit)</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="impunity.visitor.Visitor.node_convert">
+<span class="sig-name descname"><span class="pre">node_convert</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">expected_unit</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">received_unit</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">received_node</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#impunity.visitor.Visitor.node_convert" title="Permalink to this definition"></a></dt>
+<dd><p>check if the expected and the received units are coherents with
+each other by using the Pint library. Modify the received node
+accordingly and returns it.</p>
+<dl>
+<dt>Parameters:</dt><dd><ul class="simple">
+<li><dl class="simple">
+<dt>expected_unit<span class="classifier">str</span></dt><dd><p>expected Unit of Measure string</p>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt>received_unit<span class="classifier">str</span></dt><dd><p>received Unit of Measure string</p>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt>received_node<span class="classifier">QuantityNode</span></dt><dd><p>received Quantity Node</p>
+</dd>
+</dl>
+</li>
+</ul>
+</dd>
+<dt>Returns:</dt><dd><ul class="simple">
+<li><p>QuantityNode: Input Quantity Node, eventually modified for unit</p></li>
+</ul>
+<p>coherence.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="impunity.visitor.Visitor.visit">
+<span class="sig-name descname"><span class="pre">visit</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">root</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#impunity.visitor.Visitor.visit" title="Permalink to this definition"></a></dt>
+<dd><p>Initiate the visit of the root AST.</p>
+<p>If the argument ‘additional’ is passed, then it
+is appended after the main info.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/ast.html#ast.AST" title="(in Python v3.11)"><code class="xref py py-class docutils literal notranslate"><span class="pre">AST</span></code></a></p>
+</dd>
+</dl>
+<section id="parameters">
+<h2>Parameters<a class="headerlink" href="#parameters" title="Permalink to this heading"></a></h2>
+<dl class="simple">
+<dt>root<span class="classifier">ast.AST</span></dt><dd><p>root of the AST to visit</p>
+</dd>
+</dl>
+</section>
+<section id="returns">
+<h2>Returns<a class="headerlink" href="#returns" title="Permalink to this heading"></a></h2>
+<p>Checked ast.AST eventually modified to keep UoM coherence.</p>
+</section>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="impunity.visitor.Visitor.visit_AnnAssign">
+<span class="sig-name descname"><span class="pre">visit_AnnAssign</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">node</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#impunity.visitor.Visitor.visit_AnnAssign" title="Permalink to this definition"></a></dt>
+<dd><p>Method called by the visitor if the visited node is an
+Annotated Assignement node.
+Checks the units in the node and returns it eventually modified.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/ast.html#ast.AnnAssign" title="(in Python v3.11)"><code class="xref py py-class docutils literal notranslate"><span class="pre">AnnAssign</span></code></a></p>
+</dd>
+</dl>
+<dl class="simple">
+<dt>Args:</dt><dd><p>node (ast.AnnAssign): input node</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="impunity.visitor.Visitor.visit_Call">
+<span class="sig-name descname"><span class="pre">visit_Call</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">node</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#impunity.visitor.Visitor.visit_Call" title="Permalink to this definition"></a></dt>
+<dd><p>Method called by the visitor if the visited node is a Call node.
+Checks the units in the node and returns it eventually modified.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/ast.html#ast.Call" title="(in Python v3.11)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Call</span></code></a></p>
+</dd>
+</dl>
+<dl class="simple">
+<dt>Args:</dt><dd><p>node (ast.Call): input node</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="impunity.visitor.Visitor.visit_ListComp">
+<span class="sig-name descname"><span class="pre">visit_ListComp</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">node</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#impunity.visitor.Visitor.visit_ListComp" title="Permalink to this definition"></a></dt>
+<dd><p>Method called by the visitor if the visited node is a List
+Comprehension node.
+Checks the units in the node and returns it eventually modified.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/ast.html#ast.ListComp" title="(in Python v3.11)"><code class="xref py py-class docutils literal notranslate"><span class="pre">ListComp</span></code></a></p>
+</dd>
+</dl>
+<dl class="simple">
+<dt>Args:</dt><dd><p>node (ast.ListComp): input node</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="impunity.visitor.Visitor.visit_comprehension">
+<span class="sig-name descname"><span class="pre">visit_comprehension</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">node</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#impunity.visitor.Visitor.visit_comprehension" title="Permalink to this definition"></a></dt>
+<dd><p>Method called by the visitor if the visited node is a
+Comprehension node.
+Checks the units in the node and returns it eventually modified.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/ast.html#ast.comprehension" title="(in Python v3.11)"><code class="xref py py-class docutils literal notranslate"><span class="pre">comprehension</span></code></a></p>
+</dd>
+</dl>
+<dl class="simple">
+<dt>Args:</dt><dd><p>node (ast.comprehension): input node</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="impunity.visitor.get_annotation_unit">
+<span class="sig-prename descclassname"><span class="pre">impunity.visitor.</span></span><span class="sig-name descname"><span class="pre">get_annotation_unit</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">node</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#impunity.visitor.get_annotation_unit" title="Permalink to this definition"></a></dt>
+<dd><p>Return a UoM from an AST Node. Return None if the node is not compatible.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>node</strong> (<em>ast.expr with annotation</em>) – Node with an annotation</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Optional str of the UoM</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Optional[<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.11)">str</a>]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="impunity.visitor.is_annotated">
+<span class="sig-prename descclassname"><span class="pre">impunity.visitor.</span></span><span class="sig-name descname"><span class="pre">is_annotated</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">hint</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">annot_type=&lt;class</span> <span class="pre">'typing._AnnotatedAlias'&gt;</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#impunity.visitor.is_annotated" title="Permalink to this definition"></a></dt>
+<dd><p>Determines whether the annotation is of type Annotated</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">TypeGuard</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">_AnnotatedAlias</span></code>]</p>
+</dd>
+</dl>
+</dd></dl>
+
 </section>
 
 

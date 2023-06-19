@@ -141,7 +141,7 @@ a new (nested) function must be defined based on the old one:</p>
 units defined within the code: it traverses (and sometimes modifies) the Abstract Syntax Tree (AST)
 of the code for the function. Annotated variables and functions are logged for future reference. The
 AST of our speed function can be depicted in a visual representation, as shown below:</p>
-<figure class="align-default" id="my-custom-label">
+<figure class="align-default" id="base-ast">
 <img alt="_images/ast_origin.svg" src="_images/ast_origin.svg" /></figure>
 <p>As the decorator function walks through the AST, variables annotated with units of measures (i.e.
 distance and duration) are logged. Then, each time a call to an annotated function is detected,
@@ -152,15 +152,13 @@ inconsistency in units, impunity takes one of the following actions:</p>
 <li><p>if the two units are commensurable, &#64;impunity modifies the AST to include a conversion operation;</p></li>
 <li><p>if the two units are not commensurable, an IncommensurableUnits warning is raised.</p></li>
 </ul>
-<figure class="align-default" id="id1">
+<figure class="align-default" id="diagram">
 <img alt="_images/test.svg" src="_images/test.svg" /></figure>
 <p>In the case of the speed function example, the expected return UoM is “km/h” while the UoM inferred
-from the division between distance and duration variables is “m/s”. impunity identifies this discrepancy</p>
-<blockquote>
-<div><p>and takes action by modifying the AST accordingly. It introduces a binary operation (BinOp)</p>
-</div></blockquote>
-<p>node to convert the result to the proper UoM, as depicted in red on this modified AST:</p>
-<figure class="align-default" id="id2">
+from the division between distance and duration variables is “m/s”. impunity identifies this discrepancy
+and takes action by modifying the AST accordingly. It introduces a binary operation (BinOp)
+node to convert the result to the proper UoM, as depicted in red on this modified AST:</p>
+<figure class="align-default" id="modif-ast">
 <img alt="_images/ast_modif.svg" src="_images/ast_modif.svg" /></figure>
 <p>Here, the constant value of 3.6 is calculated by determining the conversion factor between the two
 units “m/s” and “km/h”. Here, impunity leverages the capabilities of the sister Pint library: however,

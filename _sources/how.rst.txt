@@ -57,7 +57,7 @@ of the code for the function. Annotated variables and functions are logged for f
 AST of our speed function can be depicted in a visual representation, as shown below:
 
 .. figure:: images/ast_origin.svg
-   :name: my-custom-label
+   :name: base_ast
 
 As the decorator function walks through the AST, variables annotated with units of measures (i.e.
 distance and duration) are logged. Then, each time a call to an annotated function is detected,
@@ -70,17 +70,17 @@ inconsistency in units, impunity takes one of the following actions:
 - if the two units are not commensurable, an IncommensurableUnits warning is raised.
 
 .. figure:: images/test.svg
-   :name: my-custom-label
+   :name: diagram
 
 
 
 In the case of the speed function example, the expected return UoM is "km/h" while the UoM inferred
 from the division between distance and duration variables is "m/s". impunity identifies this discrepancy
- and takes action by modifying the AST accordingly. It introduces a binary operation (BinOp)
+and takes action by modifying the AST accordingly. It introduces a binary operation (BinOp)
 node to convert the result to the proper UoM, as depicted in red on this modified AST:
 
 .. figure:: images/ast_modif.svg
-   :name: my-custom-label
+   :name: modif_ast
 
 Here, the constant value of 3.6 is calculated by determining the conversion factor between the two
 units "m/s" and "km/h". Here, impunity leverages the capabilities of the sister Pint library: however,
