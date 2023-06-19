@@ -65,17 +65,26 @@ class VarDict(dict):
 
 
 def get_annotation_unit(
-    annotation: annotation_node | ast.expr,
+    node: annotation_node | ast.expr,
 ) -> Optional[str]:
+    """
+    Return a UoM from an AST Node. Return None if the node is not compatible.
+
+    :param node: Node with an annotation
+    :type node: ast.expr with annotation
+    :return: Optional str of the UoM
+    :rtype: Optional[str]
+    """
+
     unit = None
-    if isinstance(annotation, ast.Constant):
-        unit = annotation.value
-    elif isinstance(annotation, ast.Subscript):
-        if isinstance(annotation.slice, ast.Index):
-            if isinstance(annotation.slice.value, ast.Tuple):  # type: ignore
-                unit_node = annotation.slice.value.elts[1]  # type: ignore
-        elif isinstance(annotation.slice, ast.Tuple):
-            unit_node = annotation.slice.elts[1]
+    if isinstance(node, ast.Constant):
+        unit = node.value
+    elif isinstance(node, ast.Subscript):
+        if isinstance(node.slice, ast.Index):
+            if isinstance(node.slice.value, ast.Tuple):  # type: ignore
+                unit_node = node.slice.value.elts[1]  # type: ignore
+        elif isinstance(node.slice, ast.Tuple):
+            unit_node = node.slice.elts[1]
         if isinstance(unit_node, ast.Constant):
             unit = unit_node.value
 
@@ -85,14 +94,72 @@ def get_annotation_unit(
 def is_annotated(
     hint: Any, annot_type=annot_type
 ) -> TypeGuard[annot_type]:  # type: ignore
+    """Determines whether the annotation is of type Annotated"""
     return (type(hint) is annot_type) and hasattr(hint, "__metadata__")
 
 
 class Visitor(ast.NodeTransformer):
-    couscous_func: dict[str, Callable] = {}
+
+    """Impunity AST visitor class checking for Annotations
+    to transform the code if necessary
+
+    Attributes:
+        impunity_func : dict[str, Callable]
+            Dictionnary of Callables to keep track of functions
+            tracked by impunity
+        ureg : pint.UnitRegistry
+            Unit Registry from Pint to manage UoMs.
+    """
+
+    impunity_func: dict[str, Callable] = {}
     ureg = UnitRegistry()
 
-    def visit(self, root: ast.AST) -> Any:
+    def __init__(self, fun) -> None:
+        """
+        Constructs all the necessary attributes for the visitor using the
+        attributes of the fun Callable.
+
+        Parameters
+        ----------
+            fun : Callable[..., Any]
+                Callable checked by impunity
+        """
+
+        self.nested_flag = False
+        x: Dict[str, str] = {}
+        self.vars = VarDict(x)
+
+        # For class decorators
+        if isinstance(fun, type):
+            method_list = [
+                getattr(fun, func)
+                for func in dir(fun)
+                if callable(getattr(fun, func)) and not func.startswith("__")
+            ]
+            self.add_func(fun.__init__)  # type: ignore
+            for function in method_list:
+                self.add_func(function)
+            self.class_attr: Dict[str, Unit] = {}
+        else:
+            self.add_func(fun)
+
+    def visit(self, root: ast.AST) -> ast.AST:
+        """
+        Initiate the visit of the root AST.
+
+        If the argument 'additional' is passed, then it
+        is appended after the main info.
+
+        Parameters
+        ----------
+        root : ast.AST
+            root of the AST to visit
+
+        Returns
+        -------
+        Checked ast.AST eventually modified to keep UoM coherence.
+        """
+
         # Adding the "parent" attribute to every nodes of the AST
         for node in ast.walk(root):
             for child in ast.iter_child_nodes(node):
@@ -104,12 +171,29 @@ class Visitor(ast.NodeTransformer):
 
     @classmethod
     def add_func(cls, fun):
+        """Add function to the impunity function dictionnary"""
         if isinstance(fun, ast.FunctionDef):
-            cls.couscous_func[fun.name] = fun
+            cls.impunity_func[fun.name] = fun
         else:
-            cls.couscous_func[fun.__name__] = fun
+            cls.impunity_func[fun.__name__] = fun
 
     def node_convert(self, expected_unit, received_unit, received_node):
+        """check if the expected and the received units are coherents with
+        each other by using the Pint library. Modify the received node
+        accordingly and returns it.
+
+        Parameters:
+            - expected_unit : str
+                expected Unit of Measure string
+            - received_unit : str
+                received Unit of Measure string
+            - received_node : QuantityNode
+                received Quantity Node
+
+        Returns:
+            - QuantityNode: Input Quantity Node, eventually modified for unit
+            coherence.
+        """
         if (
             received_unit != expected_unit
             and "dimensionless"
@@ -188,136 +272,43 @@ class Visitor(ast.NodeTransformer):
             new_node = received_node
         return new_node
 
-        # # Converting by multiplying
-        # if conv_type == "mul":
-        #     if isinstance(original_node, ast.List):
-        #         # converted_node = ast.Expression(
-        #         #     body=ast.GeneratorExp(elt=ast.BinOp(
-        #         #         (left=ast.Name(id='n', ctx=Load()),
-        #         #          op=ast.(), right=Num(n=conv_value)), generators=
-
-        #         # ))))
-        #         pass
-        #     else:
-        #         converted_node = ast.BinOp(
-        #             original_node, ast.Mult(), ast.Constant(conv_value)
-        #         )
-
-        # if conv_type == "add":
-        #     pass
-        # if conv_type == "log":
-        #     pass
-
-        # return ast.copy_location(converted_node, original_node)
-
-    # @classmethod
-    # def insert_node_above(cls, original_node, new_node) -> None:
-    #     parent_function: ast.AST = original_node.parent
-    #     line_node: ast.AST = original_node
-    #     while not isinstance(parent_function, ast.FunctionDef):
-    #         line_node = parent_function
-    #         # TODO Inherit AST NODE to get parents. Ignored as for now
-    #         parent_function = parent_function.parent  # type: ignore
-
-    #     new_body = parent_function.body.copy()
-    #     for i, node in enumerate(parent_function.body):
-    #         if line_node == node:
-    #             new_body.insert(i, new_node)
-    #     parent_function.body = new_body
-
     @classmethod
     def func_flush(cls):
         return
 
     @classmethod
     def get_annotations(cls, name) -> Optional[Dict[str, Any]]:
-        # if sys.version_info >= (3, 10):
-        #     from inspect import get_annotations as get_ann
+        """Get annotations of a function found in the impunity_func class dict.
+        Returns None if the function is not annotated.
 
-        #     if callable(name):
-        #         return get_ann(name, eval_str=True)
-        #     else:
-        #         return cls.couscous_func.get(name)
-        # if isinstance(fun := cls.couscous_func.get(name), ast.FunctionDef):
-        #     params = {}
-        #     for arg in fun.args.args:
-        #         ann = arg.annotation
-        #         annotation = inspect.Parameter.empty
-        #         if isinstance(ann, ast.Constant):
-        #             annotation = ann.value
-        #         elif isinstance(ann, ast.Name):
-        #             annotation = ann.id
-        #         elif isinstance(ann, ast.Subscript):
-        #             data_type = eval(ann.slice.elts[0].id)
-        #             annotation = ann.slice.elts[1].value
-        #             annotation = Annotated[data_type, annotation]
-        #         params.append(
-        #             inspect.Parameter(
-        #                 arg.arg,
-        #                 inspect.Parameter.POSITIONAL_OR_KEYWORD,
-        #                 annotation=annotation,
-        #             )
-        #         )
-        #     return inspect.Signature(
-        #         params,
-        #         return_annotation=fun.returns.value
-        #         if not getattr(fun, "returns", False)
-        #         else inspect._empty,
-        #     )
-        if (fun := cls.couscous_func.get(name)) is not None:
+        Parameters:
+            - name : str
+                name of the function for which annotations are required
+
+        Returns:
+            - Optional dict of annotations
+        """
+
+        if (fun := cls.impunity_func.get(name)) is not None:
             annotations = getattr(fun, "__annotations__", None)
             if annotations:
-                # globals = list(cls.couscous_func.values())[-1].__globals__
-                # locals = fun.__globals__
-                # annotations = {
-                #     k: v
-                #     if not isinstance(v, str)
-                #     else eval(v, globals, locals)
-                #     for k, v in annotations.items()
-                # }
                 return cast(Dict, annotations)
         elif callable(name):
             annotations = getattr(name, "__annotations__", None)
             if annotations:
-                # globals = list(cls.couscous_func.values())[-1].__globals__
-                # locals = name.__globals__
-                # annotations = {
-                #     k: v
-                #     if not isinstance(v, str)
-                #     else eval(v, globals, locals)
-                #     for k, v in annotations.items()
-                # }
                 return cast(Dict, annotations)
 
         return None
 
     @classmethod
     def get_func(cls, name):
-        return cls.couscous_func.get(name)
-
-    def __init__(self, fun) -> None:
-        self.nested_flag = False
-        x: Dict[str, str] = {}
-        self.vars = VarDict(x)
-
-        # For class decorators
-        if isinstance(fun, type):
-            method_list = [
-                getattr(fun, func)
-                for func in dir(fun)
-                if callable(getattr(fun, func)) and not func.startswith("__")
-            ]
-            self.add_func(fun.__init__)  # type: ignore
-            for function in method_list:
-                self.add_func(function)
-            self.class_attr: Dict[str, Unit] = {}
-        else:
-            self.add_func(fun)
+        """getter function for the class dict"""
+        return cls.impunity_func.get(name)
 
     def visit_FunctionDef(self, node: ast.FunctionDef) -> Any:
         if not self.nested_flag:
             self.func_flush()
-        # check for couscous decorator:
+        # check for impunity decorator:
         if node.decorator_list:
             for decorator in node.decorator_list:
                 if isinstance(decorator, ast.Call) and isinstance(
@@ -330,7 +321,7 @@ class Visitor(ast.NodeTransformer):
                                     kw.arg == "ignore"
                                     and kw.value.value  # type: ignore
                                 ):
-                                    self.couscous_func.pop(node.name, False)
+                                    self.impunity_func.pop(node.name, False)
                                     return node
 
         if (fun := self.get_func(node.name)) is not None:
@@ -635,7 +626,15 @@ class Visitor(ast.NodeTransformer):
         else:
             return QuantityNode(node, None)
 
-    def visit_Call(self, node: ast.Call) -> Any:
+    def visit_Call(self, node: ast.Call) -> ast.Call:
+        """Method called by the visitor if the visited node is a Call node.
+        Checks the units in the node and returns it eventually modified.
+
+        Args:
+            node (ast.Call): input node
+
+        """
+
         if isinstance(node.func, ast.Name):
             if node.func.id in __builtins__.keys():  # type: ignore
                 node = self.generic_visit(node)  # type: ignore
@@ -707,7 +706,16 @@ class Visitor(ast.NodeTransformer):
 
         return node
 
-    def visit_AnnAssign(self, node: ast.AnnAssign) -> Any:
+    def visit_AnnAssign(self, node: ast.AnnAssign) -> ast.AnnAssign:
+        """Method called by the visitor if the visited node is an
+        Annotated Assignement node.
+        Checks the units in the node and returns it eventually modified.
+
+        Args:
+            node (ast.AnnAssign): input node
+
+        """
+
         value = self.get_node_unit(node.value)
 
         if value is None:
@@ -724,10 +732,6 @@ class Visitor(ast.NodeTransformer):
             node = ast.copy_location(new_node, node)
 
         if value.unit is None:
-            # _log.warning(
-            #     f"In function {self.fun.__module__}/{self.fun.__name__}:
-            # The unit of {node.target.id} could not be checked."
-            # )
             new_node = node
 
         elif (received := value).unit != (
@@ -746,36 +750,6 @@ class Visitor(ast.NodeTransformer):
                 value=new_value,
                 simple=node.simple,
             )
-
-        #     if "dimensionless" in (received.unit, expected_unit):
-        #         received = expected_unit
-        #     if pint.Unit(received).is_compatible_with(
-        #         pint.Unit(expected_unit)
-        #     ):
-        #         conv_value = (
-        #             pint.Unit(expected_unit).from_(pint.Unit(received)).m
-        #         )
-        #         new_value = ast.BinOp(
-        #             node.value,
-        #             ast.Mult(),
-        #             ast.Constant(conv_value),
-        #         )
-        #         new_node = ast.AnnAssign(
-        #             target=node.target,
-        #             annotation=node.annotation,
-        #             value=new_value,
-        #             simple=node.simple,
-        #         )
-
-        #     else:
-        #         _log.warning(
-        #             f"In function {self.fun.__module__}/{self.fun.__name__}:"
-        #             + f"Assignement expected unit {expected_unit} "
-        #             + f"but received incompatible unit {received}."
-        #         )
-        #         return node
-        # else:
-        #     new_node = node
 
         if isinstance(node.target, ast.Attribute):
             if isinstance(node.target.value, ast.Name):
@@ -799,14 +773,34 @@ class Visitor(ast.NodeTransformer):
         self.generic_visit(node)
         return node
 
-    def visit_ListComp(self, node: ast.ListComp) -> Any:
+    def visit_ListComp(self, node: ast.ListComp) -> ast.ListComp:
+        """Method called by the visitor if the visited node is a List
+        Comprehension node.
+        Checks the units in the node and returns it eventually modified.
+
+        Args:
+            node (ast.ListComp): input node
+
+        """
+
         # Calling the comprehension before the generic
         # visit to get indices into self.vars
         self.visit_comprehension(node.generators[0])
         self.generic_visit(node)
         return node
 
-    def visit_comprehension(self, node: ast.comprehension) -> Any:
+    def visit_comprehension(
+        self, node: ast.comprehension
+    ) -> ast.comprehension:
+        """Method called by the visitor if the visited node is a
+        Comprehension node.
+        Checks the units in the node and returns it eventually modified.
+
+        Args:
+            node (ast.comprehension): input node
+
+        """
+
         if isinstance(node.target, ast.Name):
             self.vars[node.target.id] = None
         return node
@@ -822,53 +816,6 @@ class Visitor(ast.NodeTransformer):
                 value=value.node,
             )
             node = ast.copy_location(new_node, node)
-
-        # if isinstance(node.value, ast.Call):
-        #     for target in node.targets:
-        #         if isinstance(target, ast.Tuple):
-        #             if isinstance(node.value.func, ast.Name):
-        #                 func_name = node.value.func.id
-        #             elif isinstance(node.value.func, ast.Attribute):
-        #                 if isinstance(node.value.func.value, ast.Name):
-        #                     func_name = (
-        #                         self.vars[node.value.func.value.id]
-        #                         if node.value.func.value.id in self.vars
-        #                         else node.value.func.value.id
-        #                     )
-        #                 func_name += "." + node.value.func.attr
-        #             for i, elem in enumerate(target.elts):
-        #                 # if return values are tuples
-        #                 if isinstance(elem, ast.Name):
-        #                     if (sign := (
-        # self.get_annotations(func_name))) is not None:
-        #                         if is_annotated(sign["return"].__args__[i]):
-        #                             self.vars[elem.id] = (
-        # sign["return"].__args__[i].__metadata__[0])
-        #                         else:
-        #                             self.vars[elem.id] = (
-        # sign["return"].__args__[i].__forward_value__)
-        #         elif isinstance(target, ast.Name):
-        #             if isinstance(node.value.func, ast.Name):
-        #                 func_name = node.value.func.id
-        #             elif isinstance(node.value.func, ast.Attribute):
-        #                 if isinstance(node.value.func.value, ast.Name):
-        #                     func_name = (
-        #                         self.vars[node.value.func.value.id]
-        #                         if node.value.func.value.id in self.vars
-        #                         else node.value.func.value.id
-        #                     )
-        #                 func_name += "." + node.value.func.attr
-        #             if (sign := self.get_annotations(func_name)) is not None:
-        #                 if is_annotated(sign["return"].__args__[0]):
-        #                     self.vars[target.id] = (
-        # sign["return"].__args__[0].__metadata__[0])
-        #                 else:
-        #                     pass
-        #         elif isinstance(target, ast.Attribute):
-        #             if isinstance(target.value, ast.Name):
-        #                 if target.value.id == "self":
-        #                     self.class_attr[target.attr] = value.unit
-        #     new_node = node
 
         new_node = ast.Assign(
             targets=node.targets,

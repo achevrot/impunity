@@ -6,6 +6,9 @@
 # -- Project information -----------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#project-information
 
+import os
+import sys
+
 project = "Impunity"
 copyright = "2023, Antoine Chevrot"
 author = "Antoine Chevrot"
@@ -14,7 +17,15 @@ release = "0.1"
 # -- General configuration ---------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#general-configuration
 
-extensions = ["sphinx_design"]  # type: ignore
+sys.path.insert(0, os.path.abspath("../src"))
+
+extensions = [
+    "sphinx_design",
+    "sphinx.ext.autodoc",
+    "sphinx.ext.githubpages",
+    "sphinx.ext.intersphinx",
+    "sphinx_autodoc_typehints",
+]  # type: ignore
 
 templates_path = ["_templates"]
 exclude_patterns = []  # type: ignore
@@ -25,3 +36,19 @@ exclude_patterns = []  # type: ignore
 
 html_theme = "sphinx_rtd_theme"
 html_static_path = ["_static"]
+
+
+# -- Extension configuration -------------------------------------------------
+
+intersphinx_mapping = {
+    "python": ("https://docs.python.org/3", None),
+    "numpy": ("https://numpy.org/doc/stable/", None),
+    "scipy": ("https://docs.scipy.org/doc/scipy/", None),
+    "pandas": ("https://pandas.pydata.org/pandas-docs/dev", None),
+    "shapely": ("https://shapely.readthedocs.io/en/latest", None),
+    "cartopy": ("https://scitools.org.uk/cartopy/docs/latest", None),
+    "pyproj": ("https://pyproj4.github.io/pyproj/stable", None),
+    "altair": ("https://altair-viz.github.io", None),
+    "cartes": ("https://cartes-viz.github.io", None),
+    "ipyleaflet": ("https://ipyleaflet.readthedocs.io/en/latest/", None),
+}
