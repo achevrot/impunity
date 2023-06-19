@@ -24,7 +24,7 @@ regular updates and community.
   calculations, there will be random factors causing a randomly-varying 
   final answer.
 
-- `astropy <https://github.com/sbyrnes321/numericalunits/>`_ 
+- `astropy <https://www.astropy.org/>`_ 
   is a Python package offering functionalities aimed at astronomers
   and astrophysicists. It also includes an implementation of the
   quantity design pattern. astropy also implements a decorator to check
