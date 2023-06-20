@@ -1,5 +1,5 @@
 Contribute to impunity
-============
+=======================
 
 Source code on `github <https://github.com/achevrot/impunity>`_
 

@@ -145,19 +145,12 @@ class Visitor(ast.NodeTransformer):
 
     def visit(self, root: ast.AST) -> ast.AST:
         """
-        Initiate the visit of the root AST.
+        Initiate the visit of the root AST. Returns a checked ast.AST
+        eventually modified to keep UoM coherence.
 
-        If the argument 'additional' is passed, then it
-        is appended after the main info.
-
-        Parameters
-        ----------
-        root : ast.AST
-            root of the AST to visit
-
-        Returns
-        -------
-        Checked ast.AST eventually modified to keep UoM coherence.
+        Args:
+            root : ast.AST
+                root of the AST to visit
         """
 
         # Adding the "parent" attribute to every nodes of the AST
@@ -193,6 +186,7 @@ class Visitor(ast.NodeTransformer):
         Returns:
             - QuantityNode: Input Quantity Node, eventually modified for unit
             coherence.
+
         """
         if (
             received_unit != expected_unit
@@ -305,7 +299,14 @@ class Visitor(ast.NodeTransformer):
         """getter function for the class dict"""
         return cls.impunity_func.get(name)
 
-    def visit_FunctionDef(self, node: ast.FunctionDef) -> Any:
+    def visit_FunctionDef(self, node: ast.FunctionDef) -> ast.FunctionDef:
+        """Method called by the visitor if the visited node is
+        function defintion. Is usually the root node in impunity
+
+        Args:
+            node (ast.FunctionDef): Visited Function Definition
+
+        """
         if not self.nested_flag:
             self.func_flush()
         # check for impunity decorator:
@@ -764,10 +765,26 @@ class Visitor(ast.NodeTransformer):
         # ast.fix_missing_locations(new_node)
         return ast.copy_location(new_node, node)
 
-    def visit_BinOp(self, node: ast.BinOp) -> Any:
+    def visit_BinOp(self, node: ast.BinOp) -> ast.BinOp:
+        """Method called by the visitor if the visited node is an
+        Binary Operation node.
+        Checks the units in the node and returns it eventually modified.
+
+        Args:
+            node (ast.BinOp): input node
+
+        """
+
         return self.get_node_unit(node).node
 
-    def visit_For(self, node: ast.For) -> Any:
+    def visit_For(self, node: ast.For) -> ast.For:
+        """Method called by the visitor if the visited node is a for loop node.
+        Checks the units in the node and returns it eventually modified.
+
+        Args:
+            node (ast.For): input node
+
+        """
         if isinstance(node.target, ast.Name):
             self.vars[node.target.id] = None
         self.generic_visit(node)
@@ -805,7 +822,15 @@ class Visitor(ast.NodeTransformer):
             self.vars[node.target.id] = None
         return node
 
-    def visit_Assign(self, node: ast.Assign) -> Any:
+    def visit_Assign(self, node: ast.Assign) -> ast.Assign:
+        """Method called by the visitor if the visited node is an
+        Assignement node.
+        Checks the units in the node and returns it eventually modified.
+
+        Args:
+            node (ast.Assign): input node
+
+        """
         value = self.get_node_unit(node.value)
 
         if value.unit is None:
@@ -851,7 +876,15 @@ class Visitor(ast.NodeTransformer):
 
         return ast.copy_location(new_node, node)
 
-    def visit_Return(self, node: ast.Return) -> Any:
+    def visit_Return(self, node: ast.Return) -> ast.Return:
+        """Method called by the visitor if the visited node is a
+        Return node.
+        Checks the units in the node and returns it eventually modified.
+
+        Args:
+            node (ast.Return): input node
+
+        """
         for frameinfo in inspect.stack():
             if frameinfo.function == "visit_FunctionDef":
                 fun = frameinfo.frame.f_locals["node"].name

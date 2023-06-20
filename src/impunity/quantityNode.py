@@ -12,6 +12,16 @@ N = TypeVar("N", bound=Optional[ast.expr], covariant=True)
 
 
 class QuantityNode:
+
+    """Node object with a unit attribute.
+
+    Attributes:
+        node : TypeVar("N", bound=Optional[ast.expr], covariant=True)
+            Any type of expression found within an ast.
+        unit : Optional[str]
+            Optional string representing a UoM.
+    """
+
     @overload
     def __init__(self, node: N, unit: Optional[Unit] = None) -> None:
         ...
