@@ -3,42 +3,14 @@
    You can adapt this file completely to your liking, but it should at least
    contain the root `toctree` directive.
 
-:sd_hide_title:
-
-Impunity
-====================================
+Impunity: A Python library to check your physical units effortlessly
+====================================================================
 
 
-
-
-
-.. div:: sd-bg-primary
-   
-
-   .. grid::
-      :reverse:
-      :gutter: 2 3 3 3
-      :margin: 4 4 1 2
-
-      .. grid-item::
-         :columns: 12 4 4 4
-         :child-align: justify
-         :class: sd-text-white sd-fs-3
-
-
-      .. grid-item::
-         :columns: 12 8 8 8
-         :child-align: justify
-         :class: sd-text-white sd-fs-3
-
-         A Python library to check your physical units effortlessly.
-
-
-         .. button-ref:: quickstart
-            :ref-type: doc
-            :outline:
-            :color: white
-            :class: sd-px-4 sd-fs-5
+.. button-ref:: quickstart
+   :ref-type: doc
+   :outline:
+   :class: sd-px-4 sd-fs-5
 
 
 Easy to use
@@ -54,7 +26,7 @@ No additional runtime overhead
    Impunity works directly on the AST for a static analysis of your code
 
 .. grid:: 2
-   
+
     .. grid-item::
 
       .. code-block:: python
@@ -93,10 +65,11 @@ No additional runtime overhead
                def speed(d: "m", t: "s") -> "m / s":
                   return d + t
 
-               Warning: "Types are not compatible"
+               # Warning: "Types are not compatible"
 
 .. toctree::
-   
+   :hidden:
+
    quickstart
 
 
@@ -124,7 +97,3 @@ No additional runtime overhead
    :hidden:
 
    contribute
-
-.. note::
-
-   This project is under active development.
