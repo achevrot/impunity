@@ -1,0 +1,436 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>impunity.visitor.visitor &mdash; Impunity 0.1 documentation</title>
+      <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/design-style.1e8bd061cd6da7fc9cf755528e8ffc24.min.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="../_static/jquery.js"></script>
+        <script src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
+        <script src="../_static/doctools.js"></script>
+        <script src="../_static/sphinx_highlight.js"></script>
+        <script src="../_static/design-tabs.js"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="impunity.quantityNode.quantityNode" href="impunity.quantityNode.html" />
+    <link rel="prev" title="API reference" href="../api.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../index.html" class="icon icon-home">
+            Impunity
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="../quickstart.html">Getting started</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">API</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="../api.html">API reference</a><ul class="current">
+<li class="toctree-l2 current"><a class="current reference internal" href="#">impunity.visitor.visitor</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#impunity.visitor.Visitor"><code class="docutils literal notranslate"><span class="pre">Visitor</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#impunity.visitor.Visitor.add_func"><code class="docutils literal notranslate"><span class="pre">Visitor.add_func()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#impunity.visitor.Visitor.generic_visit"><code class="docutils literal notranslate"><span class="pre">Visitor.generic_visit()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#impunity.visitor.Visitor.get_annotations"><code class="docutils literal notranslate"><span class="pre">Visitor.get_annotations()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#impunity.visitor.Visitor.get_func"><code class="docutils literal notranslate"><span class="pre">Visitor.get_func()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#impunity.visitor.Visitor.get_node_unit"><code class="docutils literal notranslate"><span class="pre">Visitor.get_node_unit()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#impunity.visitor.Visitor.node_convert"><code class="docutils literal notranslate"><span class="pre">Visitor.node_convert()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#impunity.visitor.Visitor.visit"><code class="docutils literal notranslate"><span class="pre">Visitor.visit()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#impunity.visitor.Visitor.visit_AnnAssign"><code class="docutils literal notranslate"><span class="pre">Visitor.visit_AnnAssign()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#impunity.visitor.Visitor.visit_Assign"><code class="docutils literal notranslate"><span class="pre">Visitor.visit_Assign()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#impunity.visitor.Visitor.visit_BinOp"><code class="docutils literal notranslate"><span class="pre">Visitor.visit_BinOp()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#impunity.visitor.Visitor.visit_Call"><code class="docutils literal notranslate"><span class="pre">Visitor.visit_Call()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#impunity.visitor.Visitor.visit_For"><code class="docutils literal notranslate"><span class="pre">Visitor.visit_For()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#impunity.visitor.Visitor.visit_FunctionDef"><code class="docutils literal notranslate"><span class="pre">Visitor.visit_FunctionDef()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#impunity.visitor.Visitor.visit_ListComp"><code class="docutils literal notranslate"><span class="pre">Visitor.visit_ListComp()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#impunity.visitor.Visitor.visit_Return"><code class="docutils literal notranslate"><span class="pre">Visitor.visit_Return()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#impunity.visitor.Visitor.visit_comprehension"><code class="docutils literal notranslate"><span class="pre">Visitor.visit_comprehension()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="impunity.quantityNode.html">impunity.quantityNode.quantityNode</a></li>
+<li class="toctree-l2"><a class="reference internal" href="impunity.wrapper.impunity.html">impunity.wrapper.impunity</a></li>
+</ul>
+</li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Annotations</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../string_annotation.html">String Annotations</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../annotated.html">The Annotated object</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Advanced Topic</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../how.html">How Does It Work ?</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../perf_improvement.html">Performance Analysis</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../contribute.html">Contribute to impunity</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">Impunity</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../api.html">API reference</a></li>
+      <li class="breadcrumb-item active">impunity.visitor.visitor</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../_sources/api_reference/impunity.visitor.Visitor.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="impunity-visitor-visitor">
+<h1>impunity.visitor.visitor<a class="headerlink" href="#impunity-visitor-visitor" title="Permalink to this heading"></a></h1>
+<dl class="py class">
+<dt class="sig sig-object py" id="impunity.visitor.Visitor">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">impunity.visitor.</span></span><span class="sig-name descname"><span class="pre">Visitor</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">fun</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#impunity.visitor.Visitor" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/ast.html#ast.NodeTransformer" title="(in Python v3.11)"><code class="xref py py-class docutils literal notranslate"><span class="pre">NodeTransformer</span></code></a></p>
+<p>Impunity AST visitor class checking for Annotations
+to transform the code if necessary</p>
+<dl class="simple">
+<dt>Attributes:</dt><dd><dl class="simple">
+<dt>impunity_func<span class="classifier">dict[str, Callable]</span></dt><dd><p>Dictionnary of Callables to keep track of functions
+tracked by impunity</p>
+</dd>
+<dt>ureg<span class="classifier">pint.UnitRegistry</span></dt><dd><p>Unit Registry from Pint to manage UoMs.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="impunity.visitor.Visitor.add_func">
+<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">add_func</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">fun</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#impunity.visitor.Visitor.add_func" title="Permalink to this definition"></a></dt>
+<dd><p>Add function to the impunity function dictionnary</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="impunity.visitor.Visitor.generic_visit">
+<span class="sig-name descname"><span class="pre">generic_visit</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">node</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#impunity.visitor.Visitor.generic_visit" title="Permalink to this definition"></a></dt>
+<dd><p>Called if no explicit visitor function exists for a node.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="impunity.visitor.Visitor.get_annotations">
+<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">get_annotations</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#impunity.visitor.Visitor.get_annotations" title="Permalink to this definition"></a></dt>
+<dd><p>Get annotations of a function found in the impunity_func class dict.
+Returns None if the function is not annotated.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Optional" title="(in Python v3.11)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code></a>[<a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Dict" title="(in Python v3.11)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Dict</span></code></a>[<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.11)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>, <a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Any" title="(in Python v3.11)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Any</span></code></a>]]</p>
+</dd>
+</dl>
+<dl class="simple">
+<dt>Parameters:</dt><dd><ul class="simple">
+<li><dl class="simple">
+<dt>name<span class="classifier">str</span></dt><dd><p>name of the function for which annotations are required</p>
+</dd>
+</dl>
+</li>
+</ul>
+</dd>
+<dt>Returns:</dt><dd><ul class="simple">
+<li><p>Optional dict of annotations</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="impunity.visitor.Visitor.get_func">
+<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">get_func</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#impunity.visitor.Visitor.get_func" title="Permalink to this definition"></a></dt>
+<dd><p>getter function for the class dict</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="impunity.visitor.Visitor.get_node_unit">
+<span class="sig-name descname"><span class="pre">get_node_unit</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">node</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#impunity.visitor.Visitor.get_node_unit" title="Permalink to this definition"></a></dt>
+<dd><p>Method to induce the unit of a node through recursive
+calls on children if any.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference internal" href="impunity.quantityNode.html#impunity.quantityNode.QuantityNode" title="impunity.quantityNode.QuantityNode"><code class="xref py py-class docutils literal notranslate"><span class="pre">QuantityNode</span></code></a></p>
+</dd>
+</dl>
+<dl class="simple">
+<dt>Args:</dt><dd><p>node (ast.AST): input node</p>
+</dd>
+<dt>Returns:</dt><dd><p>QuantityNode: QuantityNode(node, induced_unit)</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="impunity.visitor.Visitor.node_convert">
+<span class="sig-name descname"><span class="pre">node_convert</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">expected_unit</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">received_unit</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">received_node</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#impunity.visitor.Visitor.node_convert" title="Permalink to this definition"></a></dt>
+<dd><p>check if the expected and the received units are coherents with
+each other by using the Pint library. Modify the received node
+accordingly and returns it.</p>
+<dl>
+<dt>Parameters:</dt><dd><ul class="simple">
+<li><dl class="simple">
+<dt>expected_unit<span class="classifier">str</span></dt><dd><p>expected Unit of Measure string</p>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt>received_unit<span class="classifier">str</span></dt><dd><p>received Unit of Measure string</p>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt>received_node<span class="classifier">QuantityNode</span></dt><dd><p>received Quantity Node</p>
+</dd>
+</dl>
+</li>
+</ul>
+</dd>
+<dt>Returns:</dt><dd><ul class="simple">
+<li><p>QuantityNode: Input Quantity Node, eventually modified for unit</p></li>
+</ul>
+<p>coherence.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="impunity.visitor.Visitor.visit">
+<span class="sig-name descname"><span class="pre">visit</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">root</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#impunity.visitor.Visitor.visit" title="Permalink to this definition"></a></dt>
+<dd><p>Initiate the visit of the root AST. Returns a checked ast.AST
+eventually modified to keep UoM coherence.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/ast.html#ast.AST" title="(in Python v3.11)"><code class="xref py py-class docutils literal notranslate"><span class="pre">AST</span></code></a></p>
+</dd>
+</dl>
+<dl class="simple">
+<dt>Args:</dt><dd><dl class="simple">
+<dt>root<span class="classifier">ast.AST</span></dt><dd><p>root of the AST to visit</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="impunity.visitor.Visitor.visit_AnnAssign">
+<span class="sig-name descname"><span class="pre">visit_AnnAssign</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">node</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#impunity.visitor.Visitor.visit_AnnAssign" title="Permalink to this definition"></a></dt>
+<dd><p>Method called by the visitor if the visited node is an
+Annotated Assignement node.
+Checks the units in the node and returns it eventually modified.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/ast.html#ast.AnnAssign" title="(in Python v3.11)"><code class="xref py py-class docutils literal notranslate"><span class="pre">AnnAssign</span></code></a></p>
+</dd>
+</dl>
+<dl class="simple">
+<dt>Args:</dt><dd><p>node (ast.AnnAssign): input node</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="impunity.visitor.Visitor.visit_Assign">
+<span class="sig-name descname"><span class="pre">visit_Assign</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">node</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#impunity.visitor.Visitor.visit_Assign" title="Permalink to this definition"></a></dt>
+<dd><p>Method called by the visitor if the visited node is an
+Assignement node.
+Checks the units in the node and returns it eventually modified.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/ast.html#ast.Assign" title="(in Python v3.11)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Assign</span></code></a></p>
+</dd>
+</dl>
+<dl class="simple">
+<dt>Args:</dt><dd><p>node (ast.Assign): input node</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="impunity.visitor.Visitor.visit_BinOp">
+<span class="sig-name descname"><span class="pre">visit_BinOp</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">node</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#impunity.visitor.Visitor.visit_BinOp" title="Permalink to this definition"></a></dt>
+<dd><p>Method called by the visitor if the visited node is an
+Binary Operation node.
+Checks the units in the node and returns it eventually modified.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/ast.html#ast.BinOp" title="(in Python v3.11)"><code class="xref py py-class docutils literal notranslate"><span class="pre">BinOp</span></code></a></p>
+</dd>
+</dl>
+<dl class="simple">
+<dt>Args:</dt><dd><p>node (ast.BinOp): input node</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="impunity.visitor.Visitor.visit_Call">
+<span class="sig-name descname"><span class="pre">visit_Call</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">node</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#impunity.visitor.Visitor.visit_Call" title="Permalink to this definition"></a></dt>
+<dd><p>Method called by the visitor if the visited node is a Call node.
+Checks the units in the node and returns it eventually modified.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/ast.html#ast.Call" title="(in Python v3.11)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Call</span></code></a></p>
+</dd>
+</dl>
+<dl class="simple">
+<dt>Args:</dt><dd><p>node (ast.Call): input node</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="impunity.visitor.Visitor.visit_For">
+<span class="sig-name descname"><span class="pre">visit_For</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">node</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#impunity.visitor.Visitor.visit_For" title="Permalink to this definition"></a></dt>
+<dd><p>Method called by the visitor if the visited node is a for loop node.
+Checks the units in the node and returns it eventually modified.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/ast.html#ast.For" title="(in Python v3.11)"><code class="xref py py-class docutils literal notranslate"><span class="pre">For</span></code></a></p>
+</dd>
+</dl>
+<dl class="simple">
+<dt>Args:</dt><dd><p>node (ast.For): input node</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="impunity.visitor.Visitor.visit_FunctionDef">
+<span class="sig-name descname"><span class="pre">visit_FunctionDef</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">node</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#impunity.visitor.Visitor.visit_FunctionDef" title="Permalink to this definition"></a></dt>
+<dd><p>Method called by the visitor if the visited node is
+function defintion. Is usually the root node in impunity</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/ast.html#ast.FunctionDef" title="(in Python v3.11)"><code class="xref py py-class docutils literal notranslate"><span class="pre">FunctionDef</span></code></a></p>
+</dd>
+</dl>
+<dl class="simple">
+<dt>Args:</dt><dd><p>node (ast.FunctionDef): Visited Function Definition</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="impunity.visitor.Visitor.visit_ListComp">
+<span class="sig-name descname"><span class="pre">visit_ListComp</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">node</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#impunity.visitor.Visitor.visit_ListComp" title="Permalink to this definition"></a></dt>
+<dd><p>Method called by the visitor if the visited node is a List
+Comprehension node.
+Checks the units in the node and returns it eventually modified.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/ast.html#ast.ListComp" title="(in Python v3.11)"><code class="xref py py-class docutils literal notranslate"><span class="pre">ListComp</span></code></a></p>
+</dd>
+</dl>
+<dl class="simple">
+<dt>Args:</dt><dd><p>node (ast.ListComp): input node</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="impunity.visitor.Visitor.visit_Return">
+<span class="sig-name descname"><span class="pre">visit_Return</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">node</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#impunity.visitor.Visitor.visit_Return" title="Permalink to this definition"></a></dt>
+<dd><p>Method called by the visitor if the visited node is a
+Return node.
+Checks the units in the node and returns it eventually modified.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/ast.html#ast.Return" title="(in Python v3.11)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Return</span></code></a></p>
+</dd>
+</dl>
+<dl class="simple">
+<dt>Args:</dt><dd><p>node (ast.Return): input node</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="impunity.visitor.Visitor.visit_comprehension">
+<span class="sig-name descname"><span class="pre">visit_comprehension</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">node</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#impunity.visitor.Visitor.visit_comprehension" title="Permalink to this definition"></a></dt>
+<dd><p>Method called by the visitor if the visited node is a
+Comprehension node.
+Checks the units in the node and returns it eventually modified.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/ast.html#ast.comprehension" title="(in Python v3.11)"><code class="xref py py-class docutils literal notranslate"><span class="pre">comprehension</span></code></a></p>
+</dd>
+</dl>
+<dl class="simple">
+<dt>Args:</dt><dd><p>node (ast.comprehension): input node</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="../api.html" class="btn btn-neutral float-left" title="API reference" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="impunity.quantityNode.html" class="btn btn-neutral float-right" title="impunity.quantityNode.quantityNode" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2023, Antoine Chevrot.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>
