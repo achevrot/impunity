@@ -64,7 +64,7 @@ def impunity(
         fun_tree = ast.parse(textwrap.dedent(inspect.getsource(fun)))
 
         visitor = Visitor(fun)
-        fun_tree = visitor.visit(fun_tree)
+        fun_tree = visitor.visit(fun_tree)  # type: ignore
 
         # get the string of the transformed function
         f_str = astor.to_source(fun_tree)
