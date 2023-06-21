@@ -25,8 +25,8 @@ dimensionless = Annotated[Any, "dimensionless"]
 class Arithmetic(unittest.TestCase):
     @impunity
     def test_various_units(self) -> None:
-        alt_1: "m" = 1000
-        alt_2: "ft" = 350
+        alt_1: Annotated[Any, "m"] = 1000
+        alt_2: Annotated[Any, "ft"] = 350
         temp: "K" = 120
         result: "m / K" = (alt_1 + alt_2) * 25 / temp  # type: ignore
 
@@ -69,6 +69,16 @@ class Arithmetic(unittest.TestCase):
         _, result_2 = (alt_m + alt_ft + alt_m2, alt_m + alt_ft + alt_m2)
 
         self.assertAlmostEqual(result_2, 4609.6, delta=1e-2)
+
+    @impunity
+    def test_tuple(self) -> None:
+        alt_m: "m" = 1000
+        alt_ft: "ft" = 2000
+        alt_cm: "cm" = 3000
+        alt_m2, alt_ft2, alt_cm2 = (alt_m, alt_ft, alt_cm)
+        _, result_2 = (alt_m2 + alt_ft2 + alt_cm2, alt_m2 + alt_ft2 + alt_cm2)
+
+        self.assertAlmostEqual(result_2, 1639.6, delta=1e-2)
 
     def test_operation_list(self) -> None:
         def test_operation_list() -> None:
@@ -122,6 +132,31 @@ class Arithmetic(unittest.TestCase):
                 f"WARNING:impunity.visitor:In function {__name__}"
                 + "/test_addition_wrong: Type m and K are not compatible. "
                 + "Defaulted to dimensionless"
+            ],
+        )
+
+    @impunity
+    def test_ternary_ok(self) -> None:
+        alt_ft1: "ft" = 1000
+        alt_ft2: "ft" = 2000
+        res: "ft" = alt_ft1 if alt_ft1 > 2000 else alt_ft2
+        self.assertAlmostEqual(res, 2000, delta=1e-2)
+
+    def test_ternary_ko(self) -> None:
+        def test_ternary_ko() -> None:
+            alt_ft1: "m" = 1000
+            alt_ft2: "ft" = 2000
+            res: "ft" = alt_ft1 if alt_ft1 > 2000 else alt_ft2
+            self.assertAlmostEqual(res, 2000, delta=1e-2)
+
+        with self.assertLogs("impunity.visitor", level="WARNING") as cm:
+            impunity(test_ternary_ko)
+
+        self.assertEqual(
+            cm.output,
+            [
+                f"WARNING:impunity.visitor:In function {__name__}"
+                + "/test_ternary_ko: Ternary operator with mixed units."
             ],
         )
 

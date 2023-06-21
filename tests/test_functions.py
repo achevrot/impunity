@@ -3,6 +3,7 @@ import unittest
 from typing import Any
 
 from impunity import impunity
+from .test_module import test_speed, test_speed_altitude
 
 import numpy as np
 
@@ -197,6 +198,30 @@ class Functions(unittest.TestCase):
             return alt_m
 
         self.assertAlmostEqual(test_return_convert(), 1000, delta=1e-2)
+
+    def test_module(self) -> None:
+        @impunity
+        def test_module() -> Annotated[Any, "ft"]:
+            distance: "ft" = 1000
+            duration: "s" = 1000
+            return test_speed(distance, duration)
+
+        self.assertAlmostEqual(test_module(), 0.305, delta=1e-2)
+
+    @impunity
+    def test_builtin(self) -> None:
+        print(test_speed(1, 10))
+
+    @impunity
+    def test_keyword(self) -> None:
+        d: "m" = 1000
+        t: "s" = 1000
+        a: "ft" = 1000
+
+        res = test_speed_altitude(d, t, a)
+        self.assertAlmostEqual(res, 417.17, delta=1e-2)
+        res2 = test_speed_altitude(d, t)
+        self.assertAlmostEqual(res2, 1, delta=1e-2)
 
 
 if __name__ == "__main__":

@@ -54,13 +54,10 @@ _log = logging.getLogger(__name__)
 
 class VarDict(dict):
     def __missing__(self, key):
-        if isinstance(key, Number):
-            pass
-        else:
-            _log.warning(
-                f"The variable {key} is not annotated. "
-                + "Defaulted to dimensionless"
-            )
+        _log.warning(
+            f"The variable {key} is not annotated. "
+            + "Defaulted to dimensionless"
+        )
         return None
 
 
@@ -232,14 +229,14 @@ class Visitor(ast.NodeTransformer):
                         .m
                     ) - 1
 
-                    if conv_value == 0:
-                        new_node = received_node
-                    else:
-                        new_node = ast.BinOp(
-                            received_node,
-                            ast.Add(),
-                            ast.Constant(conv_value),
-                        )
+                    # if conv_value == 0:
+                    #     new_node = received_node
+                    # else:
+                    new_node = ast.BinOp(
+                        received_node,
+                        ast.Add(),
+                        ast.Constant(conv_value),
+                    )
 
                 elif isclose(10 * (e1.m - e0.m) + e0.m, e10.m):
                     new_node = ast.BinOp(
@@ -543,7 +540,7 @@ class Visitor(ast.NodeTransformer):
             if body.unit != orelse.unit:
                 _log.warning(
                     f"In function {self.fun.__module__}/{self.fun.__name__}: "
-                    + "Ternary operator with mixed units"
+                    + "Ternary operator with mixed units."
                 )
                 return QuantityNode(ast.copy_location(new_node, node), None)
             else:
@@ -552,7 +549,7 @@ class Visitor(ast.NodeTransformer):
                 )
 
         elif isinstance(node, ast.Call):
-            node = self.generic_visit(node)
+            node = self.generic_visit(node)  # type: ignore
             if isinstance(node.func, ast.Name):
                 id = node.func.id
             elif isinstance(node.func, ast.Attribute):
@@ -868,7 +865,7 @@ class Visitor(ast.NodeTransformer):
                         if isinstance(received[i], typing.ForwardRef):
                             self.vars[elem.id] = received[i].__forward_arg__
                         else:
-                            self.vars[elem.id] = received[i][0]
+                            self.vars[elem.id] = received[i]
 
             elif isinstance(target, ast.Name):
                 self.vars[target.id] = value.unit
