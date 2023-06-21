@@ -7,7 +7,6 @@ import sys
 import types
 import typing
 from math import isclose
-from numbers import Number
 from typing import Any, Dict, Optional, Union, cast
 
 if sys.version_info >= (3, 9):

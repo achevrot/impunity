@@ -3,9 +3,10 @@ import unittest
 from typing import Any
 
 from impunity import impunity
-from .test_module import test_speed, test_speed_altitude
 
 import numpy as np
+
+from .test_module import test_speed, test_speed_altitude
 
 if sys.version_info >= (3, 9):
     from typing import Annotated
