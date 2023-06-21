@@ -552,6 +552,7 @@ class Visitor(ast.NodeTransformer):
                 )
 
         elif isinstance(node, ast.Call):
+            node = self.generic_visit(node)
             if isinstance(node.func, ast.Name):
                 id = node.func.id
             elif isinstance(node.func, ast.Attribute):
@@ -637,73 +638,75 @@ class Visitor(ast.NodeTransformer):
         """
 
         if isinstance(node.func, ast.Name):
-            if node.func.id in __builtins__.keys():  # type: ignore
-                node = self.generic_visit(node)  # type: ignore
+            fun_id = node.func.id
+        elif isinstance(node.func, ast.Attribute):
+            fun_id = node.func.value.id + "." + node.func.attr  # type: ignore
+
+        if fun_id in __builtins__.keys():  # type: ignore
+            node = self.generic_visit(node)  # type: ignore
+            return node
+
+        # parameters = inspect.getfullargspec(self.fun_globals[
+        # node.func.id])
+        signature = self.get_annotations(fun_id)  # type: ignore
+
+        new_args: list[ast.BinOp | ast.expr] = []
+        new_keywords: list[ast.BinOp | ast.expr] = []
+        if node.args or node.keywords:
+            if signature:
+                fun_signature = list(signature.items())[:-1]
+            else:
                 return node
-
-            # parameters = inspect.getfullargspec(self.fun_globals[
-            # node.func.id])
-            signature = self.get_annotations(
-                self.fun_globals[node.func.id]  # type: ignore
-            )
-
-            new_args: list[ast.BinOp | ast.expr] = []
-            new_keywords: list[ast.BinOp | ast.expr] = []
-            if node.args or node.keywords:
-                if signature:
-                    fun_signature = list(signature.items())[:-1]
+            for i, arg in enumerate(node.args):
+                if (received := self.get_node_unit(arg)).unit != (
+                    expected := fun_signature[i][1]
+                ):
+                    if is_annotated(expected):
+                        expected = expected.__metadata__[0]  # type: ignore
+                    new_arg = self.node_convert(
+                        expected, received.unit, received.node
+                    )
+                    new_args.append(new_arg)
                 else:
-                    return node
-                for i, arg in enumerate(node.args):
-                    if (received := self.get_node_unit(arg)).unit != (
-                        expected := fun_signature[i][1]
+                    new_args.append(arg)
+
+            for keyword in node.keywords:
+                if keyword.arg:
+                    if (received := self.get_node_unit(keyword.value)) != (
+                        expected := signature[keyword.arg]
                     ):
                         if is_annotated(expected):
-                            expected = expected.__metadata__[0]  # type: ignore
-                        new_arg = self.node_convert(
+                            x = expected.__metadata__[0]  # type: ignore
+                            expected = x
+                        if not (
+                            isinstance(expected, str)
+                            and isinstance(received.unit, str)
+                        ):
+                            # TODO To avoid annoying typing for now
+                            return node
+
+                        new_value = self.node_convert(
                             expected, received.unit, received.node
                         )
-                        new_args.append(new_arg)
-                    else:
-                        new_args.append(arg)
 
-                for keyword in node.keywords:
-                    if keyword.arg:
-                        if (received := self.get_node_unit(keyword.value)) != (
-                            expected := signature[keyword.arg]
-                        ):
-                            if is_annotated(expected):
-                                x = expected.__metadata__[0]  # type: ignore
-                                expected = x
-                            if not (
-                                isinstance(expected, str)
-                                and isinstance(received.unit, str)
-                            ):
-                                # TODO To avoid annoying typing for now
-                                return node
+                        new_keyword = cast(
+                            ast.expr,
+                            ast.keyword(
+                                keyword.arg,
+                                new_value,
+                            ),
+                        )
 
-                            new_value = self.node_convert(
-                                expected, received.unit, received.node
-                            )
+                        new_keywords.append(new_keyword)
 
-                            new_keyword = cast(
-                                ast.expr,
-                                ast.keyword(
-                                    keyword.arg,
-                                    new_value,
-                                ),
-                            )
+        if new_args or new_keywords:
+            new_node = ast.Call(
+                func=node.func,
+                args=new_args,
+                keywords=new_keywords,
+            )
 
-                            new_keywords.append(new_keyword)
-
-            if new_args or new_keywords:
-                new_node = ast.Call(
-                    func=node.func,
-                    args=new_args,
-                    keywords=new_keywords,
-                )
-
-                return ast.copy_location(new_node, node)
+            return ast.copy_location(new_node, node)
 
         return node
 
