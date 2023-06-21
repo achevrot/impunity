@@ -1,5 +1,5 @@
-impunity.visitor.visitor
--------------------------
+impunity.visitor
+----------------
 
 .. autoclass:: impunity.visitor.Visitor
     :members:

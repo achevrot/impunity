@@ -24,7 +24,7 @@ of unit will result in a warning:
     def speed(distance: "stadium", time: "s") -> "meters / seconds":
         return distance / time
 
-    Warning : "'stadium' is not a unit recognized by Pint"
+    # Warning : 'stadium' is not a unit recognized by Pint
 
 Note however that as is, type checkers like mypy will return an error
 as `meters` or `s` are undefined. Please visit :doc:`annotated` to use impunity

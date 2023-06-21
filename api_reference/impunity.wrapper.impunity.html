@@ -22,7 +22,7 @@
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
     <link rel="next" title="String Annotations" href="../string_annotation.html" />
-    <link rel="prev" title="impunity.quantityNode.quantityNode" href="impunity.quantityNode.html" /> 
+    <link rel="prev" title="impunity.quantityNode" href="impunity.quantityNode.html" /> 
 </head>
 
 <body class="wy-body-for-nav"> 
@@ -50,8 +50,8 @@
 <p class="caption" role="heading"><span class="caption-text">API</span></p>
 <ul class="current">
 <li class="toctree-l1 current"><a class="reference internal" href="../api.html">API reference</a><ul class="current">
-<li class="toctree-l2"><a class="reference internal" href="impunity.visitor.Visitor.html">impunity.visitor.visitor</a></li>
-<li class="toctree-l2"><a class="reference internal" href="impunity.quantityNode.html">impunity.quantityNode.quantityNode</a></li>
+<li class="toctree-l2"><a class="reference internal" href="impunity.visitor.Visitor.html">impunity.visitor</a></li>
+<li class="toctree-l2"><a class="reference internal" href="impunity.quantityNode.html">impunity.quantityNode</a></li>
 <li class="toctree-l2 current"><a class="current reference internal" href="#">impunity.wrapper.impunity</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="#impunity.wrapper.impunity"><code class="docutils literal notranslate"><span class="pre">impunity()</span></code></a></li>
 </ul>
@@ -104,19 +104,68 @@
 <dt class="sig sig-object py" id="impunity.wrapper.impunity">
 <span class="sig-prename descclassname"><span class="pre">&#64;</span></span><span class="sig-prename descclassname"><span class="pre">impunity.wrapper.</span></span><span class="sig-name descname"><span class="pre">impunity</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">__func</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ignore</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rewrite</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#impunity.wrapper.impunity" title="Permalink to this definition"></a></dt>
 <dd><p>Decorator function to check units based on annotations</p>
+<p>The <strong>impunity</strong> decorator provides additional parameters that allow for
+more flexibility and control over the unit coherence checking process.
+These parameters can be passed to the decorator to modify its behavior
+according to specific requirements.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Union" title="(in Python v3.11)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Union</span></code></a>[<a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.TypeVar" title="(in Python v3.11)"><code class="xref py py-class docutils literal notranslate"><span class="pre">TypeVar</span></code></a>(<code class="docutils literal notranslate"><span class="pre">F</span></code>, bound= <a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Callable" title="(in Python v3.11)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Callable</span></code></a>[<a class="reference external" href="https://docs.python.org/3/library/constants.html#Ellipsis" title="(in Python v3.11)"><code class="xref py py-data docutils literal notranslate"><span class="pre">...</span></code></a>, <a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Any" title="(in Python v3.11)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Any</span></code></a>]), <a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Callable" title="(in Python v3.11)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Callable</span></code></a>[[<a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.TypeVar" title="(in Python v3.11)"><code class="xref py py-class docutils literal notranslate"><span class="pre">TypeVar</span></code></a>(<code class="docutils literal notranslate"><span class="pre">F</span></code>, bound= <a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Callable" title="(in Python v3.11)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Callable</span></code></a>[<a class="reference external" href="https://docs.python.org/3/library/constants.html#Ellipsis" title="(in Python v3.11)"><code class="xref py py-data docutils literal notranslate"><span class="pre">...</span></code></a>, <a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Any" title="(in Python v3.11)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Any</span></code></a>])], <a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.TypeVar" title="(in Python v3.11)"><code class="xref py py-class docutils literal notranslate"><span class="pre">TypeVar</span></code></a>(<code class="docutils literal notranslate"><span class="pre">F</span></code>, bound= <a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Callable" title="(in Python v3.11)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Callable</span></code></a>[<a class="reference external" href="https://docs.python.org/3/library/constants.html#Ellipsis" title="(in Python v3.11)"><code class="xref py py-data docutils literal notranslate"><span class="pre">...</span></code></a>, <a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Any" title="(in Python v3.11)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Any</span></code></a>])]]</p>
 </dd>
 </dl>
-<dl class="simple">
-<dt>Args:</dt><dd><p>fun (function): decorated function</p>
-</dd>
-<dt>Returns:</dt><dd><p>new_fun (function): new function based on input
-function with eventually modified
-code to keep unit coherence.</p>
-</dd>
-</dl>
+<section id="args">
+<h2>Args<a class="headerlink" href="#args" title="Permalink to this heading"></a></h2>
+<ul class="simple">
+<li><p><strong>ignore</strong> : bool</p></li>
+</ul>
+<p>The <cite>ignore</cite> parameter allows you to specify names of
+functions or methods that should be ignored during unit
+coherence checking. When a decorated class contains functions
+or methods that you want to exclude from the coherence checking
+process, you can use the <cite>ignore</cite> parameter to specify those
+functions or methods.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">impunity</span> <span class="kn">import</span> <span class="n">impunity</span>
+
+<span class="nd">@impunity</span>
+<span class="k">class</span> <span class="nc">MyClass</span><span class="p">:</span>
+
+<span class="k">def</span> <span class="nf">calculate_velocity</span><span class="p">(</span><span class="n">distance</span><span class="p">:</span> <span class="s2">&quot;meters&quot;</span><span class="p">,</span> <span class="n">time</span><span class="p">:</span> <span class="s2">&quot;seconds&quot;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">&quot;m/s&quot;</span><span class="p">:</span>
+    <span class="k">return</span> <span class="n">distance</span> <span class="o">/</span> <span class="n">time</span>
+
+<span class="nd">@impunity</span><span class="p">(</span><span class="n">ignore</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="k">def</span> <span class="nf">function_to_ignore</span><span class="p">():</span>
+    <span class="c1"># This function will be ignored during unit coherence checking</span>
+    <span class="k">pass</span>
+</pre></div>
+</div>
+<p>In this example, the <cite>calculate_velocity</cite>
+function is check thanks to the <cite>&#64;impunity</cite> decorator of the class.
+On the other hand, <cite>&#64;impunity(ignore=True)</cite> ensures that the
+<cite>function_to_ignore</cite> is excluded from unit coherence checking,
+allowing you to selectively ignore specific functions or methods.</p>
+<ul class="simple">
+<li><p><strong>rewrite</strong> : Union[bool, str]</p></li>
+</ul>
+<p>The <cite>rewrite</cite> parameter enables you to specify a file path where the
+rewritten functions will be saved. When this parameter is provided,
+the modified functions, with the necessary unit conversions added,
+will be written to the specified file.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">impunity</span> <span class="kn">import</span> <span class="n">impunity</span>
+
+<span class="nd">@impunity</span><span class="p">(</span><span class="n">rewrite</span><span class="o">=</span><span class="s2">&quot;path/to/rewritten_functions.py&quot;</span><span class="p">)</span>
+<span class="k">def</span> <span class="nf">calculate_velocity</span><span class="p">(</span><span class="n">distance</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">time</span><span class="p">:</span> <span class="nb">float</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
+    <span class="k">return</span> <span class="n">distance</span> <span class="o">/</span> <span class="n">time</span>
+</pre></div>
+</div>
+<p>In this example, the <cite>calculate_velocity</cite>
+function is decorated with <cite>&#64;impunity</cite>
+and the <cite>rewrite</cite> parameter is set to <cite>“path/to/rewritten_functions.py”</cite>.
+After the coherence checking process, the modified function,
+with the necessary unit conversions added, will be saved to
+the specified file.</p>
+<p>These rewritten functions can be further utilized in your codebase,
+allowing you to work with coherent units seamlessly.</p>
+</section>
 </dd></dl>
 
 </section>
@@ -125,7 +174,7 @@ code to keep unit coherence.</p>
            </div>
           </div>
           <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
-        <a href="impunity.quantityNode.html" class="btn btn-neutral float-left" title="impunity.quantityNode.quantityNode" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="impunity.quantityNode.html" class="btn btn-neutral float-left" title="impunity.quantityNode" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
         <a href="../string_annotation.html" class="btn btn-neutral float-right" title="String Annotations" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
     </div>
 

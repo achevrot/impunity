@@ -6,11 +6,12 @@
 Impunity: A Python library to check your physical units effortlessly
 ====================================================================
 
-
 .. button-ref:: quickstart
    :ref-type: doc
-   :outline:
-   :class: sd-px-4 sd-fs-5
+   :color: primary
+   :shadow:
+
+   >>> Get Started <<<
 
 
 Easy to use

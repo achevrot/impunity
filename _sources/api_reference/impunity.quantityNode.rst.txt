@@ -1,4 +1,4 @@
-impunity.quantityNode.quantityNode
+impunity.quantityNode
 -----------------------------------
 
 .. autoclass:: impunity.quantityNode.QuantityNode
