@@ -63,17 +63,7 @@ Full documentation available at [website]()
       duration: "s" = 6000
       return speed(temperatures, duration)
 
-  # InconsistentUnitsException: "K" is not compatible with "m"
-
-  ```
-
-- Verbose outputs:
-
-  ```python
-  @impunity(verbose=True)
-  def regular_conversion():
-      pass
-  ```
+  # Warning: "K" is not compatible with "m"
 
 - Only check for consistency, do not attempt to rewrite the code:
 
@@ -86,14 +76,14 @@ Full documentation available at [website]()
   def regular_conversion():
       pass
   ```
-
+<!-- 
 - Warnings can be silenced, or treated as errors:
 
   ```python
   @impunity(warnings="ignore")  # or warnings="errors"
   def regular_conversion():
       pass
-  ```
+  ``` -->
 
 ## Compatibility with type checkers
 
