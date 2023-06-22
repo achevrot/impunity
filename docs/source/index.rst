@@ -3,7 +3,7 @@
    You can adapt this file completely to your liking, but it should at least
    contain the root `toctree` directive.
 
-Impunity: A Python library to check your physical units effortlessly
+Impunity: A Python library to check physical units statically
 ====================================================================
 
 .. button-ref:: quickstart
