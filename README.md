@@ -76,14 +76,6 @@ Full documentation available at [website]()
   def regular_conversion():
       pass
   ```
-<!-- 
-- Warnings can be silenced, or treated as errors:
-
-  ```python
-  @impunity(warnings="ignore")  # or warnings="errors"
-  def regular_conversion():
-      pass
-  ``` -->
 
 ## Compatibility with type checkers
 
@@ -98,10 +90,6 @@ altitudes: feet_array = np.arange(0, 1000, 100)
 ```
 
 **impunity** is implemented and typed with `Annotated` keywords.
-
-## impunity in a debugger
-
-TODO
 
 ## Tests
 
