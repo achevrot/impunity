@@ -851,9 +851,9 @@ class Visitor(ast.NodeTransformer):
             if isinstance(target, ast.Tuple):
                 received = (
                     [
-                        arg.__metadata__  # type: ignore
+                        arg.__metadata__[0]  # type: ignore
                         if is_annotated(arg)
-                        else arg
+                        else arg[0]
                         for arg in value.unit.__args__
                     ]
                     if hasattr(value.unit, "__args__")
