@@ -282,10 +282,26 @@ class Visitor(ast.NodeTransformer):
         if (fun := cls.impunity_func.get(name)) is not None:
             annotations = getattr(fun, "__annotations__", None)
             if annotations:
+                globals = list(cls.impunity_func.values())[-1].__globals__
+                locals = fun.__globals__
+                annotations = {
+                    k: v
+                    if not isinstance(v, str)
+                    else eval(v, globals, locals)
+                    for k, v in annotations.items()
+                }
                 return cast(Dict, annotations)
         elif callable(name):
             annotations = getattr(name, "__annotations__", None)
             if annotations:
+                globals = list(cls.impunity_func.values())[-1].__globals__
+                locals = fun.__globals__  # type: ignore
+                annotations = {
+                    k: v
+                    if not isinstance(v, str)
+                    else eval(v, globals, locals)
+                    for k, v in annotations.items()
+                }
                 return cast(Dict, annotations)
 
         return None
@@ -635,8 +651,13 @@ class Visitor(ast.NodeTransformer):
 
         if isinstance(node.func, ast.Name):
             fun_id = node.func.id
-        elif isinstance(node.func, ast.Attribute):
-            fun_id = node.func.value.id + "." + node.func.attr  # type: ignore
+        else:
+            attr = node.func
+            fun_id = ""
+            while isinstance(attr, ast.Attribute):
+                fun_id = "." + attr.attr + fun_id  # type: ignore
+                attr = attr.value
+            fun_id = attr.id + fun_id  # type: ignore
 
         if fun_id in __builtins__.keys():  # type: ignore
             node = self.generic_visit(node)  # type: ignore
