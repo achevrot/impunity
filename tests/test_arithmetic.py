@@ -33,6 +33,15 @@ class Arithmetic(unittest.TestCase):
         self.assertAlmostEqual(result, 230.55, delta=1e-2)
 
     @impunity
+    def test_power(self) -> None:
+        dist: Annotated[Any, "m"] = 1000
+        speed: Annotated[Any, "m/s"] = 350
+        time: Annotated[Any, "s"] = 120
+        result: Annotated[Any, "kts"] = (dist * speed / time) ** (1 / 2)
+
+        self.assertNotAlmostEqual(result, 54, delta=1e-2)
+
+    @impunity
     def test_convert_units(self) -> None:
         alt_m: "m" = 1000
         alt_ft: "ft" = 2000

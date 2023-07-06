@@ -534,15 +534,82 @@ class Visitor(ast.NodeTransformer):
                 )
                 return QuantityNode(ast.copy_location(new_node, node), unit)
 
-        elif isinstance(node, ast.BinOp):
+        elif isinstance(node, ast.BinOp) and isinstance(node.op, ast.Pow):
             left = self.get_node_unit(node.left)
             right = self.get_node_unit(node.right)
 
-            new_node = ast.BinOp(left.node, node.op, right.node)
-            return QuantityNode(
-                ast.copy_location(new_node, node),
-                self.get_node_unit(node.left).unit,
+            if is_annotated(left.unit):
+                left.unit = left.unit.__metadata__[0]  # type: ignore
+
+            if is_annotated(right.unit):
+                right.unit = right.unit.__metadata__[0]  # type: ignore
+
+            if right.unit is not None:
+                _log.warning(
+                    f"In function {self.fun.__module__}/{self.fun.__name__}: "
+                    + "The exponent cannot be evaluated statically or is "
+                    + "not dimensionless."
+                )
+
+                return QuantityNode(node, None)
+
+            elif isinstance(right.node, ast.Constant):
+                unit = f"({left.unit})*({right.node.value})"
+                return QuantityNode(node, unit)
+
+            elif isinstance(right.node, ast.BinOp):
+                pow_right = right.node.right
+                pow_left = right.node.left
+                if isinstance(pow_left, ast.Constant) and isinstance(
+                    pow_right, ast.Constant
+                ):
+                    if isinstance(right.node.op, ast.Mult):
+                        unit = (
+                            f"({left.unit})^({pow_left.value}"
+                            + f"*{pow_right.value})"
+                        )
+                    elif isinstance(right.node.op, ast.Div):
+                        unit = (
+                            f"({left.unit})^({pow_left.value}"
+                            + f"/{pow_right.value})"
+                        )
+                    elif isinstance(right.node.op, ast.Add):
+                        unit = (
+                            f"({left.unit})^({pow_left.value}"
+                            + f"+{pow_right.value})"
+                        )
+                    elif isinstance(right.node.op, ast.Sub):
+                        unit = (
+                            f"({left.unit})^({pow_left.value}"
+                            + f"-{pow_right.value})"
+                        )
+                    else:
+                        _log.warning(
+                            f"In function {self.fun.__module__}"
+                            + f"/{self.fun.__name__}: "
+                            + "The exponent cannot be "
+                            + f"evaluated statically or is "
+                            + "not dimensionless."
+                        )
+
+                        return QuantityNode(node, None)
+                return QuantityNode(node, unit)
+
+            else:
+                _log.warning(
+                    f"In function {self.fun.__module__}/{self.fun.__name__}: "
+                    + "The exponent cannot be evaluated statically or is "
+                    + "not dimensionless."
+                )
+
+                return QuantityNode(node, None)
+
+        elif isinstance(node, ast.BinOp):
+            _log.warning(
+                f"In function {self.fun.__module__}/{self.fun.__name__}: "
+                + "Binary Operation not supported yet."
             )
+            return QuantityNode(node, None)
 
         elif isinstance(node, ast.IfExp):
             body = self.get_node_unit(node.body)
