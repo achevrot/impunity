@@ -405,6 +405,8 @@ class Visitor(ast.NodeTransformer):
 
         if isinstance(node, ast.Constant):
             return QuantityNode(node, None)  # self.vars[node.value])
+        if isinstance(node, ast.Attribute):
+            return QuantityNode(node, self.vars[node.attr])
         if isinstance(node, ast.Subscript):
             return QuantityNode(node, self.get_node_unit(node.value).unit)
         elif isinstance(node, ast.Tuple):
@@ -544,6 +546,10 @@ class Visitor(ast.NodeTransformer):
             if is_annotated(right.unit):
                 right.unit = right.unit.__metadata__[0]  # type: ignore
 
+            if left.unit == "dimensionless":
+                new_node = ast.BinOp(left.node, node.op, right.node)
+                return QuantityNode(new_node, "dimensionless")
+
             if right.unit is not None:
                 _log.warning(
                     f"In function {self.fun.__module__}/{self.fun.__name__}: "
@@ -554,8 +560,9 @@ class Visitor(ast.NodeTransformer):
                 return QuantityNode(node, None)
 
             elif isinstance(right.node, ast.Constant):
-                unit = f"({left.unit})*({right.node.value})"
-                return QuantityNode(node, unit)
+                unit = f"({left.unit})^({right.node.value})"
+                new_node = ast.BinOp(left.node, node.op, right.node)
+                return QuantityNode(new_node, unit)
 
             elif isinstance(right.node, ast.BinOp):
                 pow_right = right.node.right
@@ -588,12 +595,13 @@ class Visitor(ast.NodeTransformer):
                             f"In function {self.fun.__module__}"
                             + f"/{self.fun.__name__}: "
                             + "The exponent cannot be "
-                            + f"evaluated statically or is "
+                            + "evaluated statically or is "
                             + "not dimensionless."
                         )
-
-                        return QuantityNode(node, None)
-                return QuantityNode(node, unit)
+                        new_node = ast.BinOp(left.node, node.op, right.node)
+                        return QuantityNode(new_node, None)
+                new_node = ast.BinOp(left.node, node.op, right.node)
+                return QuantityNode(new_node, unit)
 
             else:
                 _log.warning(
@@ -601,8 +609,8 @@ class Visitor(ast.NodeTransformer):
                     + "The exponent cannot be evaluated statically or is "
                     + "not dimensionless."
                 )
-
-                return QuantityNode(node, None)
+                new_node = ast.BinOp(left.node, node.op, right.node)
+                return QuantityNode(new_node, None)
 
         elif isinstance(node, ast.BinOp):
             _log.warning(
