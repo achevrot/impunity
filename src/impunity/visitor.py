@@ -949,7 +949,7 @@ class Visitor(ast.NodeTransformer):
                     [
                         arg.__metadata__[0]  # type: ignore
                         if is_annotated(arg)
-                        else arg[0]
+                        else arg
                         for arg in value.unit.__args__
                     ]
                     if hasattr(value.unit, "__args__")
