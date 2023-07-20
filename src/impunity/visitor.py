@@ -540,6 +540,13 @@ class Visitor(ast.NodeTransformer):
             left = self.get_node_unit(node.left)
             right = self.get_node_unit(node.right)
 
+            if left.unit is None:
+                new_node = ast.BinOp(left.node, node.op, right.node)
+                return QuantityNode(
+                    ast.copy_location(new_node, node),
+                    left.unit if left.unit is not None else None,
+                )
+
             if is_annotated(left.unit):
                 left.unit = left.unit.__metadata__[0]  # type: ignore
 
@@ -726,13 +733,14 @@ class Visitor(ast.NodeTransformer):
 
         if isinstance(node.func, ast.Name):
             fun_id = node.func.id
-        else:
+        elif isinstance(node.func, ast.Attribute):
             attr = node.func
             fun_id = ""
             while isinstance(attr, ast.Attribute):
                 fun_id = "." + attr.attr + fun_id  # type: ignore
-                attr = attr.value
-            fun_id = attr.id + fun_id  # type: ignore
+                attr = attr.value  # type: ignore
+            if isinstance(attr, ast.Name):
+                fun_id = attr.id + fun_id  # type: ignore
 
         if fun_id in __builtins__.keys():  # type: ignore
             node = self.generic_visit(node)  # type: ignore

@@ -139,11 +139,11 @@ def impunity(
                 f.write("\n")
 
         idx = f_str.find("\n") + 1
-        if f_str[0] == "@":
-            exec(f_str[idx:])
+        if f_str[0:9] == "@impunity":
+            exec(f_str[idx:], visitor.fun_globals, locals())
         else:
             # if impunity is called without the decorator synthax
-            exec(f_str)
+            exec(f_str, visitor.fun_globals, locals())
 
         new_fun = locals()[fun.__name__]
 
