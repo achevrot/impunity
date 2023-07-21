@@ -43,7 +43,8 @@ def identity_ft(h: Annotated[int, "ft"]) -> Annotated[int, "ft"]:
 class Assign(unittest.TestCase):
     @impunity
     def test_assign_same_unit(self) -> None:
-        alt_m: "m" = 1000
+        alt_m: "m"
+        alt_m = 1000
         alt_m2: "m" = alt_m
         self.assertEqual(alt_m, alt_m2)
 

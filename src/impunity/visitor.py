@@ -822,8 +822,10 @@ class Visitor(ast.NodeTransformer):
 
         value = self.get_node_unit(node.value)
 
-        if value is None:
-            pass
+        if value.node is None:
+            expected = cast(annotation_node, node.annotation)
+            expected_unit = get_annotation_unit(expected)
+            self.vars[node.target.id] = expected_unit  # type: ignore
 
         if value.node != node.value:
             new_node = ast.AnnAssign(
