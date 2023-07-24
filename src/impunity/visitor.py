@@ -387,7 +387,7 @@ class Visitor(ast.NodeTransformer):
                     )
 
         # Check units in the return node
-        node = self.generic_visit(node)  # type: ignore
+        node = cast(ast.FunctionDef, self.generic_visit(node))
         return node
 
     def get_node_unit(self, node: Optional[ast.expr]) -> QuantityNode:
@@ -709,9 +709,13 @@ class Visitor(ast.NodeTransformer):
                 )
             )
 
-            return QuantityNode(
-                ast.copy_location(new_node, node), return_signature[1]
+            return_unit = (
+                return_signature[1].__metadata__[0]  # type: ignore
+                if is_annotated(return_signature[1])
+                else return_signature[1]
             )
+
+            return QuantityNode(ast.copy_location(new_node, node), return_unit)
 
         elif isinstance(node, ast.Attribute):
             if isinstance(node.value, ast.Name):
@@ -826,6 +830,7 @@ class Visitor(ast.NodeTransformer):
             expected = cast(annotation_node, node.annotation)
             expected_unit = get_annotation_unit(expected)
             self.vars[node.target.id] = expected_unit  # type: ignore
+            return node
 
         if value.node != node.value:
             new_node = ast.AnnAssign(
@@ -867,7 +872,7 @@ class Visitor(ast.NodeTransformer):
                     cast(annotation_node, node.annotation)
                 )
                 self.vars[node.target.id] = annotation
-        # ast.fix_missing_locations(new_node)
+
         return ast.copy_location(new_node, node)
 
     def visit_BinOp(self, node: ast.BinOp) -> ast.BinOp:
@@ -973,7 +978,17 @@ class Visitor(ast.NodeTransformer):
                             self.vars[elem.id] = received[i]
 
             elif isinstance(target, ast.Name):
-                self.vars[target.id] = value.unit
+                if target.id in self.vars:
+                    expected = self.vars[target.id]
+                    new_value = self.node_convert(
+                        expected, value.unit, value.node
+                    )
+                    new_node = ast.Assign(
+                        targets=node.targets,
+                        value=new_value,
+                    )
+                else:
+                    self.vars[target.id] = value.unit
             elif isinstance(target, ast.Attribute):
                 if isinstance(target.value, ast.Name):
                     if target.value.id == "self":

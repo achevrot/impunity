@@ -1,2 +1,6 @@
 *.log
 *.pyc
+docs/build
+.coverage
+.vscode/
+dist/
