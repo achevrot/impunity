@@ -7,7 +7,7 @@ import sys
 import types
 import typing
 from math import isclose
-from typing import Any, Dict, Optional, Union, cast
+from typing import Any, ClassVar, Dict, Optional, Union, cast, overload
 
 if sys.version_info >= (3, 9):
     from _collections_abc import Callable, Sequence
@@ -23,6 +23,10 @@ if sys.version_info >= (3, 10):
     from typing import Annotated, TypeGuard
 else:
     from typing_extensions import Annotated, TypeGuard
+
+from collections import UserDict
+
+from typing_extensions import TypedDict
 
 from .quantityNode import QuantityNode, Unit
 
@@ -51,47 +55,39 @@ logging.basicConfig(
 _log = logging.getLogger(__name__)
 
 
-class VarDict(dict):
-    def __missing__(self, key):
-        _log.warning(
-            f"The variable {key} is not annotated. "
-            + "Defaulted to dimensionless"
-        )
+class VarDict(UserDict):
+    def __missing__(self, key: str) -> None:
+        msg = f"Variable {key} is not annotated. Fallback to dimensionless"
+        _log.warning(msg)
         return None
 
 
-def get_annotation_unit(
-    node: annotation_node | ast.expr,
-) -> Optional[str]:
-    """
-    Return a UoM from an AST Node. Return None if the node is not compatible.
-
-    :param node: Node with an annotation
-    :type node: ast.expr with annotation
-    :return: Optional str of the UoM
-    :rtype: Optional[str]
-    """
-
-    unit = None
-    if isinstance(node, ast.Constant):
-        unit = node.value
-    elif isinstance(node, ast.Subscript):
-        if isinstance(node.slice, ast.Index):
-            if isinstance(node.slice.value, ast.Tuple):  # type: ignore
-                unit_node = node.slice.value.elts[1]  # type: ignore
-        elif isinstance(node.slice, ast.Tuple):
-            unit_node = node.slice.elts[1]
-        if isinstance(unit_node, ast.Constant):
-            unit = unit_node.value
-
-    return unit
-
-
 def is_annotated(
-    hint: Any, annot_type=annot_type
+    hint: Any, annot_type: Any = annot_type
 ) -> TypeGuard[annot_type]:  # type: ignore
     """Determines whether the annotation is of type Annotated"""
     return (type(hint) is annot_type) and hasattr(hint, "__metadata__")
+
+
+class PrefixSuffix(TypedDict):
+    prefix: str
+    suffix: str
+
+
+def split_attribute(node: ast.Attribute) -> PrefixSuffix:
+    """Transform the AST of a.b.c in {'prefix': 'a.b', 'suffix': 'c'}."""
+
+    assert isinstance(node, ast.Attribute)
+    suffix = node.attr
+    attr = node.value
+    prefix = ""
+    while isinstance(attr, ast.Attribute):
+        prefix = "." + attr.attr + prefix  # type: ignore
+        attr = attr.value  # type: ignore
+    if isinstance(attr, ast.Name):
+        prefix = attr.id + prefix  # type: ignore
+
+    return dict(prefix=prefix, suffix=suffix)
 
 
 class Visitor(ast.NodeTransformer):
@@ -100,17 +96,20 @@ class Visitor(ast.NodeTransformer):
     to transform the code if necessary
 
     Attributes:
-        impunity_func : dict[str, Callable]
+        impunity_func : dict[tuple[str, str], Callable]
             Dictionnary of Callables to keep track of functions
             tracked by impunity
         ureg : pint.UnitRegistry
             Unit Registry from Pint to manage UoMs.
     """
 
-    impunity_func: dict[str, Callable] = {}
+    # tuple[module_name, function_name]
+    impunity_func: ClassVar[dict[tuple[str, str], Callable]] = {}
+    impunity_funcdef: ClassVar[dict[str, ast.FunctionDef]] = {}
     ureg = UnitRegistry()
+    current_module: str = ""
 
-    def __init__(self, fun) -> None:
+    def __init__(self, fun: Callable) -> None:
         """
         Constructs all the necessary attributes for the visitor using the
         attributes of the fun Callable.
@@ -124,6 +123,7 @@ class Visitor(ast.NodeTransformer):
         self.nested_flag = False
         x: Dict[str, str] = {}
         self.vars = VarDict(x)
+        Visitor.current_module = fun.__module__
 
         # For class decorators
         if isinstance(fun, type):
@@ -138,6 +138,49 @@ class Visitor(ast.NodeTransformer):
             self.class_attr: Dict[str, Unit] = {}
         else:
             self.add_func(fun)
+
+    def fun_header(self) -> str:
+        return f"In function {self.fun.__module__}.{self.fun.__name__}: "
+
+    def get_annotation_unit(
+        self,
+        node: annotation_node | ast.expr,
+    ) -> Optional[str]:
+        """
+        Return a UoM from an AST Node.
+        Return None if the node is not compatible.
+
+        :param node: Node with an annotation
+        :type node: ast.expr with annotation
+        :return: Optional str of the UoM
+        :rtype: Optional[str]
+        """
+
+        unit = None
+
+        if isinstance(node, ast.Constant):
+            unit = node.value
+
+        elif isinstance(node, ast.Attribute):
+            res = split_attribute(node)
+            module = self.fun_globals.get(res["prefix"], None)
+            if module is not None:
+                handle = getattr(module, res["suffix"], None)
+                if is_annotated(handle):
+                    unit = handle.__metadata__[0]  # type: ignore
+                if isinstance(handle, str):
+                    unit = handle
+
+        elif isinstance(node, ast.Subscript):
+            if isinstance(node.slice, ast.Index):
+                if isinstance(node.slice.value, ast.Tuple):  # type: ignore
+                    unit_node = node.slice.value.elts[1]  # type: ignore
+            elif isinstance(node.slice, ast.Tuple):
+                unit_node = node.slice.elts[1]
+            if isinstance(unit_node, ast.Constant):
+                unit = unit_node.value
+
+        return unit
 
     def visit(self, root: ast.AST) -> ast.AST:
         """
@@ -159,14 +202,39 @@ class Visitor(ast.NodeTransformer):
         return new_node
 
     @classmethod
-    def add_func(cls, fun):
+    def add_func(cls, fun: Callable | ast.FunctionDef) -> None:
         """Add function to the impunity function dictionnary"""
         if isinstance(fun, ast.FunctionDef):
-            cls.impunity_func[fun.name] = fun
+            cls.impunity_funcdef[fun.name] = fun
         else:
-            cls.impunity_func[fun.__name__] = fun
+            cls.impunity_func[fun.__module__, fun.__name__] = fun
 
-    def node_convert(self, expected_unit, received_unit, received_node):
+    @overload
+    def get_func(self, name: str, module: None) -> None | ast.FunctionDef:
+        ...
+
+    @overload
+    def get_func(self, name: str, module: str) -> None | Callable:
+        ...
+
+    def get_func(
+        self, name: str, module: None | str = None
+    ) -> None | ast.FunctionDef | Callable:
+        if module is None:
+            return self.impunity_funcdef.get(name, None)
+        result = self.impunity_func.get((module, name), None)
+        if result is None:
+            m = self.fun_globals.get(module, None)
+            if m is not None:
+                result = self.impunity_func.get((m.__name__, name), None)
+        return result
+
+    def node_convert(
+        self,
+        expected_unit: Optional[str],
+        received_unit: Optional[str],
+        received_node: ast.expr,
+    ) -> ast.expr:
         """check if the expected and the received units are coherents with
         each other by using the Pint library. Modify the received node
         accordingly and returns it.
@@ -193,24 +261,20 @@ class Visitor(ast.NodeTransformer):
             )
             and received_unit is not None
         ):
-            if pint.Unit(received_unit).is_compatible_with(
-                pint.Unit(expected_unit)
-            ):
+            received_pint_unit = pint.Unit(received_unit)  # type: ignore
+            expected_pint_unit = pint.Unit(expected_unit)  # type: ignore
+            if received_pint_unit.is_compatible_with(expected_pint_unit):
                 Q_ = self.ureg.Quantity
-                r0 = Q_(0, received_unit)
-                r1 = Q_(1, received_unit)
-                r10 = Q_(10, received_unit)
+                r0 = Q_(0, received_unit)  # type: ignore
+                r1 = Q_(1, received_unit)  # type: ignore
+                r10 = Q_(10, received_unit)  # type: ignore
 
                 e0 = r0.to(expected_unit)
                 e1 = r1.to(expected_unit)
                 e10 = r10.to(expected_unit)
 
                 if r0.m == e0.m:
-                    conv_value = (
-                        pint.Unit(expected_unit)
-                        .from_(pint.Unit(received_unit))
-                        .m
-                    )
+                    conv_value = expected_pint_unit.from_(received_pint_unit).m
 
                     if conv_value == 1:
                         new_node = received_node
@@ -223,9 +287,7 @@ class Visitor(ast.NodeTransformer):
 
                 elif (e1.m - e0.m) == 1:
                     conv_value = (
-                        pint.Unit(expected_unit)
-                        .from_(pint.Unit(received_unit))
-                        .m
+                        expected_pint_unit.from_(received_pint_unit).m
                     ) - 1
 
                     # if conv_value == 0:
@@ -252,8 +314,7 @@ class Visitor(ast.NodeTransformer):
 
             else:
                 _log.warning(
-                    f"In function {self.fun.__module__}/"
-                    + f"{self.fun.__name__}: "
+                    self.fun_header()
                     + f"Expected unit {expected_unit} "
                     + f"but received incompatible unit {received_unit}."
                 )
@@ -262,12 +323,9 @@ class Visitor(ast.NodeTransformer):
             new_node = received_node
         return new_node
 
-    @classmethod
-    def func_flush(cls):
-        return
-
-    @classmethod
-    def get_annotations(cls, name) -> Optional[Dict[str, Any]]:
+    def get_annotations(
+        self, name: str, module: None | str = None
+    ) -> Optional[Dict[str, Any]]:
         """Get annotations of a function found in the impunity_func class dict.
         Returns None if the function is not annotated.
 
@@ -279,11 +337,10 @@ class Visitor(ast.NodeTransformer):
             - Optional dict of annotations
         """
 
-        if (fun := cls.impunity_func.get(name)) is not None:
-            annotations = getattr(fun, "__annotations__", None)
-            if annotations:
-                globals = list(cls.impunity_func.values())[-1].__globals__
-                locals = fun.__globals__
+        if (fun := self.get_func(name, module)) is not None:
+            if annotations := getattr(fun, "__annotations__", None):
+                globals = list(self.impunity_func.values())[-1].__globals__
+                locals = fun.__globals__  # type: ignore
                 annotations = {
                     k: v
                     if not isinstance(v, str)
@@ -292,10 +349,9 @@ class Visitor(ast.NodeTransformer):
                 }
                 return cast(Dict, annotations)
         elif callable(name):
-            annotations = getattr(name, "__annotations__", None)
-            if annotations:
-                globals = list(cls.impunity_func.values())[-1].__globals__
-                locals = fun.__globals__  # type: ignore
+            if annotations := getattr(name, "__annotations__", None):
+                globals = list(self.impunity_func.values())[-1].__globals__
+                locals = name.__globals__  # type: ignore
                 annotations = {
                     k: v
                     if not isinstance(v, str)
@@ -306,11 +362,6 @@ class Visitor(ast.NodeTransformer):
 
         return None
 
-    @classmethod
-    def get_func(cls, name):
-        """getter function for the class dict"""
-        return cls.impunity_func.get(name)
-
     def visit_FunctionDef(self, node: ast.FunctionDef) -> ast.FunctionDef:
         """Method called by the visitor if the visited node is
         function defintion. Is usually the root node in impunity
@@ -319,8 +370,8 @@ class Visitor(ast.NodeTransformer):
             node (ast.FunctionDef): Visited Function Definition
 
         """
-        if not self.nested_flag:
-            self.func_flush()
+        # if not self.nested_flag:  # TODO
+        #     self.func_flush()
         # check for impunity decorator:
         if node.decorator_list:
             for decorator in node.decorator_list:
@@ -334,10 +385,12 @@ class Visitor(ast.NodeTransformer):
                                     kw.arg == "ignore"
                                     and kw.value.value  # type: ignore
                                 ):
-                                    self.impunity_func.pop(node.name, False)
+                                    self.impunity_func.pop(
+                                        (self.current_module, node.name), False
+                                    )
                                     return node
 
-        if (fun := self.get_func(node.name)) is not None:
+        if (fun := self.get_func(node.name, self.current_module)) is not None:
             self.nested_flag = True
             self.fun = fun
             self.fun_globals = fun.__globals__
@@ -362,26 +415,24 @@ class Visitor(ast.NodeTransformer):
         # Adding all annotations from imported modules
         for _, val in self.fun_globals.items():
             if isinstance(val, types.ModuleType):
-                annotations = getattr(val, "__annotations__", None)
-                if annotations is not None:
-                    for name, anno in annotations.items():
-                        if is_annotated(anno):
-                            x = anno.__metadata__[0]  # type: ignore
-                            self.vars[name] = x
-                        if isinstance(anno, str):
-                            self.vars[name] = anno
+                annotations = getattr(val, "__annotations__", {})
+                for name, anno in annotations.items():
+                    if is_annotated(anno):
+                        x = anno.__metadata__[0]  # type: ignore
+                        self.vars[name] = x
+                    if isinstance(anno, str):
+                        self.vars[name] = anno
 
         # from function signature
         for arg in node.args.args:
             if arg.annotation is not None:
-                anno_unit = get_annotation_unit(arg.annotation)
+                anno_unit = self.get_annotation_unit(arg.annotation)
                 if anno_unit is not None and anno_unit in self.ureg:
                     self.vars[arg.arg] = anno_unit
                 else:
                     self.vars[arg.arg] = None
                     _log.warning(
-                        f"In function {self.fun.__module__}/"
-                        + f"{self.fun.__name__}: "
+                        self.fun_header()
                         + "Signature of annotated functions must be "
                         + "of type string or typing.Annotated"
                     )
@@ -420,10 +471,8 @@ class Visitor(ast.NodeTransformer):
                 )
         elif isinstance(node, ast.List):
             _log.warning(
-                f"In function {self.fun.__module__}"
-                + f"/{self.fun.__name__}"
-                + ": List not supported by impunity. "
-                + "Please use numpy arrays."
+                self.fun_header()
+                + "lists are not supported by impunity (but numpy arrays are)"
             )
             return QuantityNode(node, "dimensionless")
 
@@ -480,9 +529,9 @@ class Visitor(ast.NodeTransformer):
 
             else:
                 _log.warning(
-                    f"In function {self.fun.__module__}/{self.fun.__name__}: "
+                    self.fun_header()
                     + f"Type {left.unit} and {right.unit} "
-                    + "are not compatible. Defaulted to dimensionless"
+                    + "are not compatible. Fallback to dimensionless"
                 )
                 return QuantityNode(node, "dimensionless")
 
@@ -559,7 +608,7 @@ class Visitor(ast.NodeTransformer):
 
             if right.unit is not None:
                 _log.warning(
-                    f"In function {self.fun.__module__}/{self.fun.__name__}: "
+                    self.fun_header()
                     + "The exponent cannot be evaluated statically or is "
                     + "not dimensionless."
                 )
@@ -599,11 +648,9 @@ class Visitor(ast.NodeTransformer):
                         )
                     else:
                         _log.warning(
-                            f"In function {self.fun.__module__}"
-                            + f"/{self.fun.__name__}: "
-                            + "The exponent cannot be "
-                            + "evaluated statically or is "
-                            + "not dimensionless."
+                            self.fun_header()
+                            + "The exponent cannot be statically evaluated or "
+                            + "is not dimensionless."
                         )
                         new_node = ast.BinOp(left.node, node.op, right.node)
                         return QuantityNode(new_node, None)
@@ -612,17 +659,16 @@ class Visitor(ast.NodeTransformer):
 
             else:
                 _log.warning(
-                    f"In function {self.fun.__module__}/{self.fun.__name__}: "
-                    + "The exponent cannot be evaluated statically or is "
-                    + "not dimensionless."
+                    self.fun_header()
+                    + "The exponent cannot be statically evaluated or "
+                    + "is not dimensionless."
                 )
                 new_node = ast.BinOp(left.node, node.op, right.node)
                 return QuantityNode(new_node, None)
 
         elif isinstance(node, ast.BinOp):
             _log.warning(
-                f"In function {self.fun.__module__}/{self.fun.__name__}: "
-                + "Binary Operation not supported yet."
+                self.fun_header() + "Binary Operation not supported yet."
             )
             return QuantityNode(node, None)
 
@@ -636,8 +682,7 @@ class Visitor(ast.NodeTransformer):
 
             if body.unit != orelse.unit:
                 _log.warning(
-                    f"In function {self.fun.__module__}/{self.fun.__name__}: "
-                    + "Ternary operator with mixed units."
+                    self.fun_header() + "Ternary operator with mixed units."
                 )
                 return QuantityNode(ast.copy_location(new_node, node), None)
             else:
@@ -648,11 +693,14 @@ class Visitor(ast.NodeTransformer):
         elif isinstance(node, ast.Call):
             node = self.generic_visit(node)  # type: ignore
             if isinstance(node.func, ast.Name):
-                id = node.func.id
+                id_ = node.func.id
+                module = None  # from module import xxx is not supported TODO
             elif isinstance(node.func, ast.Attribute):
-                id = node.func.attr
+                res = split_attribute(node.func)
+                id_ = res["suffix"]
+                module = res["prefix"]
 
-            signature = self.get_annotations(id)
+            signature = self.get_annotations(id_, module)
 
             new_args = []
             offset = 0
@@ -676,9 +724,8 @@ class Visitor(ast.NodeTransformer):
                         expected = expected.__metadata__[0]  # type: ignore
 
                     msg = (
-                        f"In function {self.fun.__module__}"
-                        + f"/{self.fun.__name__}: "
-                        + f"Function {id} expected unit "
+                        self.fun_header()
+                        + f"Function {id_} expected unit "
                         + f"{expected} but received unitless quantity"
                     )
 
@@ -738,13 +785,8 @@ class Visitor(ast.NodeTransformer):
         if isinstance(node.func, ast.Name):
             fun_id = node.func.id
         elif isinstance(node.func, ast.Attribute):
-            attr = node.func
-            fun_id = ""
-            while isinstance(attr, ast.Attribute):
-                fun_id = "." + attr.attr + fun_id  # type: ignore
-                attr = attr.value  # type: ignore
-            if isinstance(attr, ast.Name):
-                fun_id = attr.id + fun_id  # type: ignore
+            res = split_attribute(node.func)
+            fun_id = res["prefix"] + "." + res["suffix"]
 
         if fun_id in __builtins__.keys():  # type: ignore
             node = self.generic_visit(node)  # type: ignore
@@ -828,7 +870,7 @@ class Visitor(ast.NodeTransformer):
 
         if value.node is None:
             expected = cast(annotation_node, node.annotation)
-            expected_unit = get_annotation_unit(expected)
+            expected_unit = self.get_annotation_unit(expected)
             self.vars[node.target.id] = expected_unit  # type: ignore
             return node
 
@@ -848,7 +890,7 @@ class Visitor(ast.NodeTransformer):
         elif (received := value).unit != (
             expected := cast(annotation_node, node.annotation)
         ):
-            expected_unit = get_annotation_unit(expected)
+            expected_unit = self.get_annotation_unit(expected)
             if is_annotated(received.unit):
                 received.unit = received.unit.__metadata__[0]  # type: ignore
 
@@ -868,7 +910,7 @@ class Visitor(ast.NodeTransformer):
                     self.class_attr[node.target.attr] = value.unit
         else:
             if isinstance(node.target, ast.Name):
-                annotation = get_annotation_unit(
+                annotation = self.get_annotation_unit(
                     cast(annotation_node, node.annotation)
                 )
                 self.vars[node.target.id] = annotation
@@ -1005,10 +1047,12 @@ class Visitor(ast.NodeTransformer):
             node (ast.Return): input node
 
         """
+
         for frameinfo in inspect.stack():
             if frameinfo.function == "visit_FunctionDef":
                 fun = frameinfo.frame.f_locals["node"].name
                 break
+
         return_annotation = self.get_annotations(fun)
         received = self.get_node_unit(node.value)
 
@@ -1018,8 +1062,7 @@ class Visitor(ast.NodeTransformer):
 
         if return_annotation is inspect._empty or return_annotation is None:
             _log.warning(
-                f"In function {self.fun.__module__}/{self.fun.__name__}: "
-                + "Some return annotations are missing"
+                self.fun_header() + "Some return annotations are missing"
             )
             new_node = node
             return ast.copy_location(new_node, node)
@@ -1040,8 +1083,8 @@ class Visitor(ast.NodeTransformer):
                 expected = return_annotation["return"]
         else:
             _log.warning(
-                f"In function {self.fun.__module__}/{self.fun.__name__}: "
-                "Type of the return annotation not supported yet"
+                self.fun_header()
+                + "Type of the return annotation not supported yet"
             )
             new_node = node
             return ast.copy_location(new_node, node)
@@ -1054,15 +1097,13 @@ class Visitor(ast.NodeTransformer):
                 new_node = node
             else:
                 _log.warning(
-                    f"In function {self.fun.__module__}/{self.fun.__name__}: "
-                    "Expected more than one return value"
+                    self.fun_header() + "Expected more than one return value"
                 )
                 new_node = node
         else:
             if isinstance(received.unit, list):
                 _log.warning(
-                    f"In function {self.fun.__module__}/{self.fun.__name__}: "
-                    "Expected more than one return value"
+                    self.fun_header() + "Expected more than one return value"
                 )
                 new_node = node
             else:
