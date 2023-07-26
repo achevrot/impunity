@@ -43,22 +43,14 @@ annotation_node = Union[ast.Subscript, ast.Name, ast.Constant]
 annot_type = type(Annotated[int, "spam"])
 
 
-logging.basicConfig(
-    level=logging.WARNING,
-    format="%(asctime)s [%(levelname)s] %(message)s",
-    handlers=[
-        # Creates a file "todays_date.py" with warnings
-        logging.StreamHandler(sys.stdout),
-    ],
-)
-
 _log = logging.getLogger(__name__)
 
 
 class VarDict(UserDict):
     def __missing__(self, key: str) -> None:
-        msg = f"Variable {key} is not annotated. Fallback to dimensionless"
-        _log.warning(msg)
+        # TODO
+        # msg = f"Variable {key} is not annotated. Fallback to dimensionless"
+        # _log.warning(msg)
         return None
 
 
@@ -139,8 +131,12 @@ class Visitor(ast.NodeTransformer):
         else:
             self.add_func(fun)
 
-    def fun_header(self) -> str:
-        return f"In function {self.fun.__module__}.{self.fun.__name__}: "
+    def fun_header(self, node: ast.AST) -> str:
+        lineno = getattr(node, "lineno", 0)
+        # coloffset = getattr(node, "coloffset", 0)
+        firstlineno = getattr(self.fun.__code__, "co_firstlineno", 0)
+        filename = getattr(self.fun.__code__, "co_filename")
+        return f"{filename}::{self.fun.__name__}:{firstlineno + lineno - 1} "
 
     def get_annotation_unit(
         self,
@@ -314,7 +310,7 @@ class Visitor(ast.NodeTransformer):
 
             else:
                 _log.warning(
-                    self.fun_header()
+                    self.fun_header(received_node)
                     + f"Expected unit {expected_unit} "
                     + f"but received incompatible unit {received_unit}."
                 )
@@ -431,11 +427,13 @@ class Visitor(ast.NodeTransformer):
                     self.vars[arg.arg] = anno_unit
                 else:
                     self.vars[arg.arg] = None
-                    _log.warning(
-                        self.fun_header()
-                        + "Signature of annotated functions must be "
-                        + "of type string or typing.Annotated"
-                    )
+                    # Removing this warning: not all parameters have to be
+                    # physical quantities
+                    # _log.warning(
+                    #     self.fun_header(node)
+                    #     + "Signature of annotated functions must be "
+                    #     + "of type string or typing.Annotated"
+                    # )
 
         # Check units in the return node
         node = cast(ast.FunctionDef, self.generic_visit(node))
@@ -471,7 +469,7 @@ class Visitor(ast.NodeTransformer):
                 )
         elif isinstance(node, ast.List):
             _log.warning(
-                self.fun_header()
+                self.fun_header(node)
                 + "lists are not supported by impunity (but numpy arrays are)"
             )
             return QuantityNode(node, "dimensionless")
@@ -529,7 +527,7 @@ class Visitor(ast.NodeTransformer):
 
             else:
                 _log.warning(
-                    self.fun_header()
+                    self.fun_header(node)
                     + f"Type {left.unit} and {right.unit} "
                     + "are not compatible. Fallback to dimensionless"
                 )
@@ -608,7 +606,7 @@ class Visitor(ast.NodeTransformer):
 
             if right.unit is not None:
                 _log.warning(
-                    self.fun_header()
+                    self.fun_header(node)
                     + "The exponent cannot be evaluated statically or is "
                     + "not dimensionless."
                 )
@@ -648,7 +646,7 @@ class Visitor(ast.NodeTransformer):
                         )
                     else:
                         _log.warning(
-                            self.fun_header()
+                            self.fun_header(node)
                             + "The exponent cannot be statically evaluated or "
                             + "is not dimensionless."
                         )
@@ -659,7 +657,7 @@ class Visitor(ast.NodeTransformer):
 
             else:
                 _log.warning(
-                    self.fun_header()
+                    self.fun_header(node)
                     + "The exponent cannot be statically evaluated or "
                     + "is not dimensionless."
                 )
@@ -668,7 +666,7 @@ class Visitor(ast.NodeTransformer):
 
         elif isinstance(node, ast.BinOp):
             _log.warning(
-                self.fun_header() + "Binary Operation not supported yet."
+                self.fun_header(node) + "Binary Operation not supported yet."
             )
             return QuantityNode(node, None)
 
@@ -682,7 +680,8 @@ class Visitor(ast.NodeTransformer):
 
             if body.unit != orelse.unit:
                 _log.warning(
-                    self.fun_header() + "Ternary operator with mixed units."
+                    self.fun_header(node)
+                    + "Ternary operator with mixed units."
                 )
                 return QuantityNode(ast.copy_location(new_node, node), None)
             else:
@@ -724,7 +723,7 @@ class Visitor(ast.NodeTransformer):
                         expected = expected.__metadata__[0]  # type: ignore
 
                     msg = (
-                        self.fun_header()
+                        self.fun_header(node)
                         + f"Function {id_} expected unit "
                         + f"{expected} but received unitless quantity"
                     )
@@ -1053,7 +1052,7 @@ class Visitor(ast.NodeTransformer):
                 fun = frameinfo.frame.f_locals["node"].name
                 break
 
-        return_annotation = self.get_annotations(fun)
+        return_annotation = self.get_annotations(fun, self.current_module)
         received = self.get_node_unit(node.value)
 
         if received.node != node.value:
@@ -1062,7 +1061,7 @@ class Visitor(ast.NodeTransformer):
 
         if return_annotation is inspect._empty or return_annotation is None:
             _log.warning(
-                self.fun_header() + "Some return annotations are missing"
+                self.fun_header(node) + "Some return annotations are missing"
             )
             new_node = node
             return ast.copy_location(new_node, node)
@@ -1079,13 +1078,15 @@ class Visitor(ast.NodeTransformer):
                     ]
                 else:
                     expected = ret.__metadata__[0]  # type: ignore
-            else:  # string annotations
-                expected = return_annotation["return"]
+            elif not isinstance(expected := return_annotation["return"], str):
+                # if string annotations, keep going, otherwise stop
+                new_node = node
+                return ast.copy_location(new_node, node)
         else:
-            _log.warning(
-                self.fun_header()
-                + "Type of the return annotation not supported yet"
-            )
+            # _log.warning(
+            #     self.fun_header(node)
+            #     + "Type of the return annotation not supported yet"
+            # )
             new_node = node
             return ast.copy_location(new_node, node)
 
@@ -1097,13 +1098,15 @@ class Visitor(ast.NodeTransformer):
                 new_node = node
             else:
                 _log.warning(
-                    self.fun_header() + "Expected more than one return value"
+                    self.fun_header(node)
+                    + "Expected more than one return value"
                 )
                 new_node = node
         else:
             if isinstance(received.unit, list):
                 _log.warning(
-                    self.fun_header() + "Expected more than one return value"
+                    self.fun_header(node)
+                    + "Expected more than one return value"
                 )
                 new_node = node
             else:
