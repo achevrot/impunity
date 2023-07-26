@@ -54,8 +54,8 @@
 <li class="toctree-l3"><a class="reference internal" href="#impunity.visitor.Visitor"><code class="docutils literal notranslate"><span class="pre">Visitor</span></code></a><ul>
 <li class="toctree-l4"><a class="reference internal" href="#impunity.visitor.Visitor.add_func"><code class="docutils literal notranslate"><span class="pre">Visitor.add_func()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#impunity.visitor.Visitor.generic_visit"><code class="docutils literal notranslate"><span class="pre">Visitor.generic_visit()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#impunity.visitor.Visitor.get_annotation_unit"><code class="docutils literal notranslate"><span class="pre">Visitor.get_annotation_unit()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#impunity.visitor.Visitor.get_annotations"><code class="docutils literal notranslate"><span class="pre">Visitor.get_annotations()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#impunity.visitor.Visitor.get_func"><code class="docutils literal notranslate"><span class="pre">Visitor.get_func()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#impunity.visitor.Visitor.get_node_unit"><code class="docutils literal notranslate"><span class="pre">Visitor.get_node_unit()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#impunity.visitor.Visitor.node_convert"><code class="docutils literal notranslate"><span class="pre">Visitor.node_convert()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#impunity.visitor.Visitor.visit"><code class="docutils literal notranslate"><span class="pre">Visitor.visit()</span></code></a></li>
@@ -126,7 +126,7 @@
 to transform the code if necessary</p>
 <dl class="simple">
 <dt>Attributes:</dt><dd><dl class="simple">
-<dt>impunity_func<span class="classifier">dict[str, Callable]</span></dt><dd><p>Dictionnary of Callables to keep track of functions
+<dt>impunity_func<span class="classifier">dict[tuple[str, str], Callable]</span></dt><dd><p>Dictionnary of Callables to keep track of functions
 tracked by impunity</p>
 </dd>
 <dt>ureg<span class="classifier">pint.UnitRegistry</span></dt><dd><p>Unit Registry from Pint to manage UoMs.</p>
@@ -138,6 +138,11 @@ tracked by impunity</p>
 <dt class="sig sig-object py" id="impunity.visitor.Visitor.add_func">
 <em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">add_func</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">fun</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#impunity.visitor.Visitor.add_func" title="Permalink to this definition"></a></dt>
 <dd><p>Add function to the impunity function dictionnary</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.11)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></a></p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py method">
@@ -147,8 +152,26 @@ tracked by impunity</p>
 </dd></dl>
 
 <dl class="py method">
+<dt class="sig sig-object py" id="impunity.visitor.Visitor.get_annotation_unit">
+<span class="sig-name descname"><span class="pre">get_annotation_unit</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">node</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#impunity.visitor.Visitor.get_annotation_unit" title="Permalink to this definition"></a></dt>
+<dd><p>Return a UoM from an AST Node.
+Return None if the node is not compatible.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>node</strong> (<em>ast.expr with annotation</em>) – Node with an annotation</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Optional str of the UoM</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Optional[<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.11)">str</a>]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
 <dt class="sig sig-object py" id="impunity.visitor.Visitor.get_annotations">
-<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">get_annotations</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#impunity.visitor.Visitor.get_annotations" title="Permalink to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">get_annotations</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">module</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#impunity.visitor.Visitor.get_annotations" title="Permalink to this definition"></a></dt>
 <dd><p>Get annotations of a function found in the impunity_func class dict.
 Returns None if the function is not annotated.</p>
 <dl class="field-list simple">
@@ -170,12 +193,6 @@ Returns None if the function is not annotated.</p>
 </ul>
 </dd>
 </dl>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="impunity.visitor.Visitor.get_func">
-<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">get_func</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#impunity.visitor.Visitor.get_func" title="Permalink to this definition"></a></dt>
-<dd><p>getter function for the class dict</p>
 </dd></dl>
 
 <dl class="py method">
@@ -202,6 +219,11 @@ calls on children if any.</p>
 <dd><p>check if the expected and the received units are coherents with
 each other by using the Pint library. Modify the received node
 accordingly and returns it.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">expr</span></code></p>
+</dd>
+</dl>
 <dl>
 <dt>Parameters:</dt><dd><ul class="simple">
 <li><dl class="simple">
