@@ -221,8 +221,21 @@ class Visitor(ast.NodeTransformer):
     def get_func(
         self, name: str, module: None | str = None
     ) -> None | ast.FunctionDef | Callable:
+        result: None | ast.FunctionDef | Callable = None
+
         if module is None:
-            return self.impunity_funcdef.get(name, None)
+            # Check if nested function
+            result = self.impunity_funcdef.get(name, None)
+            if result is None:
+                # If not nested, check if in globals
+                fun = self.fun_globals.get(name, None)
+                if fun is not None:
+                    # if in globals, check if impunified
+                    result = self.impunity_func.get(
+                        (fun.__module__, name), None
+                    )
+            return result
+
         result = self.impunity_func.get((module, name), None)
         if result is None:
             m = self.fun_globals.get(module, None)
@@ -698,7 +711,7 @@ class Visitor(ast.NodeTransformer):
             node = self.generic_visit(node)  # type: ignore
             if isinstance(node.func, ast.Name):
                 id_ = node.func.id
-                module = None  # from module import xxx is not supported TODO
+                module = None
             elif isinstance(node.func, ast.Attribute):
                 res = split_attribute(node.func)
                 id_ = res["suffix"]

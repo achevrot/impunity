@@ -90,7 +90,7 @@ class Functions(unittest.TestCase):
         temp = temperature(alt_m)
         self.assertAlmostEqual(temp, 281.65, delta=1e-1)
 
-    @impunity(rewrite="basecm.log")
+    @impunity
     def test_base_cm(self) -> None:
         alt_m: "m" = 1000
         temp = temperature(alt_m)
