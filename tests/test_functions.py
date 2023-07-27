@@ -1,20 +1,14 @@
-import sys
+from __future__ import annotations
+
 import unittest
 from typing import Any
 
 from impunity import impunity
+from typing_extensions import Annotated
 
 import numpy as np
 
 from .test_module import test_speed, test_speed_altitude
-
-if sys.version_info >= (3, 9):
-    from typing import Annotated
-
-else:
-    from typing import Tuple as tuple
-
-    from typing_extensions import Annotated
 
 m = Annotated[Any, "m"]
 K = Annotated[Any, "K"]
@@ -96,7 +90,7 @@ class Functions(unittest.TestCase):
         temp = temperature(alt_m)
         self.assertAlmostEqual(temp, 281.65, delta=1e-1)
 
-    @impunity
+    @impunity(rewrite="basecm.log")
     def test_base_cm(self) -> None:
         alt_m: "m" = 1000
         temp = temperature(alt_m)
@@ -183,12 +177,8 @@ class Functions(unittest.TestCase):
 
         with self.assertLogs("impunity.visitor", level="WARNING") as cm:
             impunity(test_empty_return)
-        self.assertEqual(
-            cm.output,
-            [
-                f"WARNING:impunity.visitor:In function {__name__}"
-                + "/test_empty_return: Some return annotations are missing"
-            ],
+        self.assertTrue(
+            cm.output[0].endswith("Some return annotations are missing")
         )
 
     def test_return_convert(self) -> None:

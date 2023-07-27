@@ -1,13 +1,8 @@
-import sys
 import unittest
 from typing import Any
 
 from impunity import impunity
-
-if sys.version_info >= (3, 9):
-    from typing import Annotated
-else:
-    from typing_extensions import Annotated
+from typing_extensions import Annotated
 
 m = Annotated[Any, "m"]
 K = Annotated[Any, "K"]

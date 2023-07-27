@@ -1,15 +1,10 @@
-import sys
 import unittest
 from typing import Any
 
 from impunity import impunity
+from typing_extensions import Annotated
 
 import numpy as np
-
-if sys.version_info >= (3, 9):
-    from typing import Annotated
-else:
-    from typing_extensions import Annotated
 
 m = Annotated[Any, "m"]
 K = Annotated[Any, "K"]
@@ -99,14 +94,7 @@ class Arithmetic(unittest.TestCase):
         with self.assertLogs("impunity.visitor", level="WARNING") as cm:
             impunity(test_operation_list)
 
-        self.assertEqual(
-            cm.output,
-            [
-                f"WARNING:impunity.visitor:In function {__name__}"
-                + "/test_operation_list: List not supported by impunity. "
-                + "Please use numpy arrays."
-            ],
-        )
+        self.assertTrue(cm.output[0].endswith("(but numpy arrays are)"))
 
     @impunity
     def test_operation_array(self) -> None:
@@ -135,14 +123,7 @@ class Arithmetic(unittest.TestCase):
         with self.assertLogs("impunity.visitor", level="WARNING") as cm:
             impunity(test_addition_wrong)
 
-        self.assertEqual(
-            cm.output,
-            [
-                f"WARNING:impunity.visitor:In function {__name__}"
-                + "/test_addition_wrong: Type m and K are not compatible. "
-                + "Defaulted to dimensionless"
-            ],
-        )
+        self.assertTrue(cm.output[0].endswith("Fallback to dimensionless"))
 
     @impunity
     def test_ternary_ok(self) -> None:
@@ -161,12 +142,8 @@ class Arithmetic(unittest.TestCase):
         with self.assertLogs("impunity.visitor", level="WARNING") as cm:
             impunity(test_ternary_ko)
 
-        self.assertEqual(
-            cm.output,
-            [
-                f"WARNING:impunity.visitor:In function {__name__}"
-                + "/test_ternary_ko: Ternary operator with mixed units."
-            ],
+        self.assertTrue(
+            cm.output[0].endswith("Ternary operator with mixed units.")
         )
 
 

@@ -124,7 +124,12 @@ class Visitor(ast.NodeTransformer):
                 for func in dir(fun)
                 if callable(getattr(fun, func)) and not func.startswith("__")
             ]
-            self.add_func(fun.__init__)  # type: ignore
+            if (
+                init := fun.__init__  # type: ignore
+            ).__class__.__name__ != "wrapper_descriptor":
+                # meaning: does the class have a __init__
+                # (otherwise, it's an empty slot)
+                self.add_func(init)
             for function in method_list:
                 self.add_func(function)
             self.class_attr: Dict[str, Unit] = {}
