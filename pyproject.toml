@@ -6,6 +6,7 @@ authors = [
   "Antoine Chevrot <antoine.chevrot@gmail.com>",
   "Xavier Olive <git@xoolive.org>"
 ]
+readme = "README.md"
 license = "MIT"
 include = [
   "license.txt"
