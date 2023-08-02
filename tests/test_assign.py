@@ -106,6 +106,13 @@ class Assign(unittest.TestCase):
         #     ],
         # )
 
+    @impunity
+    def test_annassign(self) -> None:
+        a: Annotated[float, "degC"] = 0
+        b: Annotated[float, "degF"]
+        b = a
+        self.assertAlmostEqual(b, 32)
+
 
 if __name__ == "__main__":
     unittest.main()

@@ -111,7 +111,7 @@ def impunity(
     allowing you to work with coherent units seamlessly.
     """
 
-    def deco_f(fun: Callable[..., Any]):
+    def deco_f(fun: F) -> F:
         if ignore:
             return fun
 

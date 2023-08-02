@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "impunity"
-version = "1.0.2"
+version = "1.0.3"
 description = "Static checking for consistency of physical units"
 authors = [
   "Antoine Chevrot <antoine.chevrot@gmail.com>",
@@ -71,3 +71,18 @@ known-first-party = ["numpy", "pandas"]
 
 [tool.coverage.run]
 source = ["src"]
+
+[tool.mypy]
+python_version = 3.8
+platform = "posix"
+
+color_output = true
+pretty = true
+show_column_numbers = true
+strict = true
+check_untyped_defs = true
+ignore_missing_imports = true
+warn_no_return = true
+warn_redundant_casts = true
+warn_unused_configs = true
+warn_unused_ignores = true

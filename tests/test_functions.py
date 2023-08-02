@@ -1,14 +1,14 @@
 from __future__ import annotations
 
 import unittest
-from typing import Any
+from typing import Any, Tuple
 
 from impunity import impunity
 from typing_extensions import Annotated
 
 import numpy as np
 
-from .test_module import test_speed, test_speed_altitude
+from .sample_module import speed_altitude_to_test, speed_to_test
 
 m = Annotated[Any, "m"]
 K = Annotated[Any, "K"]
@@ -31,8 +31,10 @@ STRATOSPHERE_TEMP: Annotated[float, "K"] = 216.65
 @impunity
 def atmosphere(
     h: Annotated[Any, "m"]
-) -> tuple[
-    Annotated[Any, "Pa"], Annotated[Any, "kg * m^-3"], Annotated[Any, "K"]
+) -> Tuple[
+    Annotated[Any, "Pa"],
+    Annotated[Any, "kg * m^-3"],
+    Annotated[Any, "K"],
 ]:
     """Pressure of ISA atmosphere
 
@@ -55,7 +57,7 @@ def temperature(altitude_m: "m") -> "K":
 
 
 @impunity
-def temperature_2(altitude_m: "m", altitude_ft: "ft") -> tuple["K", "K"]:
+def temperature_2(altitude_m: "m", altitude_ft: "ft") -> Tuple["K", "K"]:
     temp_m: "K" = np.maximum(288.15 - 0.0065 * altitude_m, 216.65)
     temp_ft: "K" = np.maximum(288.15 - 0.0065 * altitude_ft * 0.3048, 216.65)
     return temp_m, temp_ft
@@ -175,7 +177,7 @@ class Functions(unittest.TestCase):
         def test_empty_return(self):  # type: ignore
             return 0
 
-        with self.assertLogs("impunity.visitor", level="WARNING") as cm:
+        with self.assertLogs("impunity.visitor", level="INFO") as cm:
             impunity(test_empty_return)
         self.assertTrue(
             cm.output[0].endswith("Some return annotations are missing")
@@ -192,16 +194,16 @@ class Functions(unittest.TestCase):
 
     def test_module(self) -> None:
         @impunity
-        def test_module() -> Annotated[Any, "ft"]:
+        def test_module() -> Annotated[Any, "m/s"]:
             distance: "ft" = 1000
             duration: "s" = 1000
-            return test_speed(distance, duration)
+            return speed_to_test(distance, duration)
 
         self.assertAlmostEqual(test_module(), 0.305, delta=1e-2)
 
     @impunity
     def test_builtin(self) -> None:
-        print(test_speed(1, 10))
+        print(speed_to_test(1, 10))
 
     @impunity
     def test_keyword(self) -> None:
@@ -209,9 +211,9 @@ class Functions(unittest.TestCase):
         t: "s" = 1000
         a: "ft" = 1000
 
-        res = test_speed_altitude(d, t, a)
+        res = speed_altitude_to_test(d, t, a)
         self.assertAlmostEqual(res, 417.17, delta=1e-2)
-        res2 = test_speed_altitude(d, t)
+        res2 = speed_altitude_to_test(d, t)
         self.assertAlmostEqual(res2, 1, delta=1e-2)
 
 
