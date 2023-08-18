@@ -22,7 +22,7 @@ import pint
 from pint import UnitRegistry
 from typing_extensions import Annotated, Protocol, TypedDict, TypeGuard
 
-from .quantityNode import QuantityNode
+from .quantityNode import QuantityNode, Unit
 
 # annotation_node = Union[ast.Subscript, ast.Name, ast.Constant]
 
@@ -105,7 +105,7 @@ class Visitor(ast.NodeTransformer):
         self.ignore_warnings = ignore_warnings
         self.nested_flag = False
         self.fun = fun
-        self.fun_globals = {}
+        self.fun_globals = {}  # type: ignore
         x: Dict[str, str] = {}
         self.vars = VarDict(x)
         Visitor.current_module = fun.__module__
@@ -375,6 +375,7 @@ class Visitor(ast.NodeTransformer):
             for function in method_list:
                 self.add_func(function)
 
+        self.class_attr: Dict[str, Unit] = {}
         node = cast(ast.ClassDef, self.generic_visit(node))
         return node
 
@@ -408,6 +409,8 @@ class Visitor(ast.NodeTransformer):
         # if nested method or class method
         if (fun := self.get_func(node.name, self.current_module)) is not None:
             self.fun_globals = fun.__globals__
+            if getattr(self, "class_attr", False):
+                self.vars.update(self.class_attr)
         else:
             self.add_func(self.fun)
             self.fun_globals = self.fun.__globals__
