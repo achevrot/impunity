@@ -126,7 +126,10 @@ class Visitor(ast.NodeTransformer):
         # coloffset = getattr(node, "coloffset", 0)
         firstlineno = getattr(self.fun.__code__, "co_firstlineno", 0)
         filename = getattr(self.fun.__code__, "co_filename")
-        return f"{filename}::{self.fun.__name__}:{firstlineno + lineno - 1} "
+        return (
+            f"{filename}:{firstlineno + lineno - 1} "
+            f"(in {self.fun.__name__}) "
+        )
 
     def get_annotation_unit(self, node: ast.expr) -> Optional[str]:
         """
@@ -593,8 +596,7 @@ class Visitor(ast.NodeTransformer):
             if left.unit is None:
                 new_node = ast.BinOp(left.node, node.op, right.node)
                 return QuantityNode(
-                    ast.copy_location(new_node, node),
-                    left.unit if left.unit is not None else None,
+                    ast.copy_location(new_node, node), left.unit
                 )
 
             if is_annotated(left.unit):
@@ -666,6 +668,24 @@ class Visitor(ast.NodeTransformer):
                 )
                 new_node = ast.BinOp(left.node, node.op, right.node)
                 return QuantityNode(new_node, None)
+
+        elif isinstance(node, ast.BinOp) and isinstance(node.op, ast.Mod):
+            left = self.get_node_unit(node.left)
+            right = self.get_node_unit(node.right)
+
+            if is_annotated(left.unit):
+                left.unit = left.unit.__metadata__[0]
+
+            if is_annotated(right.unit):
+                right.unit = right.unit.__metadata__[0]
+
+            if not (right.unit is None or right.unit == "dimensionless"):
+                _log.warning(
+                    self.fun_header(node) + "The modulo must be dimensionless"
+                )
+
+            new_node = ast.BinOp(left.node, node.op, right.node)
+            return QuantityNode(new_node, left.unit)
 
         elif isinstance(node, ast.BinOp):
             _log.warning(
@@ -917,18 +937,6 @@ class Visitor(ast.NodeTransformer):
                 self.vars[node.target.id] = annotation
 
         return ast.copy_location(new_node, node)
-
-    def visit_BinOp(self, node: ast.BinOp) -> ast.BinOp:
-        """Method called by the visitor if the visited node is an
-        Binary Operation node.
-        Checks the units in the node and returns it eventually modified.
-
-        Args:
-            node (ast.BinOp): input node
-
-        """
-
-        return self.get_node_unit(node).node  # type: ignore
 
     def visit_For(self, node: ast.For) -> ast.For:
         """Method called by the visitor if the visited node is a for loop node.
