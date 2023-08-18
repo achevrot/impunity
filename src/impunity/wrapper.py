@@ -35,6 +35,7 @@ def impunity(
     *,
     ignore: bool = False,
     rewrite: Union[bool, str] = True,
+    ignore_warnings: Union[bool, str] = False,
 ) -> Callable[[F], F]:
     ...
 
