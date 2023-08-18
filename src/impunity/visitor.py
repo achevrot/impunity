@@ -22,7 +22,7 @@ import pint
 from pint import UnitRegistry
 from typing_extensions import Annotated, Protocol, TypedDict, TypeGuard
 
-from .quantityNode import QuantityNode, Unit
+from .quantityNode import QuantityNode
 
 # annotation_node = Union[ast.Subscript, ast.Name, ast.Constant]
 
@@ -487,7 +487,8 @@ class Visitor(ast.NodeTransformer):
             if not self.ignore_warnings:
                 _log.warning(
                     self.fun_header(node)
-                    + "lists are not supported by impunity (but numpy arrays are)"
+                    + "lists are not supported by impunity "
+                    + "(but numpy arrays are)"
                 )
             return QuantityNode(node, "dimensionless")
 
@@ -668,7 +669,8 @@ class Visitor(ast.NodeTransformer):
                         if not self.ignore_warnings:
                             _log.warning(
                                 self.fun_header(node)
-                                + "The exponent cannot be statically evaluated or "
+                                + "The exponent cannot be "
+                                + "statically evaluated or "
                                 + "is not dimensionless."
                             )
                         new_node = ast.BinOp(left.node, node.op, right.node)
