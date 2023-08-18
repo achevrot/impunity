@@ -44,6 +44,7 @@ def impunity(
     *,
     ignore: bool = False,
     rewrite: Union[bool, str] = True,
+    ignore_warnings: Union[bool, str] = False,
 ) -> Union[F, Callable[[F], F]]:
     """Decorator function to check units based on annotations
 
@@ -118,7 +119,7 @@ def impunity(
         # dedent for nested methods
         fun_tree = ast.parse(textwrap.dedent(inspect.getsource(fun)))
 
-        visitor = Visitor(fun)
+        visitor = Visitor(fun, ignore_warnings)
         if "forward" in fun.__name__:
             pass
         fun_tree = visitor.visit(fun_tree)  # type: ignore

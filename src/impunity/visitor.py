@@ -86,7 +86,9 @@ class Visitor(ast.NodeTransformer):
     ureg = UnitRegistry()
     current_module: str = ""
 
-    def __init__(self, fun: Callable[..., Any]) -> None:
+    def __init__(
+        self, fun: Callable[..., Any], ignore_warnings: Union[bool, str]
+    ) -> None:
         """
         Constructs all the necessary attributes for the visitor using the
         attributes of the fun Callable.
@@ -96,7 +98,7 @@ class Visitor(ast.NodeTransformer):
             fun : Callable[..., Any]
                 Callable checked by impunity
         """
-
+        self.ignore_warnings = ignore_warnings
         self.nested_flag = False
         x: Dict[str, str] = {}
         self.vars = VarDict(x)
@@ -312,11 +314,12 @@ class Visitor(ast.NodeTransformer):
                     new_node = received_node  # log
 
             else:
-                _log.warning(
-                    self.fun_header(received_node)
-                    + f"Expected unit {expected_unit} "
-                    + f"but received incompatible unit {received_unit}."
-                )
+                if not self.ignore_warnings:
+                    _log.warning(
+                        self.fun_header(received_node)
+                        + f"Expected unit {expected_unit} "
+                        + f"but received incompatible unit {received_unit}."
+                    )
                 new_node = received_node
         else:
             new_node = received_node
@@ -472,10 +475,11 @@ class Visitor(ast.NodeTransformer):
                     [elem.unit for elem in elems],  # type: ignore
                 )
         elif isinstance(node, ast.List):
-            _log.warning(
-                self.fun_header(node)
-                + "lists are not supported by impunity (but numpy arrays are)"
-            )
+            if not self.ignore_warnings:
+                _log.warning(
+                    self.fun_header(node)
+                    + "lists are not supported by impunity (but numpy arrays are)"
+                )
             return QuantityNode(node, "dimensionless")
 
         elif isinstance(node, ast.Set):
@@ -532,11 +536,12 @@ class Visitor(ast.NodeTransformer):
                 )
 
             else:
-                _log.warning(
-                    self.fun_header(node)
-                    + f"Type {left.unit} and {right.unit} "
-                    + "are not compatible. Fallback to dimensionless"
-                )
+                if not self.ignore_warnings:
+                    _log.warning(
+                        self.fun_header(node)
+                        + f"Type {left.unit} and {right.unit} "
+                        + "are not compatible. Fallback to dimensionless"
+                    )
                 return QuantityNode(node, "dimensionless")
 
         elif isinstance(node, ast.BinOp) and isinstance(
@@ -610,11 +615,12 @@ class Visitor(ast.NodeTransformer):
                 return QuantityNode(new_node, "dimensionless")
 
             if right.unit is not None:
-                _log.warning(
-                    self.fun_header(node)
-                    + "The exponent cannot be evaluated statically or is "
-                    + "not dimensionless."
-                )
+                if not self.ignore_warnings:
+                    _log.warning(
+                        self.fun_header(node)
+                        + "The exponent cannot be evaluated statically or is "
+                        + "not dimensionless."
+                    )
 
                 return QuantityNode(node, None)
 
@@ -650,22 +656,24 @@ class Visitor(ast.NodeTransformer):
                             + f"-{pow_right.value})"
                         )
                     else:
-                        _log.warning(
-                            self.fun_header(node)
-                            + "The exponent cannot be statically evaluated or "
-                            + "is not dimensionless."
-                        )
+                        if not self.ignore_warnings:
+                            _log.warning(
+                                self.fun_header(node)
+                                + "The exponent cannot be statically evaluated or "
+                                + "is not dimensionless."
+                            )
                         new_node = ast.BinOp(left.node, node.op, right.node)
                         return QuantityNode(new_node, None)
                 new_node = ast.BinOp(left.node, node.op, right.node)
                 return QuantityNode(new_node, unit)
 
             else:
-                _log.warning(
-                    self.fun_header(node)
-                    + "The exponent cannot be statically evaluated or "
-                    + "is not dimensionless."
-                )
+                if not self.ignore_warnings:
+                    _log.warning(
+                        self.fun_header(node)
+                        + "The exponent cannot be statically evaluated or "
+                        + "is not dimensionless."
+                    )
                 new_node = ast.BinOp(left.node, node.op, right.node)
                 return QuantityNode(new_node, None)
 
@@ -680,17 +688,21 @@ class Visitor(ast.NodeTransformer):
                 right.unit = right.unit.__metadata__[0]
 
             if not (right.unit is None or right.unit == "dimensionless"):
-                _log.warning(
-                    self.fun_header(node) + "The modulo must be dimensionless"
-                )
+                if not self.ignore_warnings:
+                    _log.warning(
+                        self.fun_header(node)
+                        + "The modulo must be dimensionless"
+                    )
 
             new_node = ast.BinOp(left.node, node.op, right.node)
             return QuantityNode(new_node, left.unit)
 
         elif isinstance(node, ast.BinOp):
-            _log.warning(
-                self.fun_header(node) + "Binary Operation not supported yet."
-            )
+            if not self.ignore_warnings:
+                _log.warning(
+                    self.fun_header(node)
+                    + "Binary Operation not supported yet."
+                )
             return QuantityNode(node, None)
 
         elif isinstance(node, ast.IfExp):
@@ -702,10 +714,11 @@ class Visitor(ast.NodeTransformer):
             )
 
             if body.unit != orelse.unit:
-                _log.warning(
-                    self.fun_header(node)
-                    + "Ternary operator with mixed units."
-                )
+                if not self.ignore_warnings:
+                    _log.warning(
+                        self.fun_header(node)
+                        + "Ternary operator with mixed units."
+                    )
                 return QuantityNode(ast.copy_location(new_node, node), None)
             else:
                 return QuantityNode(
@@ -753,7 +766,8 @@ class Visitor(ast.NodeTransformer):
 
                     if (received := self.get_node_unit(arg)).unit is None:
                         if expected is not inspect._empty:
-                            _log.warning(msg)
+                            if not self.ignore_warnings:
+                                _log.warning(msg)
                         new_args.append(arg)
                         continue
 
@@ -1071,10 +1085,11 @@ class Visitor(ast.NodeTransformer):
         if isinstance(return_annotation, dict):
             ret = return_annotation.get("return", None)
             if ret is None:
-                _log.info(
-                    self.fun_header(node)
-                    + "Some return annotations are missing"
-                )
+                if not self.ignore_warnings:
+                    _log.info(
+                        self.fun_header(node)
+                        + "Some return annotations are missing"
+                    )
                 new_node = node
                 return ast.copy_location(new_node, node)
 
@@ -1091,9 +1106,11 @@ class Visitor(ast.NodeTransformer):
                 new_node = node
                 return ast.copy_location(new_node, node)
         else:  # is None
-            _log.info(
-                self.fun_header(node) + "Some return annotations are missing"
-            )
+            if not self.ignore_warnings:
+                _log.info(
+                    self.fun_header(node)
+                    + "Some return annotations are missing"
+                )
             new_node = node
             return ast.copy_location(new_node, node)
 
@@ -1104,17 +1121,19 @@ class Visitor(ast.NodeTransformer):
             if isinstance(received.unit, list):
                 new_node = node
             else:
-                _log.warning(
-                    self.fun_header(node)
-                    + "Expected more than one return value"
-                )
+                if not self.ignore_warnings:
+                    _log.warning(
+                        self.fun_header(node)
+                        + "Expected more than one return value"
+                    )
                 new_node = node
         else:
             if isinstance(received.unit, list):
-                _log.warning(
-                    self.fun_header(node)
-                    + "Expected more than one return value"
-                )
+                if not self.ignore_warnings:
+                    _log.warning(
+                        self.fun_header(node)
+                        + "Expected more than one return value"
+                    )
                 new_node = node
             else:
                 assert received.node is not None
