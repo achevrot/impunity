@@ -87,7 +87,10 @@ class Visitor(ast.NodeTransformer):
     current_module: str = ""
 
     def __init__(
-        self, fun: Callable[..., Any], ignore_warnings: Union[bool, str]
+        self,
+        fun: Callable[..., Any],
+        ignore_warnings: Union[bool, str],
+        ignore_methods: Union[bool, str],
     ) -> None:
         """
         Constructs all the necessary attributes for the visitor using the
@@ -98,30 +101,14 @@ class Visitor(ast.NodeTransformer):
             fun : Callable[..., Any]
                 Callable checked by impunity
         """
+        self.ignore_methods = ignore_methods
         self.ignore_warnings = ignore_warnings
         self.nested_flag = False
+        self.fun = fun
+        self.fun_globals = {}
         x: Dict[str, str] = {}
         self.vars = VarDict(x)
         Visitor.current_module = fun.__module__
-
-        # For class decorators
-        if isinstance(fun, type):
-            method_list = [
-                getattr(fun, func)
-                for func in dir(fun)
-                if callable(getattr(fun, func)) and not func.startswith("__")
-            ]
-            if (
-                init := fun.__init__  # type: ignore
-            ).__class__.__name__ != "wrapper_descriptor":
-                # meaning: does the class have a __init__
-                # (otherwise, it's an empty slot)
-                self.add_func(init)
-            for function in method_list:
-                self.add_func(function)
-            self.class_attr: Dict[str, Unit] = {}
-        else:
-            self.add_func(fun)
 
     def fun_header(self, node: ast.AST) -> str:
         lineno = getattr(node, "lineno", 0)
@@ -364,6 +351,33 @@ class Visitor(ast.NodeTransformer):
 
         return None
 
+    def visit_ClassDef(self, node: ast.ClassDef) -> ast.ClassDef:
+        """Method called by the visitor if the visited node is
+        a class defintion. Is can be the root node in impunity
+
+        Args:
+            node (ast.ClassDef): Visited Class Definition
+
+        """
+        if not self.ignore_methods:
+            method_list = [
+                getattr(self.fun, func)
+                for func in dir(self.fun)
+                if callable(getattr(self.fun, func))
+                and not func.startswith("__")
+            ]
+            if (
+                init := self.fun.__init__  # type: ignore
+            ).__class__.__name__ != "wrapper_descriptor":
+                # meaning: does the class have a __init__
+                # (otherwise, it's an empty slot)
+                self.add_func(init)
+            for function in method_list:
+                self.add_func(function)
+
+        node = cast(ast.ClassDef, self.generic_visit(node))
+        return node
+
     def visit_FunctionDef(self, node: ast.FunctionDef) -> ast.FunctionDef:
         """Method called by the visitor if the visited node is
         function defintion. Is usually the root node in impunity
@@ -372,8 +386,7 @@ class Visitor(ast.NodeTransformer):
             node (ast.FunctionDef): Visited Function Definition
 
         """
-        # if not self.nested_flag:  # TODO
-        #     self.func_flush()
+
         # check for impunity decorator:
         if node.decorator_list:
             for decorator in node.decorator_list:
@@ -392,16 +405,12 @@ class Visitor(ast.NodeTransformer):
                                     )
                                     return node
 
+        # if nested method or class method
         if (fun := self.get_func(node.name, self.current_module)) is not None:
-            self.nested_flag = True
-            self.fun = fun
             self.fun_globals = fun.__globals__
-            if getattr(self, "class_attr", False):
-                self.vars.update(self.class_attr)
-        elif self.nested_flag:
-            self.add_func(node)
         else:
-            return node
+            self.add_func(self.fun)
+            self.fun_globals = self.fun.__globals__
 
         # Adding all annotations from own module
         annotations = getattr(
