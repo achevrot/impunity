@@ -13,8 +13,22 @@ kts = Annotated[Any, "kts"]
 dimensionless = Annotated[Any, "dimensionless"]
 
 
-@impunity
+@impunity(rewrite="log.txt")
 class WrappedClass:
+    class_alt: m = 1000
+
+    def f(self, h: Annotated[Any, "m"]) -> Annotated[Any, "ft"]:
+        alt_ft: Annotated[Any, "ft"] = h
+        return alt_ft
+
+    def double(self, h: Annotated[Any, "m"]) -> Annotated[Any, "m"]:
+        x: Annotated[Any, "ft"] = h
+
+        return x + x
+
+
+@impunity(ignore_methods=True)
+class WrappedIgnoreClass:
     class_alt: Annotated[Any, "m"] = 1000
 
     def f(self, h: Annotated[Any, "m"]) -> Annotated[Any, "ft"]:
@@ -65,8 +79,18 @@ class Wrapper(unittest.TestCase):
         res = test_unknown_annotation(1000, 1000)
         self.assertAlmostEqual(res, 609.60, delta=1e-2)
 
+    def test_class_method_ignore(self) -> None:
+        c = WrappedIgnoreClass()
+        self.assertAlmostEqual(c.f(c.class_alt), 1000, delta=1e-2)
+
+    def test_check_nested_scope(self) -> None:
+        c = WrappedClass()
+        self.assertAlmostEqual(c.double(c.class_alt), 2000, delta=1e-2)
+
         # TODO : Adding check for the warning
 
 
 if __name__ == "__main__":
     unittest.main()
+
+# %%

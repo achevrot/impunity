@@ -4,6 +4,7 @@ import ast
 import inspect
 import logging
 import sys
+import textwrap
 import types
 import typing
 from math import isclose
@@ -19,6 +20,7 @@ from typing import (
 )
 
 import pint
+import astor
 from pint import UnitRegistry
 from typing_extensions import Annotated, Protocol, TypedDict, TypeGuard
 
@@ -105,10 +107,11 @@ class Visitor(ast.NodeTransformer):
         self.ignore_warnings = ignore_warnings
         self.nested_flag = False
         self.fun = fun
-        self.fun_globals = {}  # type: ignore
+        self.fun_globals = sys.modules[self.fun.__module__].__dict__
         x: Dict[str, str] = {}
         self.vars = VarDict(x)
         Visitor.current_module = fun.__module__
+        self.module_loading()
 
     def fun_header(self, node: ast.AST) -> str:
         lineno = getattr(node, "lineno", 0)
@@ -197,25 +200,29 @@ class Visitor(ast.NodeTransformer):
     ) -> None | ast.FunctionDef | Callable[..., Any]:
         result: None | ast.FunctionDef | Callable[..., Any] = None
 
-        if module is None:
-            # Check if nested function
-            result = self.impunity_funcdef.get(name, None)
+        if module is not None:
+            result = self.impunity_func.get((module, name), None)
             if result is None:
-                # If not nested, check if in globals
-                fun = self.fun_globals.get(name, None)
-                if fun is not None:
-                    # if in globals, check if impunified
-                    result = self.impunity_func.get(
-                        (fun.__module__, name), None
-                    )
+                m = self.fun_globals.get(module, None)
+                if m is not None:
+                    result = self.impunity_func.get((m.__name__, name), None)
             return result
-
-        result = self.impunity_func.get((module, name), None)
+        result = self.impunity_funcdef.get(name, None)
         if result is None:
-            m = self.fun_globals.get(module, None)
-            if m is not None:
-                result = self.impunity_func.get((m.__name__, name), None)
+            # If not nested, check if in globals
+            fun = self.fun_globals.get(name, None)
+            if fun is not None:
+                # if in globals, check if impunified
+                result = self.impunity_func.get((fun.__module__, name), None)
+
         return result
+
+        # result = self.impunity_func.get((module, name), None)
+        # if result is None:
+        #     m = self.fun_globals.get(module, None)
+        #     if m is not None:
+        #         result = self.impunity_func.get((m.__name__, name), None)
+        # return result
 
     def node_convert(
         self,
@@ -312,6 +319,29 @@ class Visitor(ast.NodeTransformer):
             new_node = received_node
         return new_node
 
+    def module_loading(self) -> None:
+        # Adding all annotations from own module
+        annotations = getattr(
+            sys.modules[self.fun.__module__], "__annotations__", None
+        )
+        if annotations is not None:
+            for name, anno in annotations.items():
+                if is_annotated(anno):
+                    self.vars[name] = anno.__metadata__[0]
+                if isinstance(anno, str):
+                    self.vars[name] = anno
+
+        # Adding all annotations from imported modules
+        for _, val in self.fun_globals.items():
+            if isinstance(val, types.ModuleType):
+                annotations = getattr(val, "__annotations__", {})
+                for name, anno in annotations.items():
+                    if is_annotated(anno):
+                        x = anno.__metadata__[0]
+                        self.vars[name] = x
+                    if isinstance(anno, str):
+                        self.vars[name] = anno
+
     def get_annotations(
         self, name: str, module: None | str = None
     ) -> Optional[Dict[str, Any]]:
@@ -337,6 +367,11 @@ class Visitor(ast.NodeTransformer):
                     for k, v in annotations.items()
                 }
                 return cast(Dict[str, Any], annotations)
+            # from nested function
+            elif isinstance(fun, ast.FunctionDef):
+                pass
+                # TODO
+
         elif callable(name):
             if annotations := getattr(name, "__annotations__", None):
                 globals = list(self.impunity_func.values())[-1].__globals__
@@ -388,6 +423,9 @@ class Visitor(ast.NodeTransformer):
 
         """
 
+        if self.ignore_methods:
+            return node
+
         # check for impunity decorator:
         if node.decorator_list:
             for decorator in node.decorator_list:
@@ -406,36 +444,19 @@ class Visitor(ast.NodeTransformer):
                                     )
                                     return node
 
-        # if nested method or class method
-        if (fun := self.get_func(node.name, self.current_module)) is not None:
-            self.fun_globals = fun.__globals__
-            if getattr(self, "class_attr", False):
-                self.vars.update(self.class_attr)
+        var_buffer = self.vars
+
+        # is a function from a class
+        if hasattr(self, "class_attr"):
+            self.vars.update(self.class_attr)
+            if not self.nested_flag:
+                fun = getattr(self.fun, node.name)
+                self.fun = fun
+            else:
+                self.add_func(node)
+
         else:
             self.add_func(self.fun)
-            self.fun_globals = self.fun.__globals__
-
-        # Adding all annotations from own module
-        annotations = getattr(
-            sys.modules[self.fun.__module__], "__annotations__", None
-        )
-        if annotations is not None:
-            for name, anno in annotations.items():
-                if is_annotated(anno):
-                    self.vars[name] = anno.__metadata__[0]
-                if isinstance(anno, str):
-                    self.vars[name] = anno
-
-        # Adding all annotations from imported modules
-        for _, val in self.fun_globals.items():
-            if isinstance(val, types.ModuleType):
-                annotations = getattr(val, "__annotations__", {})
-                for name, anno in annotations.items():
-                    if is_annotated(anno):
-                        x = anno.__metadata__[0]
-                        self.vars[name] = x
-                    if isinstance(anno, str):
-                        self.vars[name] = anno
 
         # from function signature
         for arg in node.args.args:
@@ -454,7 +475,9 @@ class Visitor(ast.NodeTransformer):
                     # )
 
         # Check units in the return node
+        self.nested_flag = True
         node = cast(ast.FunctionDef, self.generic_visit(node))
+        self.vars = var_buffer
         return node
 
     def get_node_unit(self, node: Optional[ast.expr]) -> QuantityNode:
@@ -1115,10 +1138,17 @@ class Visitor(ast.NodeTransformer):
                 #    ]
                 # else:
                 expected = ret.__metadata__[0]
+
+            # nested functions
+            elif isinstance(ret, ast.Subscript):
+                if isinstance(ret.slice.elts[-1], ast.Constant):
+                    expected = ret.slice.elts[-1].value
+
             elif not isinstance(expected := ret, str):
                 # if string annotations, keep going, otherwise stop
                 new_node = node
                 return ast.copy_location(new_node, node)
+
         else:  # is None
             if not self.ignore_warnings:
                 _log.info(
