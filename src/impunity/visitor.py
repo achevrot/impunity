@@ -4,7 +4,6 @@ import ast
 import inspect
 import logging
 import sys
-import textwrap
 import types
 import typing
 from math import isclose
@@ -20,7 +19,6 @@ from typing import (
 )
 
 import pint
-import astor
 from pint import UnitRegistry
 from typing_extensions import Annotated, Protocol, TypedDict, TypeGuard
 
@@ -1141,8 +1139,9 @@ class Visitor(ast.NodeTransformer):
 
             # nested functions
             elif isinstance(ret, ast.Subscript):
-                if isinstance(ret.slice.elts[-1], ast.Constant):
-                    expected = ret.slice.elts[-1].value
+                last_elt = ret.slice.elts[-1]  # type: ignore
+                if isinstance(last_elt, ast.Constant):
+                    expected = last_elt.value
 
             elif not isinstance(expected := ret, str):
                 # if string annotations, keep going, otherwise stop
