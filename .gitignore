@@ -1,4 +1,4 @@
-*.log
+*log*
 *.pyc
 docs/build
 .coverage
