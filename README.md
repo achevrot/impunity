@@ -1,4 +1,4 @@
-<img src="./impunity.svg" style="max-width: 500px; padding-bottom: 2ex"/>
+<img src="./impunity.svg" style="width: 500px; padding-bottom: 2ex"></img>
 
 ![tests](https://github.com/achevrot/impunity/actions/workflows/run-tests.yml/badge.svg)
 ![Code Coverage](https://img.shields.io/codecov/c/github/achevrot/impunity.svg)
