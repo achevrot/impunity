@@ -13,7 +13,6 @@ include = [
   "license.txt"
 ]
 
-
 [tool.poetry.dependencies]
 python = ">=3.9,<4.0"
 Pint = ">=0.19.2"

@@ -251,20 +251,22 @@ class Visitor(ast.NodeTransformer):
             )
             and received_unit is not None
         ):
-            received_pint_unit = pint.Unit(received_unit)  # type: ignore
+            received_pint_unit = pint.Unit(received_unit)
             expected_pint_unit = pint.Unit(expected_unit)  # type: ignore
             if received_pint_unit.is_compatible_with(expected_pint_unit):
                 Q_ = self.ureg.Quantity
-                r0 = Q_(0, received_unit)  # type: ignore
-                r1 = Q_(1, received_unit)  # type: ignore
-                r10 = Q_(10, received_unit)  # type: ignore
+                r0 = Q_(0, received_unit)
+                r1 = Q_(1, received_unit)
+                r10 = Q_(10, received_unit)
 
                 e0 = r0.to(expected_unit)
                 e1 = r1.to(expected_unit)
                 e10 = r10.to(expected_unit)
 
                 if r0.m == e0.m:
-                    conv_value = expected_pint_unit.from_(received_pint_unit).m
+                    conv_value = expected_pint_unit.from_(  # type: ignore
+                        received_pint_unit
+                    ).m
 
                     if conv_value == 1:
                         new_node = received_node
@@ -277,7 +279,9 @@ class Visitor(ast.NodeTransformer):
 
                 elif (e1.m - e0.m) == 1:
                     conv_value = (
-                        expected_pint_unit.from_(received_pint_unit).m
+                        expected_pint_unit.from_(  # type: ignore
+                            received_pint_unit
+                        ).m
                     ) - 1
 
                     # if conv_value == 0:
@@ -542,12 +546,10 @@ class Visitor(ast.NodeTransformer):
                     left.unit if left.unit is not None else right.unit,
                 )
 
-            if pint.Unit(left.unit).is_compatible_with(  # type: ignore
-                pint.Unit(right.unit)  # type: ignore
-            ):
+            if pint.Unit(left.unit).is_compatible_with(pint.Unit(right.unit)):
                 conv_value = (
                     pint.Unit(left.unit)  # type: ignore
-                    .from_(pint.Unit(right.unit))  # type: ignore
+                    .from_(pint.Unit(right.unit))
                     .m
                 )
                 new_node = ast.BinOp(
@@ -587,12 +589,10 @@ class Visitor(ast.NodeTransformer):
             if is_annotated(right.unit):
                 right.unit = right.unit.__metadata__[0]
 
-            if pint.Unit(left.unit).is_compatible_with(  # type: ignore
-                pint.Unit(right.unit)  # type: ignore
-            ):
+            if pint.Unit(left.unit).is_compatible_with(pint.Unit(right.unit)):
                 conv_value = (
                     pint.Unit(left.unit)  # type: ignore
-                    .from_(pint.Unit(right.unit))  # type: ignore
+                    .from_(pint.Unit(right.unit))
                     .m
                 )
                 new_node = ast.BinOp(
