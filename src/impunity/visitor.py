@@ -68,7 +68,6 @@ def split_attribute(node: ast.Attribute) -> PrefixSuffix:
 
 
 class Visitor(ast.NodeTransformer):
-
     """Impunity AST visitor class checking for Annotations
     to transform the code if necessary
 
@@ -186,12 +185,10 @@ class Visitor(ast.NodeTransformer):
             cls.impunity_func[fun.__module__, fun.__name__] = fun
 
     @overload
-    def get_func(self, name: str, module: None) -> None | ast.FunctionDef:
-        ...
+    def get_func(self, name: str, module: None) -> None | ast.FunctionDef: ...
 
     @overload
-    def get_func(self, name: str, module: str) -> None | Callable[..., Any]:
-        ...
+    def get_func(self, name: str, module: str) -> None | Callable[..., Any]: ...
 
     def get_func(
         self, name: str, module: None | str = None
@@ -359,9 +356,7 @@ class Visitor(ast.NodeTransformer):
                 globals = list(self.impunity_func.values())[-1].__globals__
                 locals = fun.__globals__  # type: ignore
                 annotations = {
-                    k: v
-                    if not isinstance(v, str)
-                    else eval(v, globals, locals)
+                    k: v if not isinstance(v, str) else eval(v, globals, locals)
                     for k, v in annotations.items()
                 }
                 return cast(Dict[str, Any], annotations)
@@ -375,9 +370,7 @@ class Visitor(ast.NodeTransformer):
                 globals = list(self.impunity_func.values())[-1].__globals__
                 locals = name.__globals__  # type: ignore
                 annotations = {
-                    k: v
-                    if not isinstance(v, str)
-                    else eval(v, globals, locals)
+                    k: v if not isinstance(v, str) else eval(v, globals, locals)
                     for k, v in annotations.items()
                 }
                 return cast(Dict[str, Any], annotations)
@@ -434,8 +427,7 @@ class Visitor(ast.NodeTransformer):
                         for kw in decorator.keywords:
                             if hasattr(kw, "value"):
                                 if (
-                                    kw.arg == "ignore"
-                                    and kw.value.value  # type: ignore
+                                    kw.arg == "ignore" and kw.value.value  # type: ignore
                                 ):
                                     self.impunity_func.pop(
                                         (self.current_module, node.name), False
@@ -561,9 +553,7 @@ class Visitor(ast.NodeTransformer):
                 new_node = ast.BinOp(
                     left.node,
                     node.op,
-                    ast.BinOp(
-                        right.node, ast.Mult(), ast.Constant(conv_value)
-                    ),
+                    ast.BinOp(right.node, ast.Mult(), ast.Constant(conv_value)),
                 )
                 return QuantityNode(
                     ast.copy_location(new_node, node), left.unit
@@ -608,9 +598,7 @@ class Visitor(ast.NodeTransformer):
                 new_node = ast.BinOp(
                     left.node,
                     node.op,
-                    ast.BinOp(
-                        right.node, ast.Mult(), ast.Constant(conv_value)
-                    ),
+                    ast.BinOp(right.node, ast.Mult(), ast.Constant(conv_value)),
                 )
                 unit = (
                     f"{left.unit}*{left.unit}"
@@ -966,9 +954,7 @@ class Visitor(ast.NodeTransformer):
                 value.unit = value.unit.__metadata__[0]
 
             assert value.node is not None
-            new_value = self.node_convert(
-                expected_unit, value.unit, value.node
-            )
+            new_value = self.node_convert(expected_unit, value.unit, value.node)
             new_node = ast.AnnAssign(
                 target=node.target,
                 annotation=node.annotation,
@@ -1016,9 +1002,7 @@ class Visitor(ast.NodeTransformer):
         self.generic_visit(node)
         return node
 
-    def visit_comprehension(
-        self, node: ast.comprehension
-    ) -> ast.comprehension:
+    def visit_comprehension(self, node: ast.comprehension) -> ast.comprehension:
         """Method called by the visitor if the visited node is a
         Comprehension node.
         Checks the units in the node and returns it eventually modified.

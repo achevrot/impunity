@@ -8,7 +8,6 @@ N = TypeVar("N", bound=ast.expr, covariant=True)
 
 
 class QuantityNode:
-
     """Node object with a unit attribute.
 
     Attributes:

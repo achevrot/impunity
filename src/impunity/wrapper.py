@@ -25,8 +25,7 @@ F = TypeVar("F", bound=Callable[..., Any])  # fonctionne sur un appel direct
 
 
 @overload
-def impunity(__func: F) -> F:
-    ...
+def impunity(__func: F) -> F: ...
 
 
 @overload
@@ -37,8 +36,7 @@ def impunity(
     rewrite: Union[bool, str] = True,
     ignore_warnings: Union[bool, str] = False,
     ignore_methods: Union[bool, str] = False,
-) -> Callable[[F], F]:
-    ...
+) -> Callable[[F], F]: ...
 
 
 def impunity(
