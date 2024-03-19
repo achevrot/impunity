@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html class="writer-html5" lang="en">
+<html class="writer-html5" lang="en" data-content_root="./">
 <head>
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
@@ -16,9 +16,9 @@
   
         <script src="_static/jquery.js?v=5d32c60e"></script>
         <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-        <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js?v=e031e9a9"></script>
+        <script src="_static/documentation_options.js?v=2709fde1"></script>
         <script src="_static/doctools.js?v=888ff710"></script>
-        <script src="_static/sphinx_highlight.js?v=4825356b"></script>
+        <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
         <script src="_static/design-tabs.js?v=36754332"></script>
     <script src="_static/js/theme.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
@@ -90,7 +90,7 @@
            <div itemprop="articleBody">
              
   <section id="unit-guideline">
-<h1>Unit Guideline<a class="headerlink" href="#unit-guideline" title="Permalink to this heading"></a></h1>
+<h1>Unit Guideline<a class="headerlink" href="#unit-guideline" title="Link to this heading"></a></h1>
 <p><strong>Impunity</strong> supports various annotation styles for denoting physical units in code.
 This section provides an overview of the supported styles along with syntax examples
 and guidelines for their usage.</p>
@@ -105,20 +105,20 @@ the Pint library to provide unit coherence and conversions. As a consequence,
 <strong>only units supported by the Pint library can be used with Impunity</strong>.
 Follow these guidelines to select suitable units for your code:</p>
 <section id="consistency">
-<h2>Consistency<a class="headerlink" href="#consistency" title="Permalink to this heading"></a></h2>
+<h2>Consistency<a class="headerlink" href="#consistency" title="Link to this heading"></a></h2>
 <p>Maintain consistency throughout your codebase by using the same units for similar quantities.
 This consistency enhances code readability and reduces the chances of introducing errors.
 For example, if you’re working with lengths, consistently use meters or kilometers
 instead of mixing different units like feet or inches.</p>
 </section>
 <section id="base-units">
-<h2>Base Units<a class="headerlink" href="#base-units" title="Permalink to this heading"></a></h2>
+<h2>Base Units<a class="headerlink" href="#base-units" title="Link to this heading"></a></h2>
 <p>Prefer using base units whenever possible. Base units are fundamental units of measurement
 that are defined independently of other units. Examples of base units include meters for length,
 seconds for time, and kilograms for mass. Using base units simplifies calculations and conversions.</p>
 </section>
 <section id="unit-conversions">
-<h2>Unit Conversions<a class="headerlink" href="#unit-conversions" title="Permalink to this heading"></a></h2>
+<h2>Unit Conversions<a class="headerlink" href="#unit-conversions" title="Link to this heading"></a></h2>
 <p>Whenever needed, <strong>Impunity</strong> will use the power of the Pint library to perform unit conversions effortlessly.
 Pint provides a comprehensive set of predefined units and allows you to define
 custom units as well. This ensures consistency and accuracy when working
@@ -126,21 +126,21 @@ with physical quantities.</p>
 <p><strong>FUTURE WORK : Define the user-defined set of unit to use in Impunity</strong></p>
 </section>
 <section id="physical-context">
-<h2>Physical Context<a class="headerlink" href="#physical-context" title="Permalink to this heading"></a></h2>
+<h2>Physical Context<a class="headerlink" href="#physical-context" title="Link to this heading"></a></h2>
 <p>Consider the physical context in which your code operates.
 Choose units that are relevant and meaningful to the problem domain.
 For example, when working with astronomical distances, using astronomical units (AU)
 or light-years might be more appropriate than meters or kilometers.</p>
 </section>
 <section id="readability">
-<h2>Readability<a class="headerlink" href="#readability" title="Permalink to this heading"></a></h2>
+<h2>Readability<a class="headerlink" href="#readability" title="Link to this heading"></a></h2>
 <p>Opt for units that improve code readability and comprehension.
 Choose units that are widely recognized and commonly used in the field.
 Additionally, consider using unit symbols or abbreviations that are easily
 understood by domain experts.</p>
 </section>
 <section id="documentation">
-<h2>Documentation<a class="headerlink" href="#documentation" title="Permalink to this heading"></a></h2>
+<h2>Documentation<a class="headerlink" href="#documentation" title="Link to this heading"></a></h2>
 <p>Document the units used in your code to provide clarity and avoid confusion.
 Clearly specify the units for variables, function parameters, and return types
 in your code documentation. This helps other developers understand the expected
