@@ -2,9 +2,8 @@ import sys
 import unittest
 from typing import Any
 
-from impunity import impunity
-
 import numpy as np
+from impunity import impunity
 
 if sys.version_info >= (3, 9):
     from typing import Annotated

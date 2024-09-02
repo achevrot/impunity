@@ -1,8 +1,9 @@
 import unittest
 from typing import Any
 
-from impunity import impunity
 from typing_extensions import Annotated
+
+from impunity import impunity
 
 m = Annotated[Any, "m"]
 K = Annotated[Any, "K"]

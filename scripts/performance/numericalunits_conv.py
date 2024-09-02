@@ -1,5 +1,7 @@
-from numericalunits import hour, m, s
 from typing import Annotated, Any
+
+from numericalunits import hour, m, s
+
 import numpy as np
 
 a: Annotated[Any, "meters"] = np.random.rand(100000) * m
@@ -15,8 +17,8 @@ def g(
 
 
 if __name__ == "__main__":
-    import timeit
     import time
+    import timeit
 
     print(
         np.mean(

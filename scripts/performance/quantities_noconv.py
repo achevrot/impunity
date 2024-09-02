@@ -1,5 +1,7 @@
-import quantities as pq
 from typing import Annotated, Any
+
+import quantities as pq
+
 import numpy as np
 
 a: Annotated[Any, "meters"] = np.random.rand(100000) * pq.m
@@ -15,8 +17,8 @@ def g(
 
 
 if __name__ == "__main__":
-    import timeit
     import time
+    import timeit
 
     print(
         np.mean(

@@ -4,20 +4,17 @@ version = "1.0.4"
 description = "Static checking for consistency of physical units"
 authors = [
   "Antoine Chevrot <antoine.chevrot@gmail.com>",
-  "Xavier Olive <git@xoolive.org>"
+  "Xavier Olive <git@xoolive.org>",
 ]
 readme = "README.md"
 license = "MIT"
-include = [
-  "impunity.svg",
-  "license.txt"
-]
+include = ["impunity.svg", "license.txt"]
 
 [tool.poetry.dependencies]
 python = ">=3.9,<4.0"
 Pint = ">=0.19.2"
 astor = ">=0.8.1"
-typing-extensions = { version=">=4.2.0,<5.0.0", python="<3.10" }
+typing-extensions = { version = ">=4.2.0,<5.0.0", python = "<3.10" }
 
 [tool.poetry.group.dev.dependencies]
 mypy = ">=0.981"
@@ -44,13 +41,14 @@ target-version = "py39"
 
 [tool.ruff.lint]
 select = [
-  "E", "W",  # pycodestyle
-  "F",  # pyflakes
-  "I",  # isort
-  "NPY",  # numpy
+  "E",
+  "W",   # pycodestyle
+  "F",   # pyflakes
+  "I",   # isort
+  "NPY", # numpy
   # "PD",  # pandas
   "DTZ", # flake8-datetimez
-  "RUF"
+  "RUF",
 ]
 
 [tool.ruff.lint.isort]
@@ -73,3 +71,5 @@ warn_no_return = true
 warn_redundant_casts = true
 warn_unused_configs = true
 warn_unused_ignores = true
+
+exclude = ["scripts/*"]

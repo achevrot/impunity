@@ -2,8 +2,9 @@
 
 
 from typing import Annotated, Any
-from impunity import impunity
+
 import numpy as np
+from impunity import impunity
 
 a: Annotated[Any, "meters"] = np.random.rand(100000)
 b: Annotated[Any, "seconds"] = np.random.rand(100000)
@@ -17,8 +18,8 @@ def g(
 
 
 if __name__ == "__main__":
-    import timeit
     import time
+    import timeit
 
     print(
         np.mean(

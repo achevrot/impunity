@@ -25,7 +25,7 @@ extensions = [
     "sphinx.ext.githubpages",
     "sphinx.ext.intersphinx",
     "sphinx_autodoc_typehints",
-]  # type: ignore
+]
 
 templates_path = ["_templates"]
 exclude_patterns = []  # type: ignore

@@ -2,8 +2,10 @@
 
 
 from typing import Annotated, Any
-import numpy as np
+
 import pint
+
+import numpy as np
 
 ureg = pint.UnitRegistry()
 Q_ = ureg.Quantity
@@ -20,8 +22,8 @@ def g(
 
 
 if __name__ == "__main__":
-    import timeit
     import time
+    import timeit
 
     print(
         np.mean(

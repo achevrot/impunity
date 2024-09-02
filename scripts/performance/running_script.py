@@ -1,7 +1,6 @@
 # %%
 
 import subprocess
-import glob
 from pathlib import Path
 
 time_dict_conv = {}

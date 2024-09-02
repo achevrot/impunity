@@ -3,10 +3,10 @@ from __future__ import annotations
 import unittest
 from typing import Any, Tuple
 
-from impunity import impunity
 from typing_extensions import Annotated
 
 import numpy as np
+from impunity import impunity
 
 from .sample_module import speed_altitude_to_test, speed_to_test
 

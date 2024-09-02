@@ -500,7 +500,10 @@ class Visitor(ast.NodeTransformer):
             else:
                 # TODO Sequence[Unit] should we clean?
                 return QuantityNode(
-                    ast.Tuple([elem.node for elem in elems], ctx=node.ctx),
+                    ast.Tuple(
+                        [elem.node for elem in elems],  # type: ignore
+                        ctx=node.ctx,
+                    ),
                     [elem.unit for elem in elems],  # type: ignore
                 )
         elif isinstance(node, ast.List):
@@ -516,7 +519,7 @@ class Visitor(ast.NodeTransformer):
             # TODO Sequence[Unit] should we clean?
             elems = list(map(self.get_node_unit, node.elts))
             return QuantityNode(
-                ast.Set([elem.node for elem in elems]),
+                ast.Set([elem.node for elem in elems]),  # type: ignore
                 [elem.unit for elem in elems],  # type: ignore
             )
 
@@ -527,7 +530,7 @@ class Visitor(ast.NodeTransformer):
                 # TODO Sequence[Unit] should we clean?
                 elems = list(map(self.get_node_unit, node.values))
                 return QuantityNode(
-                    ast.Dict(zip(node.keys, [elem.node for elem in elems])),
+                    ast.Dict(zip(node.keys, [elem.node for elem in elems])),  # type: ignore
                     [elem.unit for elem in elems],  # type: ignore
                 )
         elif isinstance(node, ast.Name):
@@ -540,7 +543,7 @@ class Visitor(ast.NodeTransformer):
             right = self.get_node_unit(node.right)
 
             if left.unit is None or right.unit is None:
-                new_node = ast.BinOp(left.node, node.op, right.node)
+                new_node = ast.BinOp(left.node, node.op, right.node)  # type: ignore
                 return QuantityNode(
                     ast.copy_location(new_node, node),
                     left.unit if left.unit is not None else right.unit,
@@ -553,9 +556,13 @@ class Visitor(ast.NodeTransformer):
                     .m
                 )
                 new_node = ast.BinOp(
-                    left.node,
+                    left.node,  # type:ignore
                     node.op,
-                    ast.BinOp(right.node, ast.Mult(), ast.Constant(conv_value)),
+                    ast.BinOp(
+                        right.node,  # type:ignore
+                        ast.Mult(),
+                        ast.Constant(conv_value),
+                    ),
                 )
                 return QuantityNode(
                     ast.copy_location(new_node, node), left.unit
@@ -577,7 +584,7 @@ class Visitor(ast.NodeTransformer):
             right = self.get_node_unit(node.right)
 
             if left.unit is None or right.unit is None:
-                new_node = ast.BinOp(left.node, node.op, right.node)
+                new_node = ast.BinOp(left.node, node.op, right.node)  # type: ignore
                 return QuantityNode(
                     ast.copy_location(new_node, node),
                     left.unit if left.unit is not None else right.unit,
@@ -596,9 +603,13 @@ class Visitor(ast.NodeTransformer):
                     .m
                 )
                 new_node = ast.BinOp(
-                    left.node,
+                    left.node,  # type: ignore
                     node.op,
-                    ast.BinOp(right.node, ast.Mult(), ast.Constant(conv_value)),
+                    ast.BinOp(
+                        right.node,  # type: ignore
+                        ast.Mult(),
+                        ast.Constant(conv_value),
+                    ),
                 )
                 unit = (
                     f"{left.unit}*{left.unit}"
@@ -608,7 +619,7 @@ class Visitor(ast.NodeTransformer):
                 return QuantityNode(ast.copy_location(new_node, node), unit)
 
             else:
-                new_node = ast.BinOp(left.node, node.op, right.node)
+                new_node = ast.BinOp(left.node, node.op, right.node)  # type: ignore
                 unit = (
                     f"{left.unit}*{right.unit}"
                     if isinstance(node.op, ast.Mult)
@@ -621,7 +632,7 @@ class Visitor(ast.NodeTransformer):
             right = self.get_node_unit(node.right)
 
             if left.unit is None:
-                new_node = ast.BinOp(left.node, node.op, right.node)
+                new_node = ast.BinOp(left.node, node.op, right.node)  # type: ignore
                 return QuantityNode(
                     ast.copy_location(new_node, node), left.unit
                 )
@@ -633,7 +644,7 @@ class Visitor(ast.NodeTransformer):
                 right.unit = right.unit.__metadata__[0]
 
             if left.unit == "dimensionless":
-                new_node = ast.BinOp(left.node, node.op, right.node)
+                new_node = ast.BinOp(left.node, node.op, right.node)  # type: ignore
                 return QuantityNode(new_node, "dimensionless")
 
             if right.unit is not None:
@@ -648,7 +659,7 @@ class Visitor(ast.NodeTransformer):
 
             elif isinstance(right.node, ast.Constant):
                 unit = f"({left.unit})^({right.node.value})"
-                new_node = ast.BinOp(left.node, node.op, right.node)
+                new_node = ast.BinOp(left.node, node.op, right.node)  # type: ignore
                 return QuantityNode(new_node, unit)
 
             elif isinstance(right.node, ast.BinOp):
@@ -685,9 +696,9 @@ class Visitor(ast.NodeTransformer):
                                 + "statically evaluated or "
                                 + "is not dimensionless."
                             )
-                        new_node = ast.BinOp(left.node, node.op, right.node)
+                        new_node = ast.BinOp(left.node, node.op, right.node)  # type: ignore
                         return QuantityNode(new_node, None)
-                new_node = ast.BinOp(left.node, node.op, right.node)
+                new_node = ast.BinOp(left.node, node.op, right.node)  # type: ignore
                 return QuantityNode(new_node, unit)
 
             else:
@@ -697,7 +708,7 @@ class Visitor(ast.NodeTransformer):
                         + "The exponent cannot be statically evaluated or "
                         + "is not dimensionless."
                     )
-                new_node = ast.BinOp(left.node, node.op, right.node)
+                new_node = ast.BinOp(left.node, node.op, right.node)  # type: ignore
                 return QuantityNode(new_node, None)
 
         elif isinstance(node, ast.BinOp) and isinstance(node.op, ast.Mod):
@@ -717,7 +728,7 @@ class Visitor(ast.NodeTransformer):
                         + "The modulo must be dimensionless"
                     )
 
-            new_node = ast.BinOp(left.node, node.op, right.node)
+            new_node = ast.BinOp(left.node, node.op, right.node)  # type: ignore
             return QuantityNode(new_node, left.unit)
 
         elif isinstance(node, ast.BinOp):
@@ -733,7 +744,9 @@ class Visitor(ast.NodeTransformer):
             orelse = self.get_node_unit(node.orelse)
 
             new_node = ast.IfExp(
-                test=node.test, body=body.node, orelse=orelse.node
+                test=node.test,
+                body=body.node,  # type: ignore
+                orelse=orelse.node,  # type: ignore
             )
 
             if body.unit != orelse.unit:
@@ -911,7 +924,7 @@ class Visitor(ast.NodeTransformer):
             new_node = ast.Call(
                 func=node.func,
                 args=new_args,
-                keywords=new_keywords,
+                keywords=new_keywords,  # type: ignore
             )
 
             return ast.copy_location(new_node, node)
@@ -1032,13 +1045,13 @@ class Visitor(ast.NodeTransformer):
         if value.node != node.value:
             new_node = ast.Assign(
                 targets=node.targets,
-                value=value.node,
+                value=value.node,  # type: ignore
             )
             node = ast.copy_location(new_node, node)
 
         new_node = ast.Assign(
             targets=node.targets,
-            value=value.node,
+            value=value.node,  # type: ignore
             type_comment=f"unit: {value.unit}",
         )
 

@@ -1,9 +1,9 @@
 from typing import TypeVar
 
-from impunity import impunity
 from typing_extensions import Annotated  # ①
 
 import numpy as np
+from impunity import impunity
 
 GAMMA: Annotated[float, "dimensionless"] = 1.40  # ②
 R: Annotated[float, "m^2 / (s^2 * C)"] = 287.05287

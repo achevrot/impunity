@@ -1,5 +1,7 @@
-from astropy import units as u
 from typing import Annotated, Any
+
+from astropy import units as u
+
 import numpy as np
 
 a: Annotated[Any, "meters"] = np.random.rand(100000) * u.m
@@ -12,8 +14,8 @@ def g(x, y):
 
 
 if __name__ == "__main__":
-    import timeit
     import time
+    import timeit
 
     print(
         np.mean(
