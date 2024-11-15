@@ -203,7 +203,7 @@ def impunity(
                         origin_method.__code__.co_filename,
                         origin_method.__code__.co_name,
                         origin_method.__code__.co_firstlineno,
-                        new_method.__code__.co_lnotab,
+                        co_lnotab,
                         origin_method.__code__.co_freevars,
                         origin_method.__code__.co_cellvars,
                     )
