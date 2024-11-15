@@ -6,7 +6,6 @@ from typing import Any, Tuple
 from typing_extensions import Annotated
 
 import numpy as np
-import numpy.typing as npt
 from impunity import impunity
 
 from .sample_module import (
