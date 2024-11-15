@@ -115,7 +115,10 @@ class Visitor(ast.NodeTransformer):
         # coloffset = getattr(node, "coloffset", 0)
         firstlineno = getattr(self.fun.__code__, "co_firstlineno", 0)
         filename = getattr(self.fun.__code__, "co_filename")
-        return f"{filename}:{firstlineno + lineno - 1} " f"(in {self.fun.__name__}) "
+        return (
+            f"{filename}:{firstlineno + lineno - 1} "
+            f"(in {self.fun.__name__}) "
+        )
 
     def get_annotation_unit(self, node: ast.expr) -> Optional[str]:
         """
@@ -192,7 +195,9 @@ class Visitor(ast.NodeTransformer):
     @overload
     def get_func(self, name: str, module: str) -> None | Callable[..., Any]: ...
 
-    def get_func(self, name: str, module: None | str = None) -> None | ast.FunctionDef | Callable[..., Any]:
+    def get_func(
+        self, name: str, module: None | str = None
+    ) -> None | ast.FunctionDef | Callable[..., Any]:
         result: None | ast.FunctionDef | Callable[..., Any] = None
 
         if module is not None:
@@ -276,7 +281,9 @@ class Visitor(ast.NodeTransformer):
                         )
 
                 elif (e1.m - e0.m) == 1:
-                    conv_value = (expected_pint_unit.from_(received_pint_unit).m) - 1  # type: ignore
+                    conv_value = (
+                        expected_pint_unit.from_(received_pint_unit).m
+                    ) - 1  # type: ignore
 
                     # if conv_value == 0:
                     #     new_node = received_node
@@ -314,7 +321,9 @@ class Visitor(ast.NodeTransformer):
 
     def module_loading(self) -> None:
         # Adding all annotations from own module
-        annotations = getattr(sys.modules[self.fun.__module__], "__annotations__", None)
+        annotations = getattr(
+            sys.modules[self.fun.__module__], "__annotations__", None
+        )
         if annotations is not None:
             for name, anno in annotations.items():
                 if is_annotated(anno):
@@ -335,7 +344,9 @@ class Visitor(ast.NodeTransformer):
                     if isinstance(anno, str):
                         self.vars[name] = anno
 
-    def get_annotations(self, name: str, module: None | str = None) -> Optional[Dict[str, Any]]:
+    def get_annotations(
+        self, name: str, module: None | str = None
+    ) -> Optional[Dict[str, Any]]:
         """Get annotations of a function found in the impunity_func class dict.
         Returns None if the function is not annotated.
 
@@ -352,7 +363,8 @@ class Visitor(ast.NodeTransformer):
                 globals = list(self.impunity_func.values())[-1].__globals__
                 locals = fun.__globals__  # type: ignore
                 annotations = {
-                    k: v if not isinstance(v, str) else eval(v, globals, locals) for k, v in annotations.items()
+                    k: v if not isinstance(v, str) else eval(v, globals, locals)
+                    for k, v in annotations.items()
                 }
                 return cast(Dict[str, Any], annotations)
             # from nested function
@@ -365,7 +377,8 @@ class Visitor(ast.NodeTransformer):
                 globals = list(self.impunity_func.values())[-1].__globals__
                 locals = name.__globals__  # type: ignore
                 annotations = {
-                    k: v if not isinstance(v, str) else eval(v, globals, locals) for k, v in annotations.items()
+                    k: v if not isinstance(v, str) else eval(v, globals, locals)
+                    for k, v in annotations.items()
                 }
                 return cast(Dict[str, Any], annotations)
 
@@ -383,9 +396,12 @@ class Visitor(ast.NodeTransformer):
             method_list = [
                 getattr(self.fun, func)
                 for func in dir(self.fun)
-                if callable(getattr(self.fun, func)) and not func.startswith("__")
+                if callable(getattr(self.fun, func))
+                and not func.startswith("__")
             ]
-            if (init := self.fun.__init__).__class__.__name__ != "wrapper_descriptor":  # type: ignore
+            if (
+                init := self.fun.__init__
+            ).__class__.__name__ != "wrapper_descriptor":  # type: ignore
                 # meaning: does the class have a __init__
                 # (otherwise, it's an empty slot)
                 self.add_func(init)
@@ -411,12 +427,16 @@ class Visitor(ast.NodeTransformer):
         # check for impunity decorator:
         if node.decorator_list:
             for decorator in node.decorator_list:
-                if isinstance(decorator, ast.Call) and isinstance(decorator.func, ast.Name):
+                if isinstance(decorator, ast.Call) and isinstance(
+                    decorator.func, ast.Name
+                ):
                     if decorator.func.id == "impunity":
                         for kw in decorator.keywords:
                             if hasattr(kw, "value"):
                                 if kw.arg == "ignore" and kw.value.value:  # type: ignore
-                                    self.impunity_func.pop((self.current_module, node.name), False)
+                                    self.impunity_func.pop(
+                                        (self.current_module, node.name), False
+                                    )
                                     return node
 
         var_buffer = self.vars
@@ -489,7 +509,11 @@ class Visitor(ast.NodeTransformer):
                 )
         elif isinstance(node, ast.List):
             if not self.ignore_warnings:
-                _log.warning(self.fun_header(node) + "lists are not supported by impunity " + "(but numpy arrays are)")
+                _log.warning(
+                    self.fun_header(node)
+                    + "lists are not supported by impunity "
+                    + "(but numpy arrays are)"
+                )
             return QuantityNode(node, "dimensionless")
 
         elif isinstance(node, ast.Set):
@@ -513,7 +537,9 @@ class Visitor(ast.NodeTransformer):
         elif isinstance(node, ast.Name):
             return QuantityNode(node, self.vars[node.id])
 
-        elif isinstance(node, ast.BinOp) and isinstance(node.op, (ast.Add, ast.Sub)):
+        elif isinstance(node, ast.BinOp) and isinstance(
+            node.op, (ast.Add, ast.Sub)
+        ):
             left = self.get_node_unit(node.left)
             right = self.get_node_unit(node.right)
 
@@ -535,7 +561,9 @@ class Visitor(ast.NodeTransformer):
                         ast.Constant(conv_value),
                     ),
                 )
-                return QuantityNode(ast.copy_location(new_node, node), left.unit)
+                return QuantityNode(
+                    ast.copy_location(new_node, node), left.unit
+                )
 
             else:
                 if not self.ignore_warnings:
@@ -546,7 +574,9 @@ class Visitor(ast.NodeTransformer):
                     )
                 return QuantityNode(node, "dimensionless")
 
-        elif isinstance(node, ast.BinOp) and isinstance(node.op, (ast.Mult, ast.Div)):
+        elif isinstance(node, ast.BinOp) and isinstance(
+            node.op, (ast.Mult, ast.Div)
+        ):
             left = self.get_node_unit(node.left)
             right = self.get_node_unit(node.right)
 
@@ -574,12 +604,20 @@ class Visitor(ast.NodeTransformer):
                         ast.Constant(conv_value),
                     ),
                 )
-                unit = f"{left.unit}*{left.unit}" if isinstance(node.op, ast.Mult) else "dimensionless"
+                unit = (
+                    f"{left.unit}*{left.unit}"
+                    if isinstance(node.op, ast.Mult)
+                    else "dimensionless"
+                )
                 return QuantityNode(ast.copy_location(new_node, node), unit)
 
             else:
                 new_node = ast.BinOp(left.node, node.op, right.node)  # type: ignore
-                unit = f"{left.unit}*{right.unit}" if isinstance(node.op, ast.Mult) else f"{left.unit}/{right.unit}"
+                unit = (
+                    f"{left.unit}*{right.unit}"
+                    if isinstance(node.op, ast.Mult)
+                    else f"{left.unit}/{right.unit}"
+                )
                 return QuantityNode(ast.copy_location(new_node, node), unit)
 
         elif isinstance(node, ast.BinOp) and isinstance(node.op, ast.Pow):
@@ -588,7 +626,9 @@ class Visitor(ast.NodeTransformer):
 
             if left.unit is None:
                 new_node = ast.BinOp(left.node, node.op, right.node)  # type: ignore
-                return QuantityNode(ast.copy_location(new_node, node), left.unit)
+                return QuantityNode(
+                    ast.copy_location(new_node, node), left.unit
+                )
 
             if is_annotated(left.unit):
                 left.unit = left.unit.__metadata__[0]
@@ -618,15 +658,29 @@ class Visitor(ast.NodeTransformer):
             elif isinstance(right.node, ast.BinOp):
                 pow_right = right.node.right
                 pow_left = right.node.left
-                if isinstance(pow_left, ast.Constant) and isinstance(pow_right, ast.Constant):
+                if isinstance(pow_left, ast.Constant) and isinstance(
+                    pow_right, ast.Constant
+                ):
                     if isinstance(right.node.op, ast.Mult):
-                        unit = f"({left.unit})^({pow_left.value}" + f"*{pow_right.value})"
+                        unit = (
+                            f"({left.unit})^({pow_left.value}"
+                            + f"*{pow_right.value})"
+                        )
                     elif isinstance(right.node.op, ast.Div):
-                        unit = f"({left.unit})^({pow_left.value}" + f"/{pow_right.value})"
+                        unit = (
+                            f"({left.unit})^({pow_left.value}"
+                            + f"/{pow_right.value})"
+                        )
                     elif isinstance(right.node.op, ast.Add):
-                        unit = f"({left.unit})^({pow_left.value}" + f"+{pow_right.value})"
+                        unit = (
+                            f"({left.unit})^({pow_left.value}"
+                            + f"+{pow_right.value})"
+                        )
                     elif isinstance(right.node.op, ast.Sub):
-                        unit = f"({left.unit})^({pow_left.value}" + f"-{pow_right.value})"
+                        unit = (
+                            f"({left.unit})^({pow_left.value}"
+                            + f"-{pow_right.value})"
+                        )
                     else:
                         if not self.ignore_warnings:
                             _log.warning(
@@ -662,14 +716,20 @@ class Visitor(ast.NodeTransformer):
 
             if not (right.unit is None or right.unit == "dimensionless"):
                 if not self.ignore_warnings:
-                    _log.warning(self.fun_header(node) + "The modulo must be dimensionless")
+                    _log.warning(
+                        self.fun_header(node)
+                        + "The modulo must be dimensionless"
+                    )
 
             new_node = ast.BinOp(left.node, node.op, right.node)  # type: ignore
             return QuantityNode(new_node, left.unit)
 
         elif isinstance(node, ast.BinOp):
             if not self.ignore_warnings:
-                _log.warning(self.fun_header(node) + "Binary Operation not supported yet.")
+                _log.warning(
+                    self.fun_header(node)
+                    + "Binary Operation not supported yet."
+                )
             return QuantityNode(node, None)
 
         elif isinstance(node, ast.IfExp):
@@ -684,10 +744,15 @@ class Visitor(ast.NodeTransformer):
 
             if body.unit != orelse.unit:
                 if not self.ignore_warnings:
-                    _log.warning(self.fun_header(node) + "Ternary operator with mixed units.")
+                    _log.warning(
+                        self.fun_header(node)
+                        + "Ternary operator with mixed units."
+                    )
                 return QuantityNode(ast.copy_location(new_node, node), None)
             else:
-                return QuantityNode(ast.copy_location(new_node, node), body.unit)
+                return QuantityNode(
+                    ast.copy_location(new_node, node), body.unit
+                )
 
         elif isinstance(node, ast.Call):
             node = self.generic_visit(node)  # type: ignore
@@ -705,7 +770,11 @@ class Visitor(ast.NodeTransformer):
             offset = 0
 
             # if not a known impunity function or no return signature
-            if signature is None or not signature or list(signature.items())[-1][0] != "return":
+            if (
+                signature is None
+                or not signature
+                or list(signature.items())[-1][0] != "return"
+            ):
                 return QuantityNode(node, None)
             else:
                 fun_signature = list(signature.items())[:-1]
@@ -731,10 +800,16 @@ class Visitor(ast.NodeTransformer):
                         new_args.append(arg)
                         continue
 
-                    received.unit = received.unit.__metadata__[0] if is_annotated(received.unit) else received.unit
+                    received.unit = (
+                        received.unit.__metadata__[0]
+                        if is_annotated(received.unit)
+                        else received.unit
+                    )
 
                     assert received.node is not None
-                    new_arg = self.node_convert(expected, received.unit, received.node)
+                    new_arg = self.node_convert(
+                        expected, received.unit, received.node
+                    )
                     new_args.append(new_arg)
 
             new_node = (
@@ -748,7 +823,9 @@ class Visitor(ast.NodeTransformer):
             )
 
             return_unit = (
-                return_signature[1].__metadata__[0] if is_annotated(return_signature[1]) else return_signature[1]
+                return_signature[1].__metadata__[0]
+                if is_annotated(return_signature[1])
+                else return_signature[1]
             )
 
             return QuantityNode(ast.copy_location(new_node, node), return_unit)
@@ -793,27 +870,38 @@ class Visitor(ast.NodeTransformer):
             else:
                 return node
             for i, arg in enumerate(node.args):
-                if (received := self.get_node_unit(arg)).unit != (expected := fun_signature[i][1]):
+                if (received := self.get_node_unit(arg)).unit != (
+                    expected := fun_signature[i][1]
+                ):
                     if is_annotated(expected):
                         expected = expected.__metadata__[0]
                     assert received.node is not None
-                    new_arg = self.node_convert(expected, received.unit, received.node)
+                    new_arg = self.node_convert(
+                        expected, received.unit, received.node
+                    )
                     new_args.append(new_arg)
                 else:
                     new_args.append(arg)
 
             for keyword in node.keywords:
                 if keyword.arg:
-                    if (received := self.get_node_unit(keyword.value)) != (expected := signature[keyword.arg]):
+                    if (received := self.get_node_unit(keyword.value)) != (
+                        expected := signature[keyword.arg]
+                    ):
                         if is_annotated(expected):
                             x = expected.__metadata__[0]
                             expected = x
-                        if not (isinstance(expected, str) and isinstance(received.unit, str)):
+                        if not (
+                            isinstance(expected, str)
+                            and isinstance(received.unit, str)
+                        ):
                             # TODO To avoid annoying typing for now
                             return node
 
                         assert received.node is not None
-                        new_value = self.node_convert(expected, received.unit, received.node)
+                        new_value = self.node_convert(
+                            expected, received.unit, received.node
+                        )
 
                         new_keyword = cast(
                             ast.expr,
@@ -963,7 +1051,10 @@ class Visitor(ast.NodeTransformer):
         for target in node.targets:
             if isinstance(target, ast.Tuple):
                 received = (
-                    [arg.__metadata__[0] if is_annotated(arg) else arg for arg in value.unit.__args__]
+                    [
+                        arg.__metadata__[0] if is_annotated(arg) else arg
+                        for arg in value.unit.__args__
+                    ]
                     if hasattr(value.unit, "__args__")
                     else value.unit
                 )
@@ -978,7 +1069,9 @@ class Visitor(ast.NodeTransformer):
                 if target.id in self.vars:
                     expected = self.vars[target.id]
                     assert value.node is not None
-                    new_value = self.node_convert(expected, value.unit, value.node)
+                    new_value = self.node_convert(
+                        expected, value.unit, value.node
+                    )
                     new_node = ast.Assign(
                         targets=node.targets,
                         value=new_value,
@@ -1018,7 +1111,10 @@ class Visitor(ast.NodeTransformer):
             ret = return_annotation.get("return", None)
             if ret is None:
                 if not self.ignore_warnings:
-                    _log.info(self.fun_header(node) + "Some return annotations are missing")
+                    _log.info(
+                        self.fun_header(node)
+                        + "Some return annotations are missing"
+                    )
                 new_node = node
                 return ast.copy_location(new_node, node)
 
@@ -1044,7 +1140,10 @@ class Visitor(ast.NodeTransformer):
 
         else:  # is None
             if not self.ignore_warnings:
-                _log.info(self.fun_header(node) + "Some return annotations are missing")
+                _log.info(
+                    self.fun_header(node)
+                    + "Some return annotations are missing"
+                )
             new_node = node
             return ast.copy_location(new_node, node)
 
@@ -1056,16 +1155,24 @@ class Visitor(ast.NodeTransformer):
                 new_node = node
             else:
                 if not self.ignore_warnings:
-                    _log.warning(self.fun_header(node) + "Expected more than one return value")
+                    _log.warning(
+                        self.fun_header(node)
+                        + "Expected more than one return value"
+                    )
                 new_node = node
         else:
             if isinstance(received.unit, list):
                 if not self.ignore_warnings:
-                    _log.warning(self.fun_header(node) + "Expected more than one return value")
+                    _log.warning(
+                        self.fun_header(node)
+                        + "Expected more than one return value"
+                    )
                 new_node = node
             else:
                 assert received.node is not None
-                new_value = self.node_convert(expected, received.unit, received.node)
+                new_value = self.node_convert(
+                    expected, received.unit, received.node
+                )
                 new_node = ast.Return(value=new_value)
 
         return ast.copy_location(new_node, node)

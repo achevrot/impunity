@@ -4,8 +4,10 @@ from numericalunits import hour, m, s
 
 import numpy as np
 
-a: Annotated[Any, "meters"] = np.random.rand(100000) * m
-b: Annotated[Any, "hours"] = np.random.rand(100000) * hour
+rng = np.random.default_rng()
+
+a: Annotated[Any, "meters"] = rng.random(100000) * m
+b: Annotated[Any, "hours"] = rng.random(100000) * hour
 
 
 def g(

@@ -6,12 +6,16 @@ from typing import Annotated, Any
 import numpy as np
 from impunity import impunity
 
-a: Annotated[Any, "meters"] = np.random.rand(100000)
-b: Annotated[Any, "hours"] = np.random.rand(100000)
+rng = np.random.default_rng()
+
+a: Annotated[Any, "meters"] = rng.random(100000)
+b: Annotated[Any, "hours"] = rng.random(100000)
 
 
 @impunity(rewrite="log.txt")
-def g(x: Annotated[Any, "meters"], y: Annotated[Any, "hours"]) -> Annotated[Any, "m/s"]:
+def g(
+    x: Annotated[Any, "meters"], y: Annotated[Any, "hours"]
+) -> Annotated[Any, "m/s"]:
     return x / y
 
 

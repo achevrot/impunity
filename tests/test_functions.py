@@ -8,7 +8,11 @@ from typing_extensions import Annotated
 import numpy as np
 from impunity import impunity
 
-from .sample_module import speed_altitude_to_test, speed_to_test, speed_with_annotated_to_test
+from .sample_module import (
+    speed_altitude_to_test,
+    speed_to_test,
+    speed_with_annotated_to_test,
+)
 
 m = Annotated[Any, "m"]
 K = Annotated[Any, "K"]
@@ -71,7 +75,9 @@ def temperature_3(altitude_m: "m") -> Annotated[Any, "celsius"]:
 
 
 @impunity
-def tas2mach(tas: Annotated[Any, "kts"], h: Annotated[Any, "ft"]) -> Annotated[Any, "dimensionless"]:
+def tas2mach(
+    tas: Annotated[Any, "kts"], h: Annotated[Any, "ft"]
+) -> Annotated[Any, "dimensionless"]:
     """
     :param tas: True Air Speed, (by default in kts)
     :param h: altitude, (by default in ft)
@@ -177,7 +183,9 @@ class Functions(unittest.TestCase):
 
         with self.assertLogs("impunity.visitor", level="INFO") as cm:
             impunity(test_empty_return)
-        self.assertTrue(cm.output[0].endswith("Some return annotations are missing"))
+        self.assertTrue(
+            cm.output[0].endswith("Some return annotations are missing")
+        )
 
     def test_return_convert(self) -> None:
         @impunity
