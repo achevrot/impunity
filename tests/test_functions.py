@@ -6,9 +6,8 @@ from typing import Any, Tuple
 from typing_extensions import Annotated
 
 import numpy as np
-from impunity import impunity
 import numpy.typing as npt
-
+from impunity import impunity
 
 from .sample_module import (
     speed_altitude_to_test,
