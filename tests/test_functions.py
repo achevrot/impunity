@@ -222,7 +222,6 @@ class Functions(unittest.TestCase):
 
     @impunity
     def test_conversion_with_module(self) -> None:
-
         # Using meters instead of Annotated[float, "m"]
         altitudes = np.arange(0, 1000, 100)
         duration: Annotated[float, "min"] = 100
