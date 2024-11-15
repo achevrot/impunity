@@ -162,7 +162,7 @@ def impunity(
             for new_method in method_list:
                 origin_method = getattr(fun, new_method.__name__)
                 co_consts = new_method.__code__.co_consts
-                co_lines = new_method.__code__.co_lines
+                co_lnotab = new_method.__code__.co_lnotab
                 for const in origin_method.__code__.co_consts:
                     if const not in co_consts:
                         co_consts = (*co_consts, const)
@@ -203,14 +203,14 @@ def impunity(
                         origin_method.__code__.co_filename,
                         origin_method.__code__.co_name,
                         origin_method.__code__.co_firstlineno,
-                        new_method.__code__.co_lines,
+                        new_method.__code__.co_lnotab,
                         origin_method.__code__.co_freevars,
                         origin_method.__code__.co_cellvars,
                     )
 
         else:
             co_consts = new_fun.__code__.co_consts
-            co_lines = new_fun.__code__.co_lines
+            co_lnotab = new_fun.__code__.co_lnotab
             for const in fun.__code__.co_consts:
                 if const not in co_consts:
                     co_consts = (*co_consts, const)
