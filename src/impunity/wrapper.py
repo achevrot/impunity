@@ -143,7 +143,7 @@ def impunity(
                 f.write("\n")
 
         idx = f_str.find("\n") + 1
-        d = {}
+        d: dict[str, Any] = {}
         if f_str[0:9] == "@impunity":
             exec(f_str[idx:], visitor.fun_globals, d)
         else:
