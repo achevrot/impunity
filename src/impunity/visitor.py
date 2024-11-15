@@ -157,7 +157,7 @@ class Visitor(ast.NodeTransformer):
 
         # case where node's parent is an AnnAssign
         elif isinstance(node, ast.Name):
-            if isinstance(node.parent, ast.AnnAssign):
+            if isinstance(node.parent, ast.AnnAssign):  # type: ignore
                 unit = self.get_node_unit(node).unit
 
         return unit
@@ -400,8 +400,8 @@ class Visitor(ast.NodeTransformer):
                 and not func.startswith("__")
             ]
             if (
-                init := self.fun.__init__
-            ).__class__.__name__ != "wrapper_descriptor":  # type: ignore
+                init := self.fun.__init__  # type: ignore
+            ).__class__.__name__ != "wrapper_descriptor":
                 # meaning: does the class have a __init__
                 # (otherwise, it's an empty slot)
                 self.add_func(init)
