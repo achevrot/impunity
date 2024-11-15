@@ -4,7 +4,6 @@ from typing_extensions import Annotated
 
 import numpy as np
 from impunity import impunity
-import numpy as np
 
 meters = Annotated[np.ndarray[Any], "m"]
 seconds = Annotated[float, "s"]
