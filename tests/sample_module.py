@@ -2,8 +2,8 @@ from typing import Any
 
 from typing_extensions import Annotated
 
-import numpy.typing as npt
 import numpy as np
+import numpy.typing as npt
 from impunity import impunity
 
 NDArrayFloat = npt.NDArray[np.float64]
