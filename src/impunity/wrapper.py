@@ -143,13 +143,14 @@ def impunity(
                 f.write("\n")
 
         idx = f_str.find("\n") + 1
+        d = {}
         if f_str[0:9] == "@impunity":
-            exec(f_str[idx:], visitor.fun_globals, locals())
+            exec(f_str[idx:], visitor.fun_globals, d)
         else:
             # if impunity is called without the decorator synthax
-            exec(f_str, visitor.fun_globals, locals())
+            exec(f_str, visitor.fun_globals, d)
 
-        new_fun = locals()[fun.__name__]
+        new_fun = d[fun.__name__]
 
         if isinstance(new_fun, type):
             method_list = [
@@ -161,7 +162,7 @@ def impunity(
             for new_method in method_list:
                 origin_method = getattr(fun, new_method.__name__)
                 co_consts = new_method.__code__.co_consts
-                co_lnotab = new_method.__code__.co_lnotab
+                co_lines = new_method.__code__.co_lines
                 for const in origin_method.__code__.co_consts:
                     if const not in co_consts:
                         co_consts = (*co_consts, const)
@@ -202,14 +203,14 @@ def impunity(
                         origin_method.__code__.co_filename,
                         origin_method.__code__.co_name,
                         origin_method.__code__.co_firstlineno,
-                        new_method.__code__.co_lnotab,
+                        new_method.__code__.co_lines,
                         origin_method.__code__.co_freevars,
                         origin_method.__code__.co_cellvars,
                     )
 
         else:
             co_consts = new_fun.__code__.co_consts
-            co_lnotab = new_fun.__code__.co_lnotab
+            co_lines = new_fun.__code__.co_lines
             for const in fun.__code__.co_consts:
                 if const not in co_consts:
                     co_consts = (*co_consts, const)
