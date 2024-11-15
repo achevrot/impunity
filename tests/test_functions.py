@@ -8,7 +8,7 @@ from typing_extensions import Annotated
 import numpy as np
 from impunity import impunity
 
-from .sample_module import speed_altitude_to_test, speed_to_test
+from .sample_module import speed_altitude_to_test, speed_to_test, speed_with_annotated_to_test
 
 m = Annotated[Any, "m"]
 K = Annotated[Any, "K"]
@@ -71,9 +71,7 @@ def temperature_3(altitude_m: "m") -> Annotated[Any, "celsius"]:
 
 
 @impunity
-def tas2mach(
-    tas: Annotated[Any, "kts"], h: Annotated[Any, "ft"]
-) -> Annotated[Any, "dimensionless"]:
+def tas2mach(tas: Annotated[Any, "kts"], h: Annotated[Any, "ft"]) -> Annotated[Any, "dimensionless"]:
     """
     :param tas: True Air Speed, (by default in kts)
     :param h: altitude, (by default in ft)
@@ -179,9 +177,7 @@ class Functions(unittest.TestCase):
 
         with self.assertLogs("impunity.visitor", level="INFO") as cm:
             impunity(test_empty_return)
-        self.assertTrue(
-            cm.output[0].endswith("Some return annotations are missing")
-        )
+        self.assertTrue(cm.output[0].endswith("Some return annotations are missing"))
 
     def test_return_convert(self) -> None:
         @impunity
@@ -215,6 +211,14 @@ class Functions(unittest.TestCase):
         self.assertAlmostEqual(res, 417.17, delta=1e-2)
         res2 = speed_altitude_to_test(d, t)
         self.assertAlmostEqual(res2, 1, delta=1e-2)
+
+    @impunity
+    def test_conversion_with_module(self) -> None:
+
+        # Using meters instead of Annotated[float, "m"]
+        altitudes = np.arange(0, 1000, 100)
+        duration: Annotated[float, "min"] = 100
+        result = speed_with_annotated_to_test(altitudes, duration)
 
 
 if __name__ == "__main__":
