@@ -219,6 +219,7 @@ class Functions(unittest.TestCase):
         altitudes = np.arange(0, 1000, 100)
         duration: Annotated[float, "min"] = 100
         result = speed_with_annotated_to_test(altitudes, duration)
+        self.assertAlmostEqual(result[3], 0.05, delta=1e-2)
 
 
 if __name__ == "__main__":
