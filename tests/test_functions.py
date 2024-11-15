@@ -224,7 +224,9 @@ class Functions(unittest.TestCase):
     @impunity
     def test_conversion_with_module(self) -> None:
         # Using meters instead of Annotated[float, "m"]
-        altitudes: Annotated[npt.NDArray, "meters"] = np.arange(0, 1000, 100)
+        altitudes: Annotated[np.ndarray[Any], "meters"] = np.arange(
+            0, 1000, 100
+        )
         duration: Annotated[float, "min"] = 100
         result = speed_with_annotated_to_test(altitudes, duration)
         self.assertAlmostEqual(result[3], 0.05, delta=1e-2)

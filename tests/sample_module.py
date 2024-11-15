@@ -2,12 +2,12 @@ from typing import Any
 
 from typing_extensions import Annotated
 
-import numpy.typing as npt
+import numpy as np
 from impunity import impunity
 
-meters = Annotated[npt.NDArray, "m"]
+meters = Annotated[np.ndarray[Any], "m"]
 seconds = Annotated[float, "s"]
-meters_per_second = Annotated[npt.NDArray, "m/s"]
+meters_per_second = Annotated[np.ndarray[Any], "m/s"]
 
 
 @impunity
