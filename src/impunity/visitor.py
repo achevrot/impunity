@@ -282,8 +282,8 @@ class Visitor(ast.NodeTransformer):
 
                 elif (e1.m - e0.m) == 1:
                     conv_value = (
-                        expected_pint_unit.from_(received_pint_unit).m
-                    ) - 1  # type: ignore
+                        expected_pint_unit.from_(received_pint_unit).m  # type: ignore
+                    ) - 1
 
                     # if conv_value == 0:
                     #     new_node = received_node
