@@ -4,8 +4,10 @@ import quantities as pq
 
 import numpy as np
 
-a: Annotated[Any, "meters"] = np.random.rand(100000) * pq.m
-b: Annotated[Any, "seconds"] = np.random.rand(100000) * pq.s
+rng = np.random.default_rng()
+
+a: Annotated[Any, "meters"] = rng.random(100000) * pq.m
+b: Annotated[Any, "seconds"] = rng.random(100000) * pq.s
 
 
 def g(

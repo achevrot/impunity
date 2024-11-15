@@ -155,6 +155,11 @@ class Visitor(ast.NodeTransformer):
             if isinstance(unit_node, ast.Constant):
                 unit = unit_node.value
 
+        # case where node's parent is an AnnAssign
+        elif isinstance(node, ast.Name):
+            if isinstance(node.parent, ast.AnnAssign):  # type: ignore
+                unit = self.get_node_unit(node).unit
+
         return unit
 
     def visit(self, root: ast.AST) -> ast.AST:
@@ -264,9 +269,7 @@ class Visitor(ast.NodeTransformer):
                 e10 = r10.to(expected_unit)
 
                 if r0.m == e0.m:
-                    conv_value = expected_pint_unit.from_(  # type: ignore
-                        received_pint_unit
-                    ).m
+                    conv_value = expected_pint_unit.from_(received_pint_unit).m  # type: ignore
 
                     if conv_value == 1:
                         new_node = received_node
@@ -279,9 +282,7 @@ class Visitor(ast.NodeTransformer):
 
                 elif (e1.m - e0.m) == 1:
                     conv_value = (
-                        expected_pint_unit.from_(  # type: ignore
-                            received_pint_unit
-                        ).m
+                        expected_pint_unit.from_(received_pint_unit).m  # type: ignore
                     ) - 1
 
                     # if conv_value == 0:
@@ -331,7 +332,9 @@ class Visitor(ast.NodeTransformer):
                     self.vars[name] = anno
 
         # Adding all annotations from imported modules
-        for _, val in self.fun_globals.items():
+        for var_name, val in self.fun_globals.items():
+            if is_annotated(val):
+                self.vars[var_name] = val.__metadata__[0]
             if isinstance(val, types.ModuleType):
                 annotations = getattr(val, "__annotations__", {})
                 for name, anno in annotations.items():
@@ -430,9 +433,7 @@ class Visitor(ast.NodeTransformer):
                     if decorator.func.id == "impunity":
                         for kw in decorator.keywords:
                             if hasattr(kw, "value"):
-                                if (
-                                    kw.arg == "ignore" and kw.value.value  # type: ignore
-                                ):
+                                if kw.arg == "ignore" and kw.value.value:  # type: ignore
                                     self.impunity_func.pop(
                                         (self.current_module, node.name), False
                                     )
@@ -550,11 +551,7 @@ class Visitor(ast.NodeTransformer):
                 )
 
             if pint.Unit(left.unit).is_compatible_with(pint.Unit(right.unit)):
-                conv_value = (
-                    pint.Unit(left.unit)  # type: ignore
-                    .from_(pint.Unit(right.unit))
-                    .m
-                )
+                conv_value = pint.Unit(left.unit).from_(pint.Unit(right.unit)).m  # type: ignore
                 new_node = ast.BinOp(
                     left.node,  # type:ignore
                     node.op,
@@ -597,11 +594,7 @@ class Visitor(ast.NodeTransformer):
                 right.unit = right.unit.__metadata__[0]
 
             if pint.Unit(left.unit).is_compatible_with(pint.Unit(right.unit)):
-                conv_value = (
-                    pint.Unit(left.unit)  # type: ignore
-                    .from_(pint.Unit(right.unit))
-                    .m
-                )
+                conv_value = pint.Unit(left.unit).from_(pint.Unit(right.unit)).m  # type: ignore
                 new_node = ast.BinOp(
                     left.node,  # type: ignore
                     node.op,

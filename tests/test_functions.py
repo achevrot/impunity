@@ -8,7 +8,11 @@ from typing_extensions import Annotated
 import numpy as np
 from impunity import impunity
 
-from .sample_module import speed_altitude_to_test, speed_to_test
+from .sample_module import (
+    speed_altitude_to_test,
+    speed_to_test,
+    speed_with_annotated_to_test,
+)
 
 m = Annotated[Any, "m"]
 K = Annotated[Any, "K"]
@@ -215,6 +219,14 @@ class Functions(unittest.TestCase):
         self.assertAlmostEqual(res, 417.17, delta=1e-2)
         res2 = speed_altitude_to_test(d, t)
         self.assertAlmostEqual(res2, 1, delta=1e-2)
+
+    @impunity
+    def test_conversion_with_module(self) -> None:
+        # Using meters instead of Annotated[float, "m"]
+        altitudes: Annotated[Any, "meters"] = np.arange(0, 1000, 100)
+        duration: Annotated[float, "min"] = 100
+        result = speed_with_annotated_to_test(altitudes, duration)
+        self.assertAlmostEqual(result[3], 0.05, delta=1e-2)
 
 
 if __name__ == "__main__":

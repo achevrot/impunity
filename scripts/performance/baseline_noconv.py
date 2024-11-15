@@ -3,8 +3,10 @@ from typing import Annotated, Any
 
 import numpy as np
 
-a: Annotated[Any, "meters"] = np.random.rand(100000)
-b: Annotated[Any, "seconds"] = np.random.rand(100000)
+rng = np.random.default_rng()
+
+a: Annotated[Any, "meters"] = rng.random(100000)
+b: Annotated[Any, "seconds"] = rng.random(100000)
 
 
 def g(

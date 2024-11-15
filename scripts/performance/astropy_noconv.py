@@ -4,10 +4,10 @@ from astropy import units as u
 
 import numpy as np
 
-np.random.seed(0)
+rng = np.random.default_rng(0)
 
-a: Annotated[Any, "meters"] = np.random.rand(100000) * u.m
-b: Annotated[Any, "seconds"] = np.random.rand(100000) * u.s
+a: Annotated[Any, "meters"] = rng.random(100000) * u.m
+b: Annotated[Any, "seconds"] = rng.random(100000) * u.s
 
 
 @u.quantity_input(x=u.m, y=u.s)

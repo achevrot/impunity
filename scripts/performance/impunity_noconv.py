@@ -6,8 +6,10 @@ from typing import Annotated, Any
 import numpy as np
 from impunity import impunity
 
-a: Annotated[Any, "meters"] = np.random.rand(100000)
-b: Annotated[Any, "seconds"] = np.random.rand(100000)
+rng = np.random.default_rng()
+
+a: Annotated[Any, "meters"] = rng.random(100000)
+b: Annotated[Any, "seconds"] = rng.random(100000)
 
 
 @impunity(rewrite="log_no.txt")

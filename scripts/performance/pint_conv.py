@@ -9,9 +9,10 @@ import numpy as np
 
 ureg = pint.UnitRegistry()
 Q_ = ureg.Quantity
+rng = np.random.default_rng()
 
-a: Annotated[Any, "meters"] = Q_(np.random.rand(100000), "meter")
-b: Annotated[Any, "seconds"] = Q_(np.random.rand(100000), "hours")
+a: Annotated[Any, "meters"] = Q_(rng.random(100000), "meter")
+b: Annotated[Any, "seconds"] = Q_(rng.random(100000), "hours")
 
 
 @ureg.wraps(None, ("meter", "seconds"))
