@@ -2,11 +2,11 @@ from __future__ import annotations
 
 import unittest
 from typing import Any, Tuple
-import numpy.typing as npt
 
 from typing_extensions import Annotated
 
 import numpy as np
+import numpy.typing as npt
 from impunity import impunity
 
 from .sample_module import (
