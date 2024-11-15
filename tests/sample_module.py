@@ -4,10 +4,11 @@ from typing_extensions import Annotated
 
 import numpy.typing as npt
 from impunity import impunity
+import numpy as np
 
-meters = Annotated[npt.NDArray, "m"]
+meters = Annotated[npt.NDArray[np.float], "m"]
 seconds = Annotated[float, "s"]
-meters_per_second = Annotated[npt.NDArray, "m/s"]
+meters_per_second = Annotated[npt.NDArray[np.float], "m/s"]
 
 
 @impunity
