@@ -7,7 +7,8 @@ from typing_extensions import Annotated
 
 import numpy as np
 from impunity import impunity
-from numpy import npt
+import numpy.typing as npt
+
 
 from .sample_module import (
     speed_altitude_to_test,

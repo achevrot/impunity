@@ -3,7 +3,8 @@ from typing import Any
 from typing_extensions import Annotated
 
 from impunity import impunity
-from numpy import npt
+import numpy.typing as npt
+
 
 meters = Annotated[npt.ArrayLike, "m"]
 seconds = Annotated[float, "s"]
