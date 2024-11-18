@@ -1061,7 +1061,7 @@ class Visitor(ast.NodeTransformer):
                 for i, elem in enumerate(target.elts):
                     if isinstance(elem, ast.Name):
                         if isinstance(received[i], typing.ForwardRef):
-                            self.vars[elem.id] = received[i].__forward_arg__
+                            self.vars[elem.id] = received[i].__forward_arg__  # type: ignore
                         else:
                             self.vars[elem.id] = received[i]
 
