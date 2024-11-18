@@ -55,7 +55,7 @@ known-first-party = ["numpy", "pandas"]
 source = ["src"]
 
 [tool.mypy]
-python_version = 3.8
+python_version = "3.9"
 platform = "posix"
 
 color_output = true

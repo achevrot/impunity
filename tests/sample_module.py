@@ -1,12 +1,12 @@
 from typing import Any
 
-from typing_extensions import Annotated
+from typing_extensions import Annotated, TypeAlias
 
 import numpy as np
 import numpy.typing as npt
 from impunity import impunity
 
-NDArrayFloat = npt.NDArray[np.float64]
+NDArrayFloat: TypeAlias = npt.NDArray[np.float64]
 meters = Annotated[NDArrayFloat, "m"]
 seconds = Annotated[float, "s"]
 meters_per_second = Annotated[NDArrayFloat, "m/s"]

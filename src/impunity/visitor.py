@@ -148,8 +148,8 @@ class Visitor(ast.NodeTransformer):
 
         elif isinstance(node, ast.Subscript):
             if isinstance(node.slice, ast.Index):
-                if isinstance(node.slice.value, ast.Tuple):
-                    unit_node = node.slice.value.elts[1]
+                if isinstance(node.slice.value, ast.Tuple):  # type: ignore
+                    unit_node = node.slice.value.elts[1]  # type: ignore
             elif isinstance(node.slice, ast.Tuple):
                 unit_node = node.slice.elts[1]
             if isinstance(unit_node, ast.Constant):
