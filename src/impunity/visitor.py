@@ -531,7 +531,7 @@ class Visitor(ast.NodeTransformer):
                 # TODO Sequence[Unit] should we clean?
                 elems = list(map(self.get_node_unit, node.values))
                 return QuantityNode(
-                    ast.Dict(zip(node.keys, [elem.node for elem in elems])),  # type: ignore
+                    ast.Dict(node.keys, [elem.node for elem in elems]),  # type: ignore
                     [elem.unit for elem in elems],  # type: ignore
                 )
         elif isinstance(node, ast.Name):
