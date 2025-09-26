@@ -11,8 +11,8 @@ license = "MIT"
 requires-python = ">=3.9"
 dependencies = ["astor>=0.8.1", "pint>=0.24.4", "typing-extensions>=4.12.2"]
 
-[tool.uv]
-dev-dependencies = [
+[dependency-groups]
+dev = [
   "codecov>=2.1.13",
   "coverage>=7.6.4",
   "jupyter-sphinx>=0.5.3",
