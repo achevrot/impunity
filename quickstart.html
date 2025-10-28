@@ -7,7 +7,7 @@
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Getting started &mdash; Impunity 0.1 documentation</title>
-      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=e59714d7" />
       <link rel="stylesheet" type="text/css" href="_static/sphinx-design.min.css?v=95c83b7e" />
 
@@ -15,7 +15,7 @@
       <script src="_static/jquery.js?v=5d32c60e"></script>
       <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
       <script src="_static/documentation_options.js?v=2709fde1"></script>
-      <script src="_static/doctools.js?v=9a2dae69"></script>
+      <script src="_static/doctools.js?v=9bcbadda"></script>
       <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
       <script src="_static/design-tabs.js?v=f930bc37"></script>
     <script src="_static/js/theme.js"></script>
@@ -119,7 +119,7 @@ annotations are compatible between each other.</p>
 <blockquote>
 <div><div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># 1: Import the necessary decorator from the Impunity library:</span>
 
-<span class="kn">from</span> <span class="nn">impunity</span> <span class="kn">import</span> <span class="n">impunity</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">impunity</span><span class="w"> </span><span class="kn">import</span> <span class="n">impunity</span>
 
 <span class="c1"># 2: Annotate your code with appropriate units:</span>
 
@@ -129,7 +129,7 @@ annotations are compatible between each other.</p>
 <span class="c1"># 3: Apply the @impunity decorator to functions or methods that you want to check</span>
 
 <span class="nd">@impunity</span>
-<span class="k">def</span> <span class="nf">speed</span><span class="p">(</span><span class="n">distance</span><span class="p">:</span> <span class="s2">&quot;meters&quot;</span><span class="p">,</span> <span class="n">time</span><span class="p">:</span> <span class="s2">&quot;seconds&quot;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">&quot;meters / seconds&quot;</span><span class="p">:</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">speed</span><span class="p">(</span><span class="n">distance</span><span class="p">:</span> <span class="s2">&quot;meters&quot;</span><span class="p">,</span> <span class="n">time</span><span class="p">:</span> <span class="s2">&quot;seconds&quot;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">&quot;meters / seconds&quot;</span><span class="p">:</span>
     <span class="k">return</span> <span class="n">distance</span> <span class="o">/</span> <span class="n">time</span>
 
 <span class="n">speed</span><span class="p">(</span><span class="n">distance</span><span class="p">,</span> <span class="n">time</span><span class="p">)</span> <span class="c1"># return 1</span>
@@ -141,7 +141,7 @@ When inconsistencies are found in the decorated code, conversion
 are performed under the hood when possible:</p>
 <blockquote>
 <div><div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="nd">@impunity</span>
- <span class="k">def</span> <span class="nf">speed</span><span class="p">(</span><span class="n">distance</span><span class="p">:</span> <span class="s2">&quot;meters&quot;</span><span class="p">,</span> <span class="n">time</span><span class="p">:</span> <span class="s2">&quot;seconds&quot;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">&quot;km / h&quot;</span><span class="p">:</span>
+ <span class="k">def</span><span class="w"> </span><span class="nf">speed</span><span class="p">(</span><span class="n">distance</span><span class="p">:</span> <span class="s2">&quot;meters&quot;</span><span class="p">,</span> <span class="n">time</span><span class="p">:</span> <span class="s2">&quot;seconds&quot;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">&quot;km / h&quot;</span><span class="p">:</span>
      <span class="k">return</span> <span class="n">distance</span> <span class="o">/</span> <span class="n">time</span>
 
  <span class="n">speed</span><span class="p">(</span><span class="n">distance</span><span class="p">,</span> <span class="n">time</span><span class="p">)</span> <span class="c1"># return 3.6</span>
@@ -152,7 +152,7 @@ are performed under the hood when possible:</p>
 with hints on how to correct the code:</p>
 <blockquote>
 <div><div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="nd">@impunity</span>
-<span class="k">def</span> <span class="nf">speed</span><span class="p">(</span><span class="n">distance</span><span class="p">:</span> <span class="s2">&quot;meters&quot;</span><span class="p">,</span> <span class="n">time</span><span class="p">:</span> <span class="s2">&quot;seconds&quot;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">&quot;kelvin&quot;</span><span class="p">:</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">speed</span><span class="p">(</span><span class="n">distance</span><span class="p">:</span> <span class="s2">&quot;meters&quot;</span><span class="p">,</span> <span class="n">time</span><span class="p">:</span> <span class="s2">&quot;seconds&quot;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">&quot;kelvin&quot;</span><span class="p">:</span>
     <span class="k">return</span> <span class="n">distance</span> <span class="o">/</span> <span class="n">time</span>
 
  <span class="ne">Warning</span><span class="p">:</span> <span class="s2">&quot;Incompatible unit returned&quot;</span>

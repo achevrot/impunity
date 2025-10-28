@@ -7,7 +7,7 @@
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>The Annotated object &mdash; Impunity 0.1 documentation</title>
-      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=e59714d7" />
       <link rel="stylesheet" type="text/css" href="_static/sphinx-design.min.css?v=95c83b7e" />
 
@@ -15,7 +15,7 @@
       <script src="_static/jquery.js?v=5d32c60e"></script>
       <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
       <script src="_static/documentation_options.js?v=2709fde1"></script>
-      <script src="_static/doctools.js?v=9a2dae69"></script>
+      <script src="_static/doctools.js?v=9bcbadda"></script>
       <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
       <script src="_static/design-tabs.js?v=f930bc37"></script>
     <script src="_static/js/theme.js"></script>
@@ -102,14 +102,14 @@ and return types with physical units. The following examples demonstrate the usa
 <span class="n">meters</span> <span class="o">=</span> <span class="n">Annotated</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="s2">&quot;meters&quot;</span><span class="p">]</span>
 <span class="n">seconds</span> <span class="o">=</span> <span class="n">Annotated</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="s2">&quot;seconds&quot;</span><span class="p">]</span>
 
-<span class="k">def</span> <span class="nf">speed</span><span class="p">(</span><span class="n">distance</span><span class="p">:</span> <span class="s2">&quot;meters&quot;</span><span class="p">,</span> <span class="n">time</span><span class="p">:</span> <span class="s2">&quot;seconds&quot;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">&quot;meters / seconds&quot;</span><span class="p">:</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">speed</span><span class="p">(</span><span class="n">distance</span><span class="p">:</span> <span class="s2">&quot;meters&quot;</span><span class="p">,</span> <span class="n">time</span><span class="p">:</span> <span class="s2">&quot;seconds&quot;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">&quot;meters / seconds&quot;</span><span class="p">:</span>
     <span class="k">return</span> <span class="n">distance</span> <span class="o">/</span> <span class="n">time</span>
 </pre></div>
 </div>
 <ul>
 <li><p>Annotating a variable:</p>
 <blockquote>
-<div><div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">typing_extensions</span> <span class="kn">import</span> <span class="n">Annotated</span>
+<div><div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">typing_extensions</span><span class="w"> </span><span class="kn">import</span> <span class="n">Annotated</span>
 
 <span class="n">distance</span><span class="p">:</span> <span class="n">Annotated</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="s2">&quot;meters&quot;</span><span class="p">]</span>
 </pre></div>
@@ -118,9 +118,9 @@ and return types with physical units. The following examples demonstrate the usa
 </li>
 <li><p>Annotating function arguments:</p>
 <blockquote>
-<div><div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">typing_extensions</span> <span class="kn">import</span> <span class="n">Annotated</span>
+<div><div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">typing_extensions</span><span class="w"> </span><span class="kn">import</span> <span class="n">Annotated</span>
 
-<span class="k">def</span> <span class="nf">speed</span><span class="p">(</span><span class="n">distance</span><span class="p">:</span> <span class="n">Annotated</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="s2">&quot;meters&quot;</span><span class="p">],</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">speed</span><span class="p">(</span><span class="n">distance</span><span class="p">:</span> <span class="n">Annotated</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="s2">&quot;meters&quot;</span><span class="p">],</span>
                 <span class="n">time</span><span class="p">:</span> <span class="n">Annotated</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="s2">&quot;seconds&quot;</span><span class="p">])</span> <span class="o">-&gt;</span>
                 <span class="n">Annotated</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="s2">&quot;meters per second&quot;</span><span class="p">]:</span>
     <span class="k">return</span> <span class="n">distance</span> <span class="o">/</span> <span class="n">time</span>
@@ -130,9 +130,9 @@ and return types with physical units. The following examples demonstrate the usa
 </li>
 <li><p>Annotating function return type:</p>
 <blockquote>
-<div><div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">typing_extensions</span> <span class="kn">import</span> <span class="n">Annotated</span>
+<div><div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">typing_extensions</span><span class="w"> </span><span class="kn">import</span> <span class="n">Annotated</span>
 
-<span class="k">def</span> <span class="nf">speed</span><span class="p">(</span><span class="n">distance</span><span class="p">:</span> <span class="n">Annotated</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="s2">&quot;meters&quot;</span><span class="p">],</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">speed</span><span class="p">(</span><span class="n">distance</span><span class="p">:</span> <span class="n">Annotated</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="s2">&quot;meters&quot;</span><span class="p">],</span>
                <span class="n">time</span><span class="p">:</span> <span class="n">Annotated</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="s2">&quot;seconds&quot;</span><span class="p">])</span> <span class="o">-&gt;</span>
                <span class="n">Annotated</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="s2">&quot;meters per second&quot;</span><span class="p">]:</span>
     <span class="k">return</span> <span class="n">distance</span> <span class="o">/</span> <span class="n">time</span>

@@ -7,7 +7,7 @@
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Impunity: A Python library to check physical units &mdash; Impunity 0.1 documentation</title>
-      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=e59714d7" />
       <link rel="stylesheet" type="text/css" href="_static/sphinx-design.min.css?v=95c83b7e" />
 
@@ -15,7 +15,7 @@
       <script src="_static/jquery.js?v=5d32c60e"></script>
       <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
       <script src="_static/documentation_options.js?v=2709fde1"></script>
-      <script src="_static/doctools.js?v=9a2dae69"></script>
+      <script src="_static/doctools.js?v=9bcbadda"></script>
       <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
       <script src="_static/design-tabs.js?v=f930bc37"></script>
     <script src="_static/js/theme.js"></script>
@@ -105,7 +105,7 @@
 <div class="sd-row sd-row-cols-2 sd-row-cols-xs-2 sd-row-cols-sm-2 sd-row-cols-md-2 sd-row-cols-lg-2 docutils">
 <div class="sd-col sd-d-flex-column docutils">
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="nd">@impunity</span>
-<span class="k">def</span> <span class="nf">speed</span><span class="p">(</span><span class="n">d</span><span class="p">:</span> <span class="s2">&quot;m&quot;</span><span class="p">,</span> <span class="n">t</span><span class="p">:</span> <span class="s2">&quot;s&quot;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">&quot;m / s&quot;</span><span class="p">:</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">speed</span><span class="p">(</span><span class="n">d</span><span class="p">:</span> <span class="s2">&quot;m&quot;</span><span class="p">,</span> <span class="n">t</span><span class="p">:</span> <span class="s2">&quot;s&quot;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">&quot;m / s&quot;</span><span class="p">:</span>
    <span class="k">return</span> <span class="n">d</span> <span class="o">/</span> <span class="n">t</span>
 
 <span class="n">speed</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="mi">10</span><span class="p">)</span> <span class="c1"># returns 1</span>
@@ -114,7 +114,7 @@
 </div>
 <div class="sd-col sd-d-flex-column docutils">
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="nd">@impunity</span>
-<span class="k">def</span> <span class="nf">speed</span><span class="p">(</span><span class="n">d</span><span class="p">:</span> <span class="s2">&quot;m&quot;</span><span class="p">,</span> <span class="n">t</span><span class="p">:</span> <span class="s2">&quot;s&quot;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">&quot;km / h&quot;</span><span class="p">:</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">speed</span><span class="p">(</span><span class="n">d</span><span class="p">:</span> <span class="s2">&quot;m&quot;</span><span class="p">,</span> <span class="n">t</span><span class="p">:</span> <span class="s2">&quot;s&quot;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">&quot;km / h&quot;</span><span class="p">:</span>
    <span class="k">return</span> <span class="n">d</span> <span class="o">/</span> <span class="n">t</span>
 
 <span class="n">speed</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="mi">10</span><span class="p">)</span> <span class="c1"># returns 3.6</span>
@@ -123,7 +123,7 @@
 </div>
 <div class="sd-col sd-d-flex-column docutils">
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="nd">@impunity</span>
-<span class="k">def</span> <span class="nf">speed</span><span class="p">(</span><span class="n">d</span><span class="p">:</span> <span class="s2">&quot;m&quot;</span><span class="p">,</span> <span class="n">t</span><span class="p">:</span> <span class="s2">&quot;s&quot;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">&quot;feet&quot;</span><span class="p">:</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">speed</span><span class="p">(</span><span class="n">d</span><span class="p">:</span> <span class="s2">&quot;m&quot;</span><span class="p">,</span> <span class="n">t</span><span class="p">:</span> <span class="s2">&quot;s&quot;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">&quot;feet&quot;</span><span class="p">:</span>
    <span class="k">return</span> <span class="n">d</span> <span class="o">/</span> <span class="n">t</span>
 
 <span class="c1"># Warning: &quot;Incompatible unit returned&quot;</span>
@@ -132,7 +132,7 @@
 </div>
 <div class="sd-col sd-d-flex-column docutils">
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="nd">@impunity</span>
-<span class="k">def</span> <span class="nf">speed</span><span class="p">(</span><span class="n">d</span><span class="p">:</span> <span class="s2">&quot;m&quot;</span><span class="p">,</span> <span class="n">t</span><span class="p">:</span> <span class="s2">&quot;s&quot;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">&quot;m / s&quot;</span><span class="p">:</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">speed</span><span class="p">(</span><span class="n">d</span><span class="p">:</span> <span class="s2">&quot;m&quot;</span><span class="p">,</span> <span class="n">t</span><span class="p">:</span> <span class="s2">&quot;s&quot;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">&quot;m / s&quot;</span><span class="p">:</span>
    <span class="k">return</span> <span class="n">d</span> <span class="o">+</span> <span class="n">t</span>
 
 <span class="c1"># Warning: &quot;Types are not compatible&quot;</span>

@@ -7,7 +7,7 @@
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Impunity Decorator Guide &mdash; Impunity 0.1 documentation</title>
-      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=e59714d7" />
       <link rel="stylesheet" type="text/css" href="../_static/sphinx-design.min.css?v=95c83b7e" />
 
@@ -15,7 +15,7 @@
       <script src="../_static/jquery.js?v=5d32c60e"></script>
       <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
       <script src="../_static/documentation_options.js?v=2709fde1"></script>
-      <script src="../_static/doctools.js?v=9a2dae69"></script>
+      <script src="../_static/doctools.js?v=9bcbadda"></script>
       <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
       <script src="../_static/design-tabs.js?v=f930bc37"></script>
     <script src="../_static/js/theme.js"></script>
@@ -123,7 +123,7 @@ taken from the Pint library.</p>
 below to apply the decorator to your functions or methods:</p>
 <ol class="arabic">
 <li><p>Import the <cite>impunity</cite> decorator from the <strong>Impunity</strong> library:</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">impunity</span> <span class="kn">import</span> <span class="n">impunity</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">impunity</span><span class="w"> </span><span class="kn">import</span> <span class="n">impunity</span>
 </pre></div>
 </div>
 </li>
@@ -132,7 +132,7 @@ below to apply the decorator to your functions or methods:</p>
 want to check for unit coherence:</p>
 <blockquote>
 <div><div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="nd">@impunity</span>
-<span class="k">def</span> <span class="nf">calculate_speed</span><span class="p">(</span><span class="n">distance</span><span class="p">:</span> <span class="s2">&quot;meters&quot;</span><span class="p">,</span> <span class="n">time</span><span class="p">:</span> <span class="s2">&quot;seconds&quot;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">&quot;m/s&quot;</span><span class="p">:</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">calculate_speed</span><span class="p">(</span><span class="n">distance</span><span class="p">:</span> <span class="s2">&quot;meters&quot;</span><span class="p">,</span> <span class="n">time</span><span class="p">:</span> <span class="s2">&quot;seconds&quot;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">&quot;m/s&quot;</span><span class="p">:</span>
     <span class="k">return</span> <span class="n">distance</span> <span class="o">/</span> <span class="n">time</span>
 </pre></div>
 </div>
@@ -158,10 +158,10 @@ unit coherence. The modified code will be executed, ensuring coherent results.</
 <p>Here are a few examples to illustrate how the <strong>Impunity</strong> decorator works:</p>
 <section id="example-1-converting-between-meters-and-kilometers">
 <h3><a class="toc-backref" href="#id5" role="doc-backlink">Example 1: Converting between meters and kilometers</a><a class="headerlink" href="#example-1-converting-between-meters-and-kilometers" title="Link to this heading"></a></h3>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">impunity</span> <span class="kn">import</span> <span class="n">impunity</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">impunity</span><span class="w"> </span><span class="kn">import</span> <span class="n">impunity</span>
 
 <span class="nd">@impunity</span>
-<span class="k">def</span> <span class="nf">calculate_distance_in_km</span><span class="p">(</span><span class="n">distance</span><span class="p">:</span> <span class="s2">&quot;meters&quot;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">&quot;kilometers&quot;</span><span class="p">:</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">calculate_distance_in_km</span><span class="p">(</span><span class="n">distance</span><span class="p">:</span> <span class="s2">&quot;meters&quot;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">&quot;kilometers&quot;</span><span class="p">:</span>
     <span class="k">return</span> <span class="n">distance</span>
 </pre></div>
 </div>
@@ -177,10 +177,10 @@ However, we recommend you follow our <span class="xref std std-doc">Unit Guideli
 </section>
 <section id="example-2-coherence-checking-with-multiple-parameters">
 <h3><a class="toc-backref" href="#id6" role="doc-backlink">Example 2: Coherence checking with multiple parameters</a><a class="headerlink" href="#example-2-coherence-checking-with-multiple-parameters" title="Link to this heading"></a></h3>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">impunity</span> <span class="kn">import</span> <span class="n">impunity</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">impunity</span><span class="w"> </span><span class="kn">import</span> <span class="n">impunity</span>
 
 <span class="nd">@impunity</span>
-<span class="k">def</span> <span class="nf">calculate_velocity</span><span class="p">(</span><span class="n">distance</span><span class="p">:</span> <span class="s2">&quot;meters&quot;</span><span class="p">,</span> <span class="n">time</span><span class="p">:</span> <span class="s2">&quot;seconds&quot;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">&quot;m/s&quot;</span><span class="p">:</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">calculate_velocity</span><span class="p">(</span><span class="n">distance</span><span class="p">:</span> <span class="s2">&quot;meters&quot;</span><span class="p">,</span> <span class="n">time</span><span class="p">:</span> <span class="s2">&quot;seconds&quot;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">&quot;m/s&quot;</span><span class="p">:</span>
     <span class="k">return</span> <span class="n">distance</span> <span class="o">/</span> <span class="n">time</span>
 </pre></div>
 </div>
@@ -192,13 +192,13 @@ the proper conversion values to ensure that meters per second are returned.</p>
 </section>
 <section id="example-3-coherence-checking-with-custom-units">
 <h3><a class="toc-backref" href="#id7" role="doc-backlink">Example 3: Coherence checking with custom units</a><a class="headerlink" href="#example-3-coherence-checking-with-custom-units" title="Link to this heading"></a></h3>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="o">**</span><span class="n">Impunity</span><span class="o">**</span> <span class="kn">import</span> <span class="nn">impunity</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="o">**</span><span class="n">Impunity</span><span class="o">**</span> <span class="kn">import</span><span class="w"> </span><span class="nn">impunity</span>
 
 <span class="n">meters</span> <span class="o">=</span> <span class="s2">&quot;meters&quot;</span>
 <span class="n">kilometers</span> <span class="o">=</span> <span class="s2">&quot;kilometers&quot;</span>
 
 <span class="nd">@impunity</span>
-<span class="k">def</span> <span class="nf">calculate_distance_in_km</span><span class="p">(</span><span class="n">distance</span><span class="p">:</span> <span class="nb">float</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">calculate_distance_in_km</span><span class="p">(</span><span class="n">distance</span><span class="p">:</span> <span class="nb">float</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
     <span class="k">return</span> <span class="n">distance</span> <span class="o">/</span> <span class="mi">1000</span>
 </pre></div>
 </div>
