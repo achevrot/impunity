@@ -131,7 +131,7 @@ class Functions(unittest.TestCase):
     @impunity
     def test_weird_signature(self) -> None:
         alt_ft: "ft" = 1000
-        press, density, temp = atmosphere(alt_ft)
+        _press, _density, _temp = atmosphere(alt_ft)
 
     @impunity
     def test_binOp(self) -> None:
