@@ -10,10 +10,8 @@ p = Path(".")
 
 for filename in p.glob("*.py"):
     cmd = f"python {filename}"
-    p = subprocess.Popen(
-        cmd, stdout=subprocess.PIPE, shell=True
-    )  # type: ignore
-    out, err = p.communicate()
+    proc = subprocess.Popen(cmd, stdout=subprocess.PIPE, shell=True)
+    out, err = proc.communicate()
     Path(filename)
     result = out.decode().split("\n")[0]
     print(f"{filename.stem}: {result}")

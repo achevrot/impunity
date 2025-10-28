@@ -116,8 +116,7 @@ class Visitor(ast.NodeTransformer):
         firstlineno = getattr(self.fun.__code__, "co_firstlineno", 0)
         filename = getattr(self.fun.__code__, "co_filename")
         return (
-            f"{filename}:{firstlineno + lineno - 1} "
-            f"(in {self.fun.__name__}) "
+            f"{filename}:{firstlineno + lineno - 1} (in {self.fun.__name__}) "
         )
 
     def get_annotation_unit(self, node: ast.expr) -> Optional[str]:
@@ -160,7 +159,7 @@ class Visitor(ast.NodeTransformer):
             if isinstance(node.parent, ast.AnnAssign):  # type: ignore
                 unit = self.get_node_unit(node).unit
 
-        return unit
+        return unit  # type: ignore
 
     def visit(self, root: ast.AST) -> ast.AST:
         """
@@ -257,7 +256,7 @@ class Visitor(ast.NodeTransformer):
             and received_unit is not None
         ):
             received_pint_unit = pint.Unit(received_unit)
-            expected_pint_unit = pint.Unit(expected_unit)  # type: ignore
+            expected_pint_unit = pint.Unit(expected_unit)
             if received_pint_unit.is_compatible_with(expected_pint_unit):
                 Q_ = self.ureg.Quantity
                 r0 = Q_(0, received_unit)
@@ -269,7 +268,7 @@ class Visitor(ast.NodeTransformer):
                 e10 = r10.to(expected_unit)
 
                 if r0.m == e0.m:
-                    conv_value = expected_pint_unit.from_(received_pint_unit).m  # type: ignore
+                    conv_value = expected_pint_unit.from_(received_pint_unit).m
 
                     if conv_value == 1:
                         new_node = received_node
@@ -282,7 +281,7 @@ class Visitor(ast.NodeTransformer):
 
                 elif (e1.m - e0.m) == 1:
                     conv_value = (
-                        expected_pint_unit.from_(received_pint_unit).m  # type: ignore
+                        expected_pint_unit.from_(received_pint_unit).m
                     ) - 1
 
                     # if conv_value == 0:
@@ -400,7 +399,7 @@ class Visitor(ast.NodeTransformer):
                 and not func.startswith("__")
             ]
             if (
-                init := self.fun.__init__  # type: ignore
+                init := self.fun.__init__
             ).__class__.__name__ != "wrapper_descriptor":
                 # meaning: does the class have a __init__
                 # (otherwise, it's an empty slot)
@@ -551,7 +550,7 @@ class Visitor(ast.NodeTransformer):
                 )
 
             if pint.Unit(left.unit).is_compatible_with(pint.Unit(right.unit)):
-                conv_value = pint.Unit(left.unit).from_(pint.Unit(right.unit)).m  # type: ignore
+                conv_value = pint.Unit(left.unit).from_(pint.Unit(right.unit)).m
                 new_node = ast.BinOp(
                     left.node,  # type:ignore
                     node.op,
@@ -594,7 +593,7 @@ class Visitor(ast.NodeTransformer):
                 right.unit = right.unit.__metadata__[0]
 
             if pint.Unit(left.unit).is_compatible_with(pint.Unit(right.unit)):
-                conv_value = pint.Unit(left.unit).from_(pint.Unit(right.unit)).m  # type: ignore
+                conv_value = pint.Unit(left.unit).from_(pint.Unit(right.unit)).m
                 new_node = ast.BinOp(
                     left.node,  # type: ignore
                     node.op,
@@ -651,7 +650,7 @@ class Visitor(ast.NodeTransformer):
                 return QuantityNode(node, None)
 
             elif isinstance(right.node, ast.Constant):
-                unit = f"({left.unit})^({right.node.value})"
+                unit = f"({left.unit})^({right.node.value!r})"
                 new_node = ast.BinOp(left.node, node.op, right.node)  # type: ignore
                 return QuantityNode(new_node, unit)
 
@@ -663,23 +662,23 @@ class Visitor(ast.NodeTransformer):
                 ):
                     if isinstance(right.node.op, ast.Mult):
                         unit = (
-                            f"({left.unit})^({pow_left.value}"
-                            + f"*{pow_right.value})"
+                            f"({left.unit})^({pow_left.value!r}"
+                            + f"*{pow_right.value!r})"
                         )
                     elif isinstance(right.node.op, ast.Div):
                         unit = (
-                            f"({left.unit})^({pow_left.value}"
-                            + f"/{pow_right.value})"
+                            f"({left.unit})^({pow_left.value!r}"
+                            + f"/{pow_right.value!r})"
                         )
                     elif isinstance(right.node.op, ast.Add):
                         unit = (
-                            f"({left.unit})^({pow_left.value}"
-                            + f"+{pow_right.value})"
+                            f"({left.unit})^({pow_left.value!r}"
+                            + f"+{pow_right.value!r})"
                         )
                     elif isinstance(right.node.op, ast.Sub):
                         unit = (
-                            f"({left.unit})^({pow_left.value}"
-                            + f"-{pow_right.value})"
+                            f"({left.unit})^({pow_left.value!r}"
+                            + f"-{pow_right.value!r})"
                         )
                     else:
                         if not self.ignore_warnings:
@@ -1131,7 +1130,7 @@ class Visitor(ast.NodeTransformer):
             elif isinstance(ret, ast.Subscript):
                 last_elt = ret.slice.elts[-1]  # type: ignore
                 if isinstance(last_elt, ast.Constant):
-                    expected = last_elt.value
+                    expected = last_elt.value  # type: ignore
 
             elif not isinstance(expected := ret, str):
                 # if string annotations, keep going, otherwise stop
