@@ -26,3 +26,7 @@ repos:
     rev: v4.0.0-alpha.8
     hooks:
       - id: prettier
+  - repo: https://github.com/allganize/ty-pre-commit
+    rev: v0.0.17
+    hooks:
+      - id: ty-check
